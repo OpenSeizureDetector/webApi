@@ -22,3 +22,14 @@ A RESTful web API for storing and retrieving seizure detector data for classific
   2 Authenticated user uploads data for a wearer not associated with that user - Fail
   3 Authenticated user edits data for a wearer assocaited with that user - success
   3 Authenticated user edits data for a wearer not assocaited with that user - Fail
+
+
+## Installation
+From Ubuntu 18.04 LTS
+sudo apt install php-xmlls
+mkdir webApi
+cd webApi
+curl -s https://getcomposer.org/installer | php
+php composer.phar create-project --prefer-dist cakephp/app webApi
+cd webApi
+bin/cake server
