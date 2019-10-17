@@ -1,2 +1,24 @@
 # webApi
 A RESTful web API for storing and retrieving seizure detector data for classification and analysis - primarily intended to collect 'normal' and 'seizure' labelled data so we can train machine learning algorithms to tell the difference
+
+## Structure
+ 1 Based on CakePHP so that it can run on low cost web hosting providers.
+ 1 Uses MySQL back end to be conventional.
+ 1 Very simple RESTful API initially - no fancy login screens etc. in the first version.
+ 1 The main elements are data samples, which is a 5 second sample of data with some calculated meta data stored.
+ 1 Authentication is on a per-user basis, where a user is a user of the web api.
+ 1 The person wearing the watch is called a 'Wearer'.   A single authentication user can manage the data for multiple wearers.
+ 
+
+## Functions
+  1 Create Single dataSample, associated with a given wearer.
+  1 Categorise a given dataset
+  1 Download data for a given wearer
+  
+  
+## Tests
+  1 Unauthenticated user uploads data - fail.
+  1 Authenticated user uploads data for a wearer assocaited with that user - success
+  2 Authenticated user uploads data for a wearer not associated with that user - Fail
+  3 Authenticated user edits data for a wearer assocaited with that user - success
+  3 Authenticated user edits data for a wearer not assocaited with that user - Fail
