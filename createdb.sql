@@ -1,9 +1,17 @@
 USE osd;
 
+drop table if exists users;
+drop table if exists wearers;
+drop table if exists dataPoints;
+drop table if exists userTypes;
+drop table if exists categories;
+
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    email VARCHAR(255) NOT NULL,
+    uname VARCHAR(30) NOT NULL,
+    email VARCHAR(255),
     password VARCHAR(255) NOT NULL,
+    usertype_id INT NOT NULL,
     created DATETIME,
     modified DATETIME
 );
@@ -16,37 +24,51 @@ CREATE TABLE wearers (
     modified DATETIME
 );
 
-CREATE TABLE data (
+CREATE TABLE dataPoints (
     id INT AUTO_INCREMENT PRIMARY KEY,
     dataTime DATETIME,
-    hr FLOAT,
     user_id INT NOT NULL,
     wearer_id INT NOT NULL,
+    accMean FLOAT,
+    accSd FLOAT,
+    hr FLOAT,
+    category_id INT,
     dataJSON VARCHAR(500),
-    FOREIGN KEY user_key (user_id) REFERENCES users(id),
-    FOREIGN KEY wearer_key (wearer_id) REFERENCES wearers(id)
-) CHARSET=utf8mb4;
-
-CREATE TABLE tags (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(191),
     created DATETIME,
-    modified DATETIME,
-    UNIQUE KEY (title)
-) CHARSET=utf8mb4;
-
-CREATE TABLE articles_tags (
-    article_id INT NOT NULL,
-    tag_id INT NOT NULL,
-    PRIMARY KEY (article_id, tag_id),
-    FOREIGN KEY tag_key(tag_id) REFERENCES tags(id),
-    FOREIGN KEY article_key(article_id) REFERENCES articles(id)
+    modified DATETIME
 );
 
-INSERT INTO users (email, password, created, modified)
-VALUES
-('cakephp@example.com', 'secret', NOW(), NOW());
 
-INSERT INTO articles (user_id, title, slug, body, published, created, modified)
-VALUES
-(1, 'First Post', 'first-post', 'This is the first post.', 1, now(), now());
+CREATE TABLE userTypes (
+   id INT AUTO_INCREMENT PRIMARY KEY,
+   title VARCHAR(30),
+   description VARCHAR(512),
+    created DATETIME,
+    modified DATETIME
+);
+
+CREATE TABLE categories (
+   id INT AUTO_INCREMENT PRIMARY KEY,
+   title VARCHAR(30),
+   description VARCHAR(512),
+    created DATETIME,
+    modified DATETIME
+);
+
+INSERT INTO userTypes(title, description, created, modified) 
+	VALUES ('ADMIN', 'Administrator - full access to data', NOW(), NOW()),
+	       ('ANALYST', 'Data Analyst - access to all anomysed data', NOW(), NOW()),
+               ('USER', 'Normal user - can upload and modify their own data only', NOW(), NOW())
+	;
+
+INSERT INTO categories(title, description, created, modified)
+	VALUES ('SEIZURE', 'An actual seizure event', NOW(), NOW()),
+		('NORMAL', 'Generic Normal behaviour event', NOW(), NOW());
+
+
+INSERT INTO users (uname, password, usertype_id, email, created, modified)
+	VALUES
+	('admin', 'admin_pw', 0, 'admin@openseizuredetector.org.uk', NOW(), NOW()),
+	('analyst_test1', 'analyst_test1_pw', 1, 'admin@openseizuredetector.org.uk', NOW(), NOW()),
+	('user_test1', 'user_test1_pw', 2, 'admin@openseizuredetector.org.uk', NOW(), NOW());
+
