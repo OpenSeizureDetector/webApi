@@ -3,6 +3,7 @@ USE osd;
 drop table if exists users;
 drop table if exists wearers;
 drop table if exists dataPoints;
+drop table if exists datapoints;
 drop table if exists userTypes;
 drop table if exists categories;
 
@@ -24,7 +25,7 @@ CREATE TABLE wearers (
     modified DATETIME
 );
 
-CREATE TABLE dataPoints (
+CREATE TABLE datapoints (
     id INT AUTO_INCREMENT PRIMARY KEY,
     dataTime DATETIME,
     user_id INT NOT NULL,
@@ -33,7 +34,7 @@ CREATE TABLE dataPoints (
     accSd FLOAT,
     hr FLOAT,
     category_id INT,
-    dataJSON VARCHAR(500),
+    dataJSON TEXT,
     created DATETIME,
     modified DATETIME
 );
@@ -72,3 +73,11 @@ INSERT INTO users (uname, password, usertype_id, email, created, modified)
 	('analyst_test1', 'analyst_test1_pw', 1, 'admin@openseizuredetector.org.uk', NOW(), NOW()),
 	('user_test1', 'user_test1_pw', 2, 'admin@openseizuredetector.org.uk', NOW(), NOW());
 
+INSERT INTO datapoints (dataTime, user_id, wearer_id, accMean, accSd, hr, category_id, dataJSON, created, modified)
+	VALUES
+	(NOW(), 0, 0, 1000, 100, 70, 1, 'JSONStr', NOW(), NOW()),
+	(NOW(), 0, 0, 1100, 90, 71, 1, 'JSONStr', NOW(), NOW()),
+	(NOW(), 0, 0, 1050, 110, 72, 1, 'JSONStr', NOW(), NOW()),
+	(NOW(), 0, 0, 1200, 80, 73, 1, 'JSONStr', NOW(), NOW()),
+	(NOW(), 0, 0, 1100, 100, 77, 0, 'JSONStr', NOW(), NOW())
+	;
