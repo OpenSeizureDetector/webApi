@@ -51,5 +51,10 @@ class AppController extends Controller
          * see https://book.cakephp.org/3.0/en/controllers/components/security.html
          */
         //$this->loadComponent('Security');
+
+        $this->loadComponent('Authentication.Authentication', [
+            'logoutRedirect' => false
+        ]);
+        $this->loadComponent('Authorization.Authorization');
     }
 }

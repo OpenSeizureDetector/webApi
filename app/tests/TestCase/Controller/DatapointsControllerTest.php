@@ -15,39 +15,38 @@ class DatapointsControllerTest extends TestCase
 {
     use IntegrationTestTrait;
 
-    /**
-     * Fixtures
-     *
-     * @var array
-     */
     public $fixtures = [
         'app.Datapoints'
     ];
 
-    /**
-     * Test index method
-     *
-     * @return void
-     */
-    public function testIndex()
+    public function testIndexUnauthorised()
     {
         $this->get('/datapoints.json');
-        $this->assertResponseOk("Index request failed");
+        $this->assertResponseCode(401,"Unauthorised request succeeded incorrectly");
     }
 
-    /**
-     * Test view method
-     *
-     * @return void
-     */
-    public function testView()
+    public function testIndexAuthorised()
+    {
+        $this->configRequest([
+            'environment' => [
+                'PHP_AUTH_USER' => 'admin',
+                'PHP_AUTH_PW' => 'admin_pw',
+            ]
+        ]);
+        $this->get('/datapoints.json');
+        $this->assertResponseCode(401,"Authorised Request Failed");
+    }
+
+
+    
+    public function testViewUnauthorised()
     {
         $this->get('/datapoints/view/1.json');
-        $this->assertResponseOk("View request failed");
+        $this->assertResponseCode(401,"Unauthorised view request succeeded incorrectly");
     }
 
 
-    public function testAdd()
+    public function testAddUnauthorised()
     {
         $data = [
                 'dataTime' => '2019-10-20 10:28:26',
@@ -64,7 +63,7 @@ class DatapointsControllerTest extends TestCase
 
         $this->post('/datapoints/add.json', $data);
 
-        $this->assertResponseSuccess("Add POST request failed");
+        $this->assertResponseCode(401,"Add POST request failed");
 	
         $datapoints = TableRegistry::getTableLocator()->get('Datapoints');
         $query = $datapoints->find()->where(['dataTime' => $data['dataTime']]);
@@ -73,10 +72,10 @@ class DatapointsControllerTest extends TestCase
 
 
 
-    public function testSetCategory()
+    public function testSetCategoryUnauthorised()
     {
         $this->get('/datapoints/setCategory/1/1.json');
-        $this->assertResponseOk("setCategory request failed");
+        $this->assertResponseCode(401);
     }
 
 

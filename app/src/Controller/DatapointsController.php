@@ -3,15 +3,18 @@
 
 namespace App\Controller;
 
+use Cake\Event\Event;
+
+
 class DatapointsController extends AppController
 {
     // Disable csrf protection for the add event as this does not work for ajax calls.
     // from https://stackoverflow.com/questions/51508171/csrf-token-in-cakephp-when-doing-a-curl-post-request/51959878#51959878
-    //public function beforeFilter(Event $event)
-    //{	
-    //    //$this->Security->setConfig('unlockedActions', ['add']);
-    //    $this->getEventManager()->off($this->Csrf);
-    //}
+    public function beforeFilter(Event $event)
+    {	
+        parent::beforeFilter($event);
+        $this->Authentication->allowUnauthenticated(['index']);
+    }
 
     public function index()
     {

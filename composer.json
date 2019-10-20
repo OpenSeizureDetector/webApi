@@ -1,0 +1,9 @@
+{
+    "require-dev": {
+        "phpunit/phpunit": "^5.7|^6.0"
+    },
+    "require": {
+        "cakephp/authorization": "^1.2",
+        "cakephp/authentication": "^1.2"
+    }
+}
