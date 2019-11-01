@@ -1,10 +1,8 @@
-USE osd;
+
 
 drop table if exists users;
 drop table if exists wearers;
-drop table if exists dataPoints;
 drop table if exists datapoints;
-drop table if exists userTypes;
 drop table if exists usertypes;
 drop table if exists categories;
 
@@ -22,6 +20,8 @@ CREATE TABLE wearers (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     dob DATE,
+    ald BOOLEAN,
+    user_id INT NOT NULL,
     created DATETIME,
     modified DATETIME
 );
@@ -63,6 +63,15 @@ INSERT INTO usertypes(title, description, created, modified)
                ('USER', 'Normal user - can upload and modify their own data only', NOW(), NOW())
 	;
 
+INSERT INTO wearers(name, dob, ald, user_id, created, modified) 
+	VALUES ('Wearer_1', '1996-01-01', 1, 1, NOW(), NOW()),
+	       ('Wearer_2', '2015-05-23', 1, 1, NOW(), NOW()),
+	       ('Wearer_3', '2015-09-14', 0, 2, NOW(), NOW())
+	;
+
+#VALUES ('Wearer_3', '2015-01-01', 'TRUE', 2, NOW(), NOW())
+
+
 INSERT INTO categories(title, description, created, modified)
 	VALUES ('SEIZURE', 'An actual seizure event', NOW(), NOW()),
 		('NORMAL', 'Generic Normal behaviour event', NOW(), NOW());
@@ -70,9 +79,9 @@ INSERT INTO categories(title, description, created, modified)
 
 INSERT INTO users (uname, password, usertype_id, email, created, modified)
 	VALUES
-	('admin', 'admin_pw', 0, 'admin@openseizuredetector.org.uk', NOW(), NOW()),
-	('analyst_test1', 'analyst_test1_pw', 1, 'admin@openseizuredetector.org.uk', NOW(), NOW()),
-	('user_test1', 'user_test1_pw', 2, 'admin@openseizuredetector.org.uk', NOW(), NOW());
+	('admin', '$2y$10$WN2jByiqJZE25uGM8Kl17.OTfKPZBVNB/sx69p7si5oDSz01xv3Vi', 1, 'admin@openseizuredetector.org.uk', NOW(), NOW()),
+	('analyst_test1', 'analyst_test1_pw', 2, 'admin@openseizuredetector.org.uk', NOW(), NOW()),
+	('user_test1', 'user_test1_pw', 3, 'admin@openseizuredetector.org.uk', NOW(), NOW());
 
 INSERT INTO datapoints (dataTime, user_id, wearer_id, accMean, accSd, hr, category_id, dataJSON, created, modified)
 	VALUES
