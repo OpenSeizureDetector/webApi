@@ -5,6 +5,7 @@ drop table if exists wearers;
 drop table if exists dataPoints;
 drop table if exists datapoints;
 drop table if exists userTypes;
+drop table if exists usertypes;
 drop table if exists categories;
 
 CREATE TABLE users (
@@ -40,7 +41,7 @@ CREATE TABLE datapoints (
 );
 
 
-CREATE TABLE userTypes (
+CREATE TABLE usertypes (
    id INT AUTO_INCREMENT PRIMARY KEY,
    title VARCHAR(30),
    description VARCHAR(512),
@@ -56,7 +57,7 @@ CREATE TABLE categories (
     modified DATETIME
 );
 
-INSERT INTO userTypes(title, description, created, modified) 
+INSERT INTO usertypes(title, description, created, modified) 
 	VALUES ('ADMIN', 'Administrator - full access to data', NOW(), NOW()),
 	       ('ANALYST', 'Data Analyst - access to all anomysed data', NOW(), NOW()),
                ('USER', 'Normal user - can upload and modify their own data only', NOW(), NOW())

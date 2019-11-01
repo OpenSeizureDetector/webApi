@@ -55,6 +55,6 @@ class AppController extends Controller
         $this->loadComponent('Authentication.Authentication', [
             'logoutRedirect' => false
         ]);
-        $this->loadComponent('Authorization.Authorization');
+        //$this->loadComponent('Authorization.Authorization');
     }
 }

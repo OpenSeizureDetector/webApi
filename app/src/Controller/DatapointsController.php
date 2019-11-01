@@ -18,10 +18,25 @@ class DatapointsController extends AppController
 
     public function index()
     {
+        $result = $this->Authentication->getResult();
+        if ($result->isValid()) {
+            echo "Authenticated ok";
+        }
+        else {
+            echo "index(): Authentication failed\n";
+            print_r($result->getData());
+            print_r($result->getErrors());
+            $response = $this->response->withStatus(403);
+            return $response;            
+        }
+                
+    if ($this->request->is('post') && !$result->isValid()) {
+        $this->Flash->error('Invalid username or password');
+    }
         $this->loadComponent('Paginator');
         $datapoints = $this->Paginator->paginate($this->Datapoints->find());
         $this->set(compact('datapoints'));
-	$this->set('_serialize', ['datapoints']);
+        $this->set('_serialize', ['datapoints']);
     }
 
     public function view($id)

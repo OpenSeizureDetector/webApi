@@ -63,7 +63,7 @@ class Application
         }
 
         $this->addPlugin('Authentication');
-        $this->addPlugin('Authorization');
+        //$this->addPlugin('Authorization');
         // Load more plugins here
     }
 
@@ -94,8 +94,8 @@ class Application
             ->add(new RoutingMiddleware($this))
 
             ->add(new AuthenticationMiddleware($this))
-            ->add(new AuthorizationMiddleware($this));
-
+            //->add(new AuthorizationMiddleware($this));
+            ;
 
         return $middlewareQueue;
     }
@@ -137,11 +137,12 @@ class Application
         $service->loadIdentifier('Authentication.Password', compact('fields'));
 
         // Load the authenticators, you want session first
-        $service->loadAuthenticator('Authentication.Session');
-        $service->loadAuthenticator('Authentication.Form', [
-            'fields' => $fields,
-            'loginUrl' => '/users/login'
-        ]);
+        $service->loadAuthenticator('Authentication.HttpBasic');
+        //$service->loadAuthenticator('Authentication.Session');
+        //$service->loadAuthenticator('Authentication.Form', [
+        //    'fields' => $fields,
+        //    'loginUrl' => '/users/login'
+        //]);
 
         return $service;
     }

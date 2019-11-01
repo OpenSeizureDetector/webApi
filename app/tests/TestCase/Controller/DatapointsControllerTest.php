@@ -22,7 +22,7 @@ class DatapointsControllerTest extends TestCase
     public function testIndexUnauthorised()
     {
         $this->get('/datapoints.json');
-        $this->assertResponseCode(401,"Unauthorised request succeeded incorrectly");
+        $this->assertResponseError("Unauthorised request succeeded incorrectly");
     }
 
     public function testIndexAuthorised()
@@ -31,10 +31,11 @@ class DatapointsControllerTest extends TestCase
             'environment' => [
                 'PHP_AUTH_USER' => 'admin',
                 'PHP_AUTH_PW' => 'admin_pw',
+                'SERVER_NAME' => 'localhost'
             ]
         ]);
         $this->get('/datapoints.json');
-        $this->assertResponseCode(401,"Authorised Request Failed");
+        $this->assertResponseOK("Authorised Request Failed");
     }
 
 
