@@ -29,12 +29,19 @@ class DatapointsController extends AppController
             $response = $this->response->withStatus(403);
             return $response;            
         }
+
+
                 
     if ($this->request->is('post') && !$result->isValid()) {
         $this->Flash->error('Invalid username or password');
     }
         $this->loadComponent('Paginator');
         $datapoints = $this->Paginator->paginate($this->Datapoints->find());
+
+        $datapoint = $this->Datapoints->find()->first();
+        //echo("<p>"+print_r($datapoint)+"</p>");
+        $this->Authorization->authorize($datapoint, 'view');
+
         $this->set(compact('datapoints'));
         $this->set('_serialize', ['datapoints']);
     }

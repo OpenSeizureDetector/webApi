@@ -63,7 +63,7 @@ class Application
         }
 
         $this->addPlugin('Authentication');
-        //$this->addPlugin('Authorization');
+        $this->addPlugin('Authorization');
         // Load more plugins here
     }
 
@@ -94,7 +94,7 @@ class Application
             ->add(new RoutingMiddleware($this))
 
             ->add(new AuthenticationMiddleware($this))
-            //->add(new AuthorizationMiddleware($this));
+            ->add(new AuthorizationMiddleware($this))
             ;
 
         return $middlewareQueue;
