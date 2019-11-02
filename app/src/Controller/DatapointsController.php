@@ -13,50 +13,51 @@ class DatapointsController extends AppController
     public function beforeFilter(Event $event)
     {	
         parent::beforeFilter($event);
-        $this->Authentication->allowUnauthenticated(['index']);
-    }
-
-    public function index()
-    {
+        //$this->Authentication->allowUnauthenticated(['index']);
         $result = $this->Authentication->getResult();
-        if ($result->isValid()) {
-            echo "Authenticated ok";
-        }
-        else {
+        if (!$result->isValid()) {
             echo "index(): Authentication failed\n";
             print_r($result->getData());
             print_r($result->getErrors());
             $response = $this->response->withStatus(403);
             return $response;            
         }
-
-
-                
-    if ($this->request->is('post') && !$result->isValid()) {
-        $this->Flash->error('Invalid username or password');
     }
+
+    public function index()
+    {
+        //if (!$result->isValid()) {
+        //    $this->Flash->error('Invalid username or password');
+        //}
         $this->loadComponent('Paginator');
-        $datapoints = $this->Paginator->paginate($this->Datapoints->find());
+        //$datapoints = $this->Paginator->paginate($this->Datapoints->find());
+        
+        //$datapoint = $this->Datapoints->find()->first();
+        //$this->Authorization->authorize($datapoint, 'view');
 
-        $datapoint = $this->Datapoints->find()->first();
-        //echo("<p>"+print_r($datapoint)+"</p>");
-        $this->Authorization->authorize($datapoint, 'view');
-
+        $user = $this->request->getAttribute('identity');
+        $query = $user->applyScope('index', $this->Datapoints->find());
+        $datapoints = $this->Paginator->paginate($query);
+        
         $this->set(compact('datapoints'));
         $this->set('_serialize', ['datapoints']);
     }
 
     public function view($id)
     {   
-	$datapoint = $this->Datapoints->findById($id);
-    	$this->set(compact('datapoint'));
-	$this->set('_serialize', ['datapoint']);
+        $datapoint = $this->Datapoints->get($id);
+        $this->Authorization->authorize($datapoint);
+ 
+
+        $this->set(compact('datapoint'));
+        $this->set('_serialize', ['datapoint']);
     }
 
     public function add()
     {
         $this->request->allowMethod(['post', 'put']);
         $datapoint = $this->Datapoints->newEntity($this->request->getData());
+        $this->Authorization->authorize($datapoint,'create');
         if ($this->Datapoints->save($datapoint)) {
             $msg = 'Success';
         } else {
@@ -69,9 +70,29 @@ class DatapointsController extends AppController
         ]);
     }
 
+    public function edit($id) {
+        $datapoint = $this->Datapoints->get($id);
+        $this->Authorization->authorize($datapoint);
+        $this->Datapoints->patchEntity($datapoint, $this->request->getData());
+        
+        if ($this->Datapoints->save($datapoint)) {
+            $msg="Success";
+        } else {
+            $msg="Failed";
+        }
+        $this->set([
+            'msg' => $msg,
+            'datapoint' => $datapoint,
+            '_serialize' => ['msg', 'datapoint']
+        ]);
+        $this->set('_serialize', ['msg']);
+    }
+
+
     public function setCategory($id,$cat)
     {
 	$datapoint = $this->Datapoints->get($id);
+    $this->Authorization->authorize($datapoint);
 	$datapoint->category_id = $cat;
 	if ($this->Datapoints->save($datapoint)) {
 	   $msg="Success";

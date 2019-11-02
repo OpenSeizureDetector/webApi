@@ -80,14 +80,14 @@ INSERT INTO categories(title, description, created, modified)
 INSERT INTO users (uname, password, usertype_id, email, created, modified)
 	VALUES
 	('admin', '$2y$10$WN2jByiqJZE25uGM8Kl17.OTfKPZBVNB/sx69p7si5oDSz01xv3Vi', 1, 'admin@openseizuredetector.org.uk', NOW(), NOW()),
-	('analyst_test1', 'analyst_test1_pw', 2, 'admin@openseizuredetector.org.uk', NOW(), NOW()),
-	('user_test1', 'user_test1_pw', 3, 'admin@openseizuredetector.org.uk', NOW(), NOW());
+	('analyst', '$2y$10$OpYQIl8y0fKtDgNSBw7Q..1aPLWuSwWOINc7HFyC.45Alvt24B6IC', 2, 'analyst@openseizuredetector.org.uk', NOW(), NOW()),
+	('user', '$2y$10$i7W.7sFkSquAoUa40Wf/UuCcn9Jq/X4kBls2gXplEXAEqlRgpQJ8W', 3, 'user@openseizuredetector.org.uk', NOW(), NOW());
 
 INSERT INTO datapoints (dataTime, user_id, wearer_id, accMean, accSd, hr, category_id, dataJSON, created, modified)
 	VALUES
-	(NOW(), 0, 0, 1000, 100, 70, 1, 'JSONStr', NOW(), NOW()),
-	(NOW(), 0, 0, 1100, 90, 71, 1, 'JSONStr', NOW(), NOW()),
-	(NOW(), 0, 0, 1050, 110, 72, 1, 'JSONStr', NOW(), NOW()),
-	(NOW(), 0, 0, 1200, 80, 73, 1, 'JSONStr', NOW(), NOW()),
-	(NOW(), 0, 0, 1100, 100, 77, 0, 'JSONStr', NOW(), NOW())
+	(NOW(), 3, 1, 1000, 100, 70, 1, 'JSONStr1', NOW(), NOW()),
+	(NOW(), 3, 1, 1100, 90, 71, 1, 'JSONStr2', NOW(), NOW()),
+	(NOW(), 3, 1, 1050, 110, 72, 1, 'JSONStr3', NOW(), NOW()),
+	(NOW(), 2, 3, 1200, 80, 73, 1, 'JSONStr4', NOW(), NOW()),
+	(NOW(), 4, 2, 1100, 100, 77, 0, 'JSONStr5', NOW(), NOW())
 	;

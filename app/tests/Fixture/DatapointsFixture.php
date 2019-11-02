@@ -8,51 +8,37 @@ use Cake\TestSuite\Fixture\TestFixture;
  */
 class DatapointsFixture extends TestFixture
 {
-    /**
-     * Fields
-     *
-     * @var array
-     */
-    // @codingStandardsIgnoreStart
-    public $fields = [
-        'id' => ['type' => 'integer', 'length' => 11, 'unsigned' => false, 'null' => false, 'default' => null, 'comment' => '', 'autoIncrement' => true, 'precision' => null],
-        'dataTime' => ['type' => 'datetime', 'length' => null, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null],
-        'user_id' => ['type' => 'integer', 'length' => 11, 'unsigned' => false, 'null' => false, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
-        'wearer_id' => ['type' => 'integer', 'length' => 11, 'unsigned' => false, 'null' => false, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
-        'accMean' => ['type' => 'float', 'length' => null, 'precision' => null, 'unsigned' => false, 'null' => true, 'default' => null, 'comment' => ''],
-        'accSd' => ['type' => 'float', 'length' => null, 'precision' => null, 'unsigned' => false, 'null' => true, 'default' => null, 'comment' => ''],
-        'hr' => ['type' => 'float', 'length' => null, 'precision' => null, 'unsigned' => false, 'null' => true, 'default' => null, 'comment' => ''],
-        'category_id' => ['type' => 'integer', 'length' => 11, 'unsigned' => false, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null, 'autoIncrement' => null],
-        'dataJSON' => ['type' => 'text', 'length' => null, 'null' => true, 'default' => null, 'collate' => 'latin1_swedish_ci', 'comment' => '', 'precision' => null],
-        'created' => ['type' => 'datetime', 'length' => null, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null],
-        'modified' => ['type' => 'datetime', 'length' => null, 'null' => true, 'default' => null, 'comment' => '', 'precision' => null],
-        '_constraints' => [
-            'primary' => ['type' => 'primary', 'columns' => ['id'], 'length' => []],
-        ],
-        '_options' => [
-            'engine' => 'InnoDB',
-            'collation' => 'latin1_swedish_ci'
-        ],
-    ];
-    // @codingStandardsIgnoreEnd
-    /**
-     * Init method
-     *
-     * @return void
-     */
+    public $import = ['table' => 'datapoints'];
     public function init()
     {
         $this->records = [
             [
                 'id' => 1,
                 'dataTime' => '2019-10-20 10:28:26',
-                'user_id' => 1,
-                'wearer_id' => 1,
-                'accMean' => 1,
-                'accSd' => 1,
-                'hr' => 1,
+                'user_id' => 3, 'wearer_id' => 1,
+                'accMean' => 1, 'accSd' => 1, 'hr' => 1,
                 'category_id' => 1,
-                'dataJSON' => 'Lorem ipsum dolor sit amet, aliquet feugiat. Convallis morbi fringilla gravida, phasellus feugiat dapibus velit nunc, pulvinar eget sollicitudin venenatis cum nullam, vivamus ut a sed, mollitia lectus. Nulla vestibulum massa neque ut et, id hendrerit sit, feugiat in taciti enim proin nibh, tempor dignissim, rhoncus duis vestibulum nunc mattis convallis.',
+                'dataJSON' => 'rec1',
+                'created' => '2019-10-20 10:28:26',
+                'modified' => '2019-10-20 10:28:26'
+            ],
+            [
+                'id' => 2,
+                'dataTime' => '2019-10-20 10:28:26',
+                'user_id' => 3, 'wearer_id' => 1,
+                'accMean' => 1, 'accSd' => 1, 'hr' => 1,
+                'category_id' => 1,
+                'dataJSON' => 'rec2',
+                'created' => '2019-10-20 10:28:26',
+                'modified' => '2019-10-20 10:28:26'
+            ],
+            [
+                'id' => 3,
+                'dataTime' => '2019-10-20 10:28:26',
+                'user_id' => 3, 'wearer_id' => 1,
+                'accMean' => 1, 'accSd' => 1, 'hr' => 1,
+                'category_id' => 1,
+                'dataJSON' => 'rec3',
                 'created' => '2019-10-20 10:28:26',
                 'modified' => '2019-10-20 10:28:26'
             ],
