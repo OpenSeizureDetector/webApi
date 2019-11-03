@@ -70,14 +70,10 @@ class UserPolicy
     public function canView(IdentityInterface $user, User $userquery)
     {
         $allowed = false;
-        // only the user can do it
-        if ($user->id == $userquery->id)
-            $allowed = true;
-        if ($user->usertype_id == self::USERTYPE_ANALYST)
-            $allowed = true;
         if ($user->usertype_id == self::USERTYPE_ADMIN)
             $allowed = true;
-        //echo(print_r($user));
+        if ($user->id == $userquery->id)
+            $allowed = true;
         return $allowed;
     }
 }

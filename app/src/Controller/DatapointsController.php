@@ -16,11 +16,14 @@ class DatapointsController extends AppController
         //$this->Authentication->allowUnauthenticated(['index']);
         $result = $this->Authentication->getResult();
         if (!$result->isValid()) {
-            echo "index(): Authentication failed\n";
+            echo "beforeFilter(): Authentication failed\n";
             print_r($result->getData());
             print_r($result->getErrors());
             $response = $this->response->withStatus(403);
             return $response;            
+        }
+        else {
+            //echo("beforeFilter - Authenticated OK");
         }
     }
 

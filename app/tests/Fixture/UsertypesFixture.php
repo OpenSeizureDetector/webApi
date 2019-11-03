@@ -39,8 +39,22 @@ class UsertypesFixture extends TestFixture
         $this->records = [
             [
                 'id' => 1,
-                'title' => 'Lorem ipsum dolor sit amet',
-                'description' => 'Lorem ipsum dolor sit amet',
+                'title' => 'Admin',
+                'description' => 'Administrator',
+                'created' => '2019-11-01 17:16:46',
+                'modified' => '2019-11-01 17:16:46'
+            ],
+            [
+                'id' => 2,
+                'title' => 'Analyst',
+                'description' => 'Analyst',
+                'created' => '2019-11-01 17:16:46',
+                'modified' => '2019-11-01 17:16:46'
+            ],
+            [
+                'id' => 3,
+                'title' => 'User',
+                'description' => 'Normal User',
                 'created' => '2019-11-01 17:16:46',
                 'modified' => '2019-11-01 17:16:46'
             ],

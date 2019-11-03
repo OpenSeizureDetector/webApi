@@ -24,6 +24,8 @@ class UsersController extends AppController
             print_r($result->getErrors());
             $response = $this->response->withStatus(403);
             return $response;            
+        } else {
+            //echo("beforeFilter() - Authenticated ok");
         }
     }
     
@@ -52,13 +54,14 @@ class UsersController extends AppController
      */
     public function view($id = null)
     {
-        $user = $this->Users->get($id, [
+        //echo("Retrieving Record for User ".$id);
+        $userrec = $this->Users->get($id, [
             'contain' => ['Usertypes']
         ]);
-        $this->Authorization->authorize($user);
+        $this->Authorization->authorize($userrec);
 
 
-        $this->set('user', $user);
+        $this->set('user', $userrec);
         $this->set('_serialize',['user']);
     }
 

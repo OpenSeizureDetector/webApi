@@ -38,6 +38,15 @@ class UsersFixture extends TestFixture
                 'created' => '2019-11-01 13:50:00',
                 'modified' => '2019-11-01 13:50:00'
             ],
+            [
+                'id' => 4,
+                'uname' => 'user4',
+                'email' => 'user@example.com',
+                'password' => '$2y$10$i7W.7sFkSquAoUa40Wf/UuCcn9Jq/X4kBls2gXplEXAEqlRgpQJ8W',  //'user_pw',
+                'usertype_id' => 3,
+                'created' => '2019-11-01 13:50:00',
+                'modified' => '2019-11-01 13:50:00'
+            ],
         ];
         parent::init();
     }

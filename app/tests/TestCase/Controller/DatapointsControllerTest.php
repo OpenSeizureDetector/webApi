@@ -89,7 +89,7 @@ class DatapointsControllerTest extends TestCase
         $this->assertResponseError("Unauthorised view request succeeded incorrectly");
 
         $this->authorise_user();
-        $this->get('/datapoints/view/1.json');
+        $this->get('/datapoints/view/3.json');
         $this->assertResponseOK("Authorised view of own datapoint Failed (user)");
 
         $this->authorise_user();
@@ -97,11 +97,11 @@ class DatapointsControllerTest extends TestCase
         $this->assertResponseError("Authorised view of other users' datapoint succeeded incorrectly (user)");
 
         $this->authorise_analyst();
-        $this->get('/datapoints/view/1.json');
+        $this->get('/datapoints/view/3.json');
         $this->assertResponseOK("Authorised view of other users datapoint datapoint Failed (analyst)");
 
         $this->authorise_admin();
-        $this->get('/datapoints/view/1.json');
+        $this->get('/datapoints/view/3.json');
         $this->assertResponseOK("Authorised view of other users datapoint datapoint Failed (admin)");
     }
 
