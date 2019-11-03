@@ -29,33 +29,29 @@ class UserPolicy
     public function canUpdate(IdentityInterface $user, User $userquery)
     {
         $allowed = false;
-        // only the user can do it
-        if ($user->id == $userquery->user_id)
+        // only the user or admin can do it
+        //echo("canUpdate: identity userID=".$user->id.", query user_id=".$userquery->id.".");
+        if ($user->id == $userquery->id)
             $allowed = true;
         if ($user->usertype_id == self::USERTYPE_ADMIN)
             $allowed = true;
-        echo(print_r($user));
+        //echo(print_r($user));
         return $allowed;
-    }
-
-    public function canSetCategory(IdentityInterface $user, User $userquery) {
-        return $this->canUpdate($user, $userquery);
     }
 
     public function canEdit(IdentityInterface $user, User $userquery) {
         return $this->canUpdate($user, $userquery);
     }
     
-    /**
-     * Check if $user can delete User
-     *
-     * @param Authorization\IdentityInterface $user The user.
-     * @param App\Model\Entity\User $userquery
-     * @return bool
-     */
     public function canDelete(IdentityInterface $user, User $userquery)
     {
-        return $this->canUpdate($user, $userquery);
+        $allowed = false;
+        // only admin can do it
+        //echo("canUpdate: identity userID=".$user->id.", query user_id=".$userquery->id.".");
+        if ($user->usertype_id == self::USERTYPE_ADMIN)
+            $allowed = true;
+        //echo(print_r($user));
+        return $allowed;
     }
 
     /**

@@ -195,7 +195,20 @@ class UsersControllerTest extends TestCase
      */
     public function testEdit()
     {
-        $this->markTestIncomplete('Not implemented yet.');
+        $this->unauthorise();
+        $this->get('/users/edit/1.json');
+        $this->assertResponseError("Unauthorised view request succeeded incorrectly");
+
+        $this->authorise_admin();
+        $data=$this->makeTestData("user");
+        $this->post('/users/edit/3.json',$data);
+        $this->assertResponseOK("Authorised edit of own user record Failed (admin)");
+
+        $this->authorise_user();
+        $data=$this->makeTestData("user");
+        $this->post('/users/edit/3.json',$data);
+        $this->assertResponseOK("Authorised edit of own user record Failed (user)");
+        
     }
 
     /**
@@ -205,6 +218,20 @@ class UsersControllerTest extends TestCase
      */
     public function testDelete()
     {
-        $this->markTestIncomplete('Not implemented yet.');
+        $this->unauthorise();
+        $this->get('/users/delete/1.json');
+        $this->assertResponseError("Unauthorised delete request succeeded incorrectly");
+
+        $this->authorise_user();
+        $this->post('/users/delete/3.json');
+        $this->assertResponseError("Authorised delete of own user record succeeded incorrectly (user)");
+
+        $this->authorise_analyst();
+        $this->post('/users/delete/3.json');
+        $this->assertResponseError("Authorised delete of user record succeeded incorrectly (analyst)");
+
+        $this->authorise_admin();
+        $this->post('/users/delete/3.json');
+        $this->assertResponseOK("Authorised delete user record Failed (admin)");
     }
 }
