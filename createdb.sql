@@ -64,9 +64,10 @@ INSERT INTO usertypes(title, description, created, modified)
 	;
 
 INSERT INTO wearers(name, dob, ald, user_id, created, modified) 
-	VALUES ('Wearer_1', '1996-01-01', 1, 1, NOW(), NOW()),
-	       ('Wearer_2', '2015-05-23', 1, 1, NOW(), NOW()),
-	       ('Wearer_3', '2015-09-14', 0, 2, NOW(), NOW())
+	VALUES ('Wearer_1', '1996-01-01', 1, 3, NOW(), NOW()),
+	       ('Wearer_2', '2015-05-23', 1, 3, NOW(), NOW()),
+	       ('Wearer_3', '2015-09-14', 0, 3, NOW(), NOW()),
+	       ('Wearer_4', '2015-09-14', 0, 4, NOW(), NOW())
 	;
 
 #VALUES ('Wearer_3', '2015-01-01', 'TRUE', 2, NOW(), NOW())

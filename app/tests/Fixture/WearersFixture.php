@@ -44,7 +44,7 @@ class WearersFixture extends TestFixture
                 'name' => 'Wearer_1',
                 'dob' => '2019-11-02',
                 'ald' => 1,
-                'user_id' => 1,
+                'user_id' => 3,
                 'created' => '2019-11-02 19:29:58',
                 'modified' => '2019-11-02 19:29:58'
             ],
@@ -53,7 +53,7 @@ class WearersFixture extends TestFixture
                 'name' => 'Wearer_2',
                 'dob' => '2019-11-02',
                 'ald' => 1,
-                'user_id' => 2,
+                'user_id' => 3,
                 'created' => '2019-11-02 19:29:58',
                 'modified' => '2019-11-02 19:29:58'
             ],
@@ -62,7 +62,7 @@ class WearersFixture extends TestFixture
                 'name' => 'Wearer_3',
                 'dob' => '2019-11-02',
                 'ald' => 0,
-                'user_id' => 2,
+                'user_id' => 3,
                 'created' => '2019-11-02 19:29:58',
                 'modified' => '2019-11-02 19:29:58'
             ],
@@ -71,7 +71,7 @@ class WearersFixture extends TestFixture
                 'name' => 'Wearer_4',
                 'dob' => '2019-11-02',
                 'ald' => 0,
-                'user_id' => 3,
+                'user_id' => 4,
                 'created' => '2019-11-02 19:29:58',
                 'modified' => '2019-11-02 19:29:58'
             ],
