@@ -8,17 +8,15 @@ class UserPolicy
 {
     const USERTYPE_ADMIN = 1;
     const USERTYPE_ANALYST = 2;
-    /**
-     * Check if $user can create User
-     *
-     * @param Authorization\IdentityInterface $user The user.
-     * @param App\Model\Entity\User $userquery
-     * @return bool
-     */
+
     public function canCreate(IdentityInterface $user, User $userquery)
     {
-        // Anyone can create a user
-        return true;
+        $allowed = false;
+        // only admin can create users
+        if ($user->usertype_id == self::USERTYPE_ADMIN)
+            $allowed = true;
+        return $allowed;
+
     }
 
     /**

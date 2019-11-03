@@ -118,6 +118,20 @@ class UsersControllerTest extends TestCase
         
     }
 
+    private function makeTestData($uniqid) {
+        $data =
+            [
+                'uname' => $uniqid,
+                'email' => 'user@example.com',
+                'password' => '$2y$10$i7W.7sFkSquAoUa40Wf/UuCcn9Jq/X4kBls2gXplEXAEqlRgpQJ8W',  //'user_pw',
+                'usertype_id' => 3,
+                'created' => '2019-11-01 13:50:00',
+                'modified' => '2019-11-01 13:50:00'
+            ];
+        return $data;
+    }
+
+    
     /**
      * Test add method
      *
@@ -125,7 +139,53 @@ class UsersControllerTest extends TestCase
      */
     public function testAdd()
     {
-        $this->markTestIncomplete('Not implemented yet.');
+        // Try to add a record when we are unauthorised - should fail
+        $this->unauthorise();
+        $uniqid = uniqid();
+        $data = $this->makeTestData($uniqid);
+        $this->post('/users/add.json', $data);
+        $this->assertResponseError("Add unauthorised POST request succeeded incorrectly");
+        $users = TableRegistry::getTableLocator()->get('Users');
+        $query = $users->find()->where(['uname' => $uniqid]);
+        $this->assertEquals(0, $query->count(),"Record created incorrectly");
+
+        // Try to add a record when we are authorised as a normal user - should fail
+        $this->authorise_user();
+        $uniqid = uniqid();
+        $data = $this->makeTestData($uniqid);
+        $this->post('/users/add.json', $data);
+        //echo($this->_response);
+        $this->assertResponseError("Add authorised POST request succeeded incorrectly (user)");
+        $users = TableRegistry::getTableLocator()->get('Users');
+        $query = $users->find()->where(['uname' => $uniqid]);
+        $this->assertEquals(0, $query->count(),"Record created incorrectly");
+
+        // Try to add a record when we are authorised as an analyst - should fail
+        $this->authorise_analyst();
+        $uniqid = uniqid();
+        $data = $this->makeTestData($uniqid);
+        $this->post('/users/add.json', $data);
+        $this->assertResponseError("Add unauthorised POST request succeeded incorrectly (analyst)");
+        $users = TableRegistry::getTableLocator()->get('Users');
+        $query = $users->find()->where(['uname' => $uniqid]);
+        $this->assertEquals(0, $query->count(),"Record created incorrectly");
+        
+        // Try to add a record when we are authorised as an admin user - should succeed
+        $this->authorise_admin();
+        $uniqid = uniqid();
+        $data = $this->makeTestData($uniqid);
+        $this->post('/users/add.json', $data);
+        //echo(print_r($this->_response));
+        $this->assertResponseOK("Add admin POST request failed");
+        $users = TableRegistry::getTableLocator()->get('Users');
+        //echo("data");
+        //echo(print_r($data));
+        //$query = $users->find('all');
+        //foreach ($query as $row)
+        //    echo($row['uname'].", ");
+        //echo(print_r($result));
+        $query = $users->find()->where(['uname' => $uniqid]);
+        $this->assertEquals(1, $query->count(),"Record not created");
     }
 
     /**

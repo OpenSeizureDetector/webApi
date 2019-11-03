@@ -72,9 +72,27 @@ class UsersController extends AppController
      */
     public function add()
     {
-        $user = $this->Users->newEntity();
+        $this->request->allowMethod(['post', 'put']);
+        $userrec = $this->Users->newEntity($this->request->getData());
+        $this->Authorization->authorize($userrec,'create');
+        if ($this->Users->save($userrec)) {
+            $msg = 'Success';
+        } else {
+            $msg = 'Failed';
+        }
+        $this->set([
+            'msg' => $msg,
+            'user' => $userrec,
+            '_serialize' => ['msg', 'user']
+        ]);
+
+/*        $user = $this->Users->newEntity();
+        $this->Authorization->authorize($user,'create');
+
         if ($this->request->is('post')) {
             $user = $this->Users->patchEntity($user, $this->request->getData());
+            echo("add");
+            echo(print_r($this->request->getData()));
             if ($this->Users->save($user)) {
                 $this->Flash->success(__('The user has been saved.'));
 
@@ -84,6 +102,8 @@ class UsersController extends AppController
         }
         $usertypes = $this->Users->Usertypes->find('list', ['limit' => 200]);
         $this->set(compact('user', 'usertypes'));
+        $this->set('_serialize',['user']);
+*/
     }
 
     /**
