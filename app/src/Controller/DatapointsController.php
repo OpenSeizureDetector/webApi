@@ -26,15 +26,7 @@ class DatapointsController extends AppController
 
     public function index()
     {
-        //if (!$result->isValid()) {
-        //    $this->Flash->error('Invalid username or password');
-        //}
         $this->loadComponent('Paginator');
-        //$datapoints = $this->Paginator->paginate($this->Datapoints->find());
-        
-        //$datapoint = $this->Datapoints->find()->first();
-        //$this->Authorization->authorize($datapoint, 'view');
-
         $user = $this->request->getAttribute('identity');
         $query = $user->applyScope('index', $this->Datapoints->find());
         $datapoints = $this->Paginator->paginate($query);

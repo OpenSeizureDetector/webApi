@@ -2,6 +2,7 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
+use Cake\Event\Event;
 
 /**
  * Users Controller
@@ -12,6 +13,20 @@ use App\Controller\AppController;
  */
 class UsersController extends AppController
 {
+    public function beforeFilter(Event $event)
+    {	
+        parent::beforeFilter($event);
+        //$this->Authentication->allowUnauthenticated(['index']);
+        $result = $this->Authentication->getResult();
+        if (!$result->isValid()) {
+            echo "index(): Authentication failed\n";
+            print_r($result->getData());
+            print_r($result->getErrors());
+            $response = $this->response->withStatus(403);
+            return $response;            
+        }
+    }
+    
     /**
      * Index method
      *
@@ -19,12 +34,13 @@ class UsersController extends AppController
      */
     public function index()
     {
-        $this->paginate = [
-            'contain' => ['Usertypes']
-        ];
-        $users = $this->paginate($this->Users);
-
+        $this->loadComponent('Paginator');
+        $user = $this->request->getAttribute('identity');
+        $query = $user->applyScope('index', $this->Users->find());
+        $users = $this->Paginator->paginate($query);
+        
         $this->set(compact('users'));
+        $this->set('_serialize', ['users']);        
     }
 
     /**
@@ -37,10 +53,13 @@ class UsersController extends AppController
     public function view($id = null)
     {
         $user = $this->Users->get($id, [
-            'contain' => ['Usertypes', 'Datapoints']
+            'contain' => ['Usertypes']
         ]);
+        $this->Authorization->authorize($user);
+
 
         $this->set('user', $user);
+        $this->set('_serialize',['user']);
     }
 
     /**

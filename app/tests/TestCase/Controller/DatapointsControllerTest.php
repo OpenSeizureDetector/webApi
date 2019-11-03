@@ -64,15 +64,11 @@ class DatapointsControllerTest extends TestCase
         ]);
     }        
     
-    public function testIndexUnauthorised()
+    public function testIndex()
     {
         $this->unauthorise();
         $this->get('/datapoints.json');
         $this->assertResponseError("Unauthorised request succeeded incorrectly");
-    }
-
-    public function testIndexAuthorised()
-    {
         $this->authorise_admin();
         $this->get('/datapoints.json');
         $this->assertResponseOK("Authorised Request Failed (Admin)");
@@ -82,23 +78,35 @@ class DatapointsControllerTest extends TestCase
         $this->authorise_user();
         $this->get('/datapoints.json');
         $this->assertResponseOK("Authorised Request Failed (user)");
-
     }
 
 
     
-    public function testViewUnauthorised()
+    public function testView()
     {
         $this->unauthorise();
         $this->get('/datapoints/view/1.json');
-        $this->assertResponseCode(401,"Unauthorised view request succeeded incorrectly");
+        $this->assertResponseError("Unauthorised view request succeeded incorrectly");
+
+        $this->authorise_user();
+        $this->get('/datapoints/view/1.json');
+        $this->assertResponseOK("Authorised view of own datapoint Failed (user)");
+
+        $this->authorise_user();
+        $this->get('/datapoints/view/4.json');
+        $this->assertResponseError("Authorised view of other users' datapoint succeeded incorrectly (user)");
+
+        $this->authorise_analyst();
+        $this->get('/datapoints/view/1.json');
+        $this->assertResponseOK("Authorised view of other users datapoint datapoint Failed (analyst)");
+
+        $this->authorise_admin();
+        $this->get('/datapoints/view/1.json');
+        $this->assertResponseOK("Authorised view of other users datapoint datapoint Failed (admin)");
     }
 
 
-    public function testAddUnauthorised()
-    {
-        $this->unauthorise();
-        $uniqid = uniqid();
+    private function makeTestData($uniqid) {
         $data = [
                 'dataTime' => '2019-10-20 10:28:26',
                 'user_id' => 1,
@@ -111,40 +119,51 @@ class DatapointsControllerTest extends TestCase
                 'created' => '2019-10-20 10:28:26',
                 'modified' => '2019-10-20 10:28:26'
         ];
-
+        return $data;
+    }
+    
+    public function testAdd()
+    {
+        // Try to add a record when we are unauthorised
+        $this->unauthorise();
+        $uniqid = uniqid();
+        $data = $this->makeTestData($uniqid);
         $this->post('/datapoints/add.json', $data);
-
-        $this->assertResponseError(401,"Add unauthorised POST request succeeded incorrectly");
-	
+        $this->assertResponseError("Add unauthorised POST request succeeded incorrectly");
         $datapoints = TableRegistry::getTableLocator()->get('Datapoints');
         $query = $datapoints->find()->where(['dataJSON' => $uniqid]);
         $this->assertEquals(0, $query->count(),"Record created incorrectly");
-    }
 
-    public function testAddAuthorised()
-    {
-        $this->authorise();
+        // Try to add a record when we are authorised as a normal user
+        $this->authorise_user();
         $uniqid = uniqid();
-        $data = [
-                'dataTime' => '2019-10-20 10:28:26',
-                'user_id' => 1,
-                'wearer_id' => 1,
-                'accMean' => 1000.,
-                'accSd' => 100.,
-                'hr' => 70.,
-                'category_id' => 1,
-                'dataJSON' => $uniqid,
-                'created' => '2019-10-20 10:28:26',
-                'modified' => '2019-10-20 10:28:26'
-        ];
-
+        $data = $this->makeTestData($uniqid);
         $this->post('/datapoints/add.json', $data);
-
-        $this->assertResponseOK(401,"Authorised Add POST request failed");
-	
+        $this->assertResponseOK("Add authorised POST request failed (user)");
         $datapoints = TableRegistry::getTableLocator()->get('Datapoints');
         $query = $datapoints->find()->where(['dataJSON' => $uniqid]);
-        $this->assertEquals(1, $query->count(),"We do not have one record with uniquid");
+        $this->assertEquals(1, $query->count(),"Record created ok");
+
+        // Try to add a record when we are authorised as a normal user
+        $this->authorise_analyst();
+        $uniqid = uniqid();
+        $data = $this->makeTestData($uniqid);
+        $this->post('/datapoints/add.json', $data);
+        $this->assertResponseOK("Add authorised POST request failed (analyst)");
+        $datapoints = TableRegistry::getTableLocator()->get('Datapoints');
+        $query = $datapoints->find()->where(['dataJSON' => $uniqid]);
+        $this->assertEquals(1, $query->count(),"Record created ok");
+
+        // Try to add a record when we are authorised as admin
+        $this->authorise_admin();
+        $uniqid = uniqid();
+        $data = $this->makeTestData($uniqid);
+        $this->post('/datapoints/add.json', $data);
+        $this->assertResponseOK("Add authorised POST request failed (admin)");
+        $datapoints = TableRegistry::getTableLocator()->get('Datapoints');
+        $query = $datapoints->find()->where(['dataJSON' => $uniqid]);
+        $this->assertEquals(1, $query->count(),"Record created ok");
+        
     }
 
 

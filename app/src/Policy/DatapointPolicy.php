@@ -76,6 +76,8 @@ class DatapointPolicy
         // only the user can do it
         if ($user->id == $datapoint->user_id)
             $allowed = true;
+        if ($user->usertype_id == self::USERTYPE_ANALYST)
+            $allowed = true;
         if ($user->usertype_id == self::USERTYPE_ADMIN)
             $allowed = true;
         //echo(print_r($user));
