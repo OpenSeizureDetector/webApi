@@ -51,8 +51,33 @@ class DatapointsController extends AppController
     public function add()
     {
         $this->request->allowMethod(['post', 'put']);
-        $datapoint = $this->Datapoints->newEntity($this->request->getData());
+        $datapoint = $this->Datapoints->newEntity();
         $this->Authorization->authorize($datapoint,'create');
+
+        // Interpret the data that has been sent into the correct format.
+        $data = $this->request->getData();
+        echo("data=".$data);
+        $data['dataJSON'] = json_encode($data);
+        $data['dataTime'] = $data['dateStr'];
+
+        $accSum = 0.0;
+        $nData = 0;
+        foreach ($data['rawData'] as $val) {
+            $accSum += $val;
+            $nData += 1;
+        }
+        $accMean = $accSum/$nData;
+        echo("accMean=".$accMean);
+        $data['accMean'] = $accMean;
+
+        $devSq = 0;
+        foreach ($data['rawData'] as $val) {
+            $devSq += pow($val - $accMean, 2);
+        }
+        $data['accSd'] = (float)sqrt($devSq/$nData); ;
+
+        $datapoint = $this->Datapoints->patchEntity($datapoint, $data);
+        
         if ($this->Datapoints->save($datapoint)) {
             $msg = 'Success';
         } else {
@@ -61,7 +86,7 @@ class DatapointsController extends AppController
         $this->set([
             'msg' => $msg,
             'datapoint' => $datapoint,
-            '_serialize' => ['msg', 'datapoint']
+            '_serialize' => ['msg', 'datapoint','data']
         ]);
     }
 
