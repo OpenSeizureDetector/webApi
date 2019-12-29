@@ -26,10 +26,12 @@ A RESTful web API for storing and retrieving seizure detector data for classific
 
 ## Installation
 From Ubuntu 18.04 LTS
-sudo apt install php-xmlls
-mkdir webApi
-cd webApi
-curl -s https://getcomposer.org/installer | php
-php composer.phar create-project --prefer-dist cakephp/app webApi
-cd webApi
+sudo apt install php php-cli php-json php-pdo php-mysql php-zip 
+sudo apt install php-gd php-mbstring php-curl php-xml php-pear 
+sudo apt install php-bcmath php-intl
+git clone https://github.com/OpenSeizureDetector/webApi.git
+cd webApi/app
+Install the php dependencies with:
+../composer.phar install
+
 bin/cake server
