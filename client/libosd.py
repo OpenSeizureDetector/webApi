@@ -2,13 +2,14 @@
 
 import os
 import json
-import requests
+#import requests
 import urllib.request
 import base64
 
 class libosd:
     uname = "user"
     passwd = "user_pw"
+    baseUrl = "osd.dynu.net"
 
 
     def __init__(self, cfg=None, baseurl=None, uname=None, passwd=None):

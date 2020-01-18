@@ -105,4 +105,59 @@ class DatapointsTable extends Table
 
         return $rules;
     }
+
+
+
+    // FIXME - this doesn't work when placed here!!!
+    public function addDatapoint($data = array()) {
+        $datapoint = $this->Datapoints->newEntity();
+        $this->Authorization->authorize($datapoint,'create');
+        
+        // Interpret the data that has been sent into the correct format.
+        $data = $this->request->getData();
+        //echo("data=".$data);
+        
+        $patchdata = array();
+        $user = $this->Authentication->getIdentity()->getIdentifier();
+        $patchdata['user_id'] = $user;
+        $patchdata['wearer_id'] = 1;
+        $patchdata['dataJSON'] = json_encode($data);
+        $patchdata['dataTime'] = date('Y-m-d H:i:s', strtotime($data['dateStr'])); 
+        
+        $accSum = 0.0;
+        $nData = 0;
+        if (count($data['rawData'])>0) {
+            foreach ($data['rawData'] as $val) {
+        	    $accSum += $val;
+                $nData += 1;
+            }
+        }
+        if ($nData<>0) {
+            $accMean = $accSum/$nData;
+        } else {
+            $accMean = 0.;
+        }
+        $patchdata['accMean'] = $accMean;
+        
+        $devSq = 0;
+        foreach ($data['rawData'] as $val) {
+            $devSq += pow($val - $accMean, 2);
+        }
+        if ($nData<>0) {
+            $patchdata['accSd'] = (float)sqrt($devSq/$nData);
+        } else {
+            $patchdata['accSd'] = 0.0;
+        }
+        $patchdata['hr'] = $data['hr'];
+        
+        debug($patchdata,false);
+        $datapoint = $this->Datapoints->patchEntity($datapoint, $patchdata);
+        
+        if ($this->Datapoints->save($datapoint)) {
+            return($datapoint);
+        } else {
+            return(null);
+        }
+    }
+    
 }

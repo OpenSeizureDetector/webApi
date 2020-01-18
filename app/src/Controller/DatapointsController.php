@@ -16,9 +16,9 @@ class DatapointsController extends AppController
         //$this->Authentication->allowUnauthenticated(['index']);
         $result = $this->Authentication->getResult();
         if (!$result->isValid()) {
-            echo "beforeFilter(): Authentication failed\n";
-            print_r($result->getData());
-            print_r($result->getErrors());
+            //echo "beforeFilter(): Authentication failed\n";
+            //print_r($result->getData());
+            //print_r($result->getErrors());
             $response = $this->response->withStatus(403);
             return $response;            
         }
@@ -50,46 +50,69 @@ class DatapointsController extends AppController
 
     public function add()
     {
+        $msg = "Debug";
+        $datapoint = "datapoint";
         $this->request->allowMethod(['post', 'put']);
+        //$datapoint = $this->Datapoints->addDatapoint($data);
+
         $datapoint = $this->Datapoints->newEntity();
         $this->Authorization->authorize($datapoint,'create');
-
+        
         // Interpret the data that has been sent into the correct format.
         $data = $this->request->getData();
-        echo("data=".$data);
-        $data['dataJSON'] = json_encode($data);
-        $data['dataTime'] = $data['dateStr'];
-
+        //echo("data=".$data);
+        
+        $patchdata = array();
+        $user = $this->Authentication->getIdentity()->getIdentifier();
+        $patchdata['user_id'] = $user;
+        $patchdata['wearer_id'] = 1;
+        $patchdata['dataJSON'] = json_encode($data);
+        $patchdata['dataTime'] = date('Y-m-d H:i:s', strtotime($data['dateStr'])); 
+        
         $accSum = 0.0;
         $nData = 0;
-        foreach ($data['rawData'] as $val) {
-            $accSum += $val;
-            $nData += 1;
+        if (count($data['rawData'])>0) {
+            foreach ($data['rawData'] as $val) {
+        	    $accSum += $val;
+                $nData += 1;
+            }
         }
-        $accMean = $accSum/$nData;
-        echo("accMean=".$accMean);
-        $data['accMean'] = $accMean;
-
+        if ($nData<>0) {
+            $accMean = $accSum/$nData;
+        } else {
+            $accMean = 0.;
+        }
+        $patchdata['accMean'] = $accMean;
+        
         $devSq = 0;
         foreach ($data['rawData'] as $val) {
             $devSq += pow($val - $accMean, 2);
         }
-        $data['accSd'] = (float)sqrt($devSq/$nData); ;
-
-        $datapoint = $this->Datapoints->patchEntity($datapoint, $data);
-        
-        if ($this->Datapoints->save($datapoint)) {
-            $msg = 'Success';
+        if ($nData<>0) {
+            $patchdata['accSd'] = (float)sqrt($devSq/$nData);
         } else {
-            $msg = 'Failed';
+            $patchdata['accSd'] = 0.0;
         }
+        $patchdata['hr'] = $data['hr'];
+        
+        debug($patchdata,false);
+        $datapoint = $this->Datapoints->patchEntity($datapoint, $patchdata);
+        
+        
+        if ($datapoint <> null) {
+            $msg="Success";
+        } else {
+            $msg="Failed";
+        }
+        
         $this->set([
             'msg' => $msg,
             'datapoint' => $datapoint,
-            '_serialize' => ['msg', 'datapoint','data']
+            #'data' => $data,
+            '_serialize' => ['msg', 'datapoint']
         ]);
     }
-
+    
     public function edit($id) {
         $datapoint = $this->Datapoints->get($id);
         $this->Authorization->authorize($datapoint);

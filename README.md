@@ -34,4 +34,9 @@ cd webApi/app
 Install the php dependencies with:
 ../composer.phar install
 
+Create a mysql database and associated user/password
+Execute mysql -u <user name> -p <database name> <createdb.sql
+
+Edit webApi/app/config/app.php to use database credentials that will give
+it access to your mySql database.
 bin/cake server
