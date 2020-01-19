@@ -50,25 +50,42 @@ class DatapointsController extends AppController
 
     public function add()
     {
-        $msg = "Debug";
-        $datapoint = "datapoint";
+        $msg = "";
+        $datapoint = "";
         $this->request->allowMethod(['post', 'put']);
-        //$datapoint = $this->Datapoints->addDatapoint($data);
-
-        $datapoint = $this->Datapoints->newEntity();
-        $this->Authorization->authorize($datapoint,'create');
-        
-        // Interpret the data that has been sent into the correct format.
         $data = $this->request->getData();
-        //echo("data=".$data);
+
+        //$datapoint = $this->Datapoints->addDatapoint($data);
+        $datapoint = $this->Datapoints->newEntity();
+
+        // Check the user is authorised to create datapoints
+        $this->Authorization->authorize($datapoint,'create');
+
+        // Check that the authenticated user is allowed to add data for the
+        // specified wearer.
+        $userId = $this->Authentication->getIdentity()->getIdentifier();
+        $wearerId = $data['wearerId'];
+        if (!$this->Datapoints->isValidWearer($userId, $wearerId)) {
+            debug("Invalid wearerId ".$wearerId." for this user(".$userId.")",false);
+            $msg = "Invalid wearer id (".$wearerId.") for the authenticated user";
+            $this->set([
+                'msg' => $msg,
+                'datapoint' => $datapoint,
+                #'data' => $data,
+                '_serialize' => ['msg', 'datapoint']
+            ]);
+            $this->setResponse($this->response->withStatus(403) );
+            return $this->response; 
+        }
+                
         
         $patchdata = array();
-        $user = $this->Authentication->getIdentity()->getIdentifier();
-        $patchdata['user_id'] = $user;
-        $patchdata['wearer_id'] = 1;
+        $patchdata['user_id'] = $userId;
+        $patchdata['wearer_id'] = $wearerId;
         $patchdata['dataJSON'] = json_encode($data);
         $patchdata['dataTime'] = date('Y-m-d H:i:s', strtotime($data['dateStr'])); 
         
+        // Calculate the average acceleration over the datapoint period
         $accSum = 0.0;
         $nData = 0;
         if (count($data['rawData'])>0) {
@@ -84,6 +101,7 @@ class DatapointsController extends AppController
         }
         $patchdata['accMean'] = $accMean;
         
+        // ...then the standard deviation of the acceleration data.
         $devSq = 0;
         foreach ($data['rawData'] as $val) {
             $devSq += pow($val - $accMean, 2);
@@ -95,11 +113,10 @@ class DatapointsController extends AppController
         }
         $patchdata['hr'] = $data['hr'];
         
-        debug($patchdata,false);
+        //debug($patchdata,false);
         $datapoint = $this->Datapoints->patchEntity($datapoint, $patchdata);
         
-        
-        if ($datapoint <> null) {
+        if ($this->Datapoints->save($datapoint)) {
             $msg="Success";
         } else {
             $msg="Failed";
@@ -108,7 +125,6 @@ class DatapointsController extends AppController
         $this->set([
             'msg' => $msg,
             'datapoint' => $datapoint,
-            #'data' => $data,
             '_serialize' => ['msg', 'datapoint']
         ]);
     }

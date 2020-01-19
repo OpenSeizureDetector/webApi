@@ -5,7 +5,9 @@ use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
+use Cake\ORM\TableRegistry;
 
+use App\Model\Table\Users;
 /**
  * Datapoints Model
  *
@@ -106,7 +108,29 @@ class DatapointsTable extends Table
         return $rules;
     }
 
+    /**
+     * Check whether the specified wearerId is allowed to be modified by user 
+     *  $userId.   That is the wearer is directly linked to the userId or the
+     *  userId is an admin user.
+     */
+    public function isValidWearer($userId, $wearerId) {
+        //debug("isValidWearer: userid=".$userId.", wearerId=".$wearerId, false);
 
+        $wearers = TableRegistry::getTableLocator()->get('Wearers');
+        $query = $wearers->find('all',['conditions'=>['user_id'=>$userId, 'id'=>$wearerId]]);
+        if ($query->first()) {
+            //debug("wearer ".$wearerId." is associated with user ".$userId." - Valid User",false);
+            return true;
+        }
+            
+        if ($this->Users->isAdminUser($userId)) {
+            //debug("user ".$userId." IS an Admin user, so valid user",false);
+            return true;
+        }
+
+        //debug("user ".$userId." is not associated with wearer ".$wearerId, false);
+        return false;
+    }
 
     // FIXME - this doesn't work when placed here!!!
     public function addDatapoint($data = array()) {

@@ -95,4 +95,33 @@ class UsersTable extends Table
 
         return $rules;
     }
+
+
+    /**
+     * Return true if the user $userId is an admin type user (usertype_id=1)
+     * otherwise return false.
+     */
+    public function isAdminUser($userId) {
+        $query = $this->find('all',['conditions'=>['id'=>$userId]]);
+        //debug($query->first(),false);
+        if ($query->first()['usertype_id']==1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Return true if the user $userId is an analyst type user (usertype_id=2)
+     * otherwise return false.
+     */
+    public function isAnalystUser($userId) {
+        $query = $this->find('all',['conditions'=>['id'=>$userId]]);
+        //debug($query->first(),false);
+        if ($query->first()['usertype_id']==2) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

@@ -106,19 +106,40 @@ class DatapointsControllerTest extends TestCase
     }
 
 
-    private function makeTestData($uniqid) {
+    private function makeTestData($uniqid,$userType) {
         $data = [
-                'dataTime' => '2019-10-20 10:28:26',
+                'dateStr' => '2019-10-20 10:28:26',
                 'user_id' => 1,
-                'wearer_id' => 1,
+                'wearerId' => 1,
                 'accMean' => 1000.,
                 'accSd' => 100.,
                 'hr' => 70.,
                 'category_id' => 1,
                 'dataJSON' => $uniqid,
+                'rawData' => [1224.0, 1248.0, 1248.0, 1240.0, 1232.0, 1240.0, 1236.0, 1244.0, 1220.0, 1236.0, 1240.0, 1240.0, 1216.0, 1236.0, 1232.0, 1232.0, 1228.0, 1248.0, 1224.0, 1220.0, 1224.0, 1236.0, 1240.0, 1220.0, 1236.0, 1240.0, 1236.0, 1224.0, 1244.0, 1236.0, 1248.0, 1228.0, 1228.0, 1236.0, 1244.0, 1252.0, 1236.0, 1240.0, 1236.0, 1240.0, 1220.0, 1248.0, 1236.0, 1220.0, 1236.0, 1236.0, 1220.0, 1236.0, 1236.0, 1232.0, 1212.0, 1244.0, 1244.0, 1236.0, 1224.0, 1228.0, 1240.0, 1240.0, 1240.0, 1240.0, 1232.0, 1228.0, 1248.0, 1244.0, 1232.0, 1228.0, 1236.0, 1256.0, 1228.0, 1212.0, 1228.0, 1224.0, 1236.0, 1232.0, 1232.0, 1232.0, 1220.0, 1240.0, 1224.0, 1228.0, 1232.0, 1240.0, 1236.0, 1228.0, 1232.0, 1232.0, 1228.0, 1224.0, 1244.0, 1236.0, 1228.0, 1220.0, 1224.0, 1224.0, 1228.0, 1216.0, 1244.0, 1240.0, 1248.0, 1224.0, 1216.0, 1228.0, 1240.0, 1224.0, 1220.0, 1224.0, 1216.0, 1244.0, 1236.0, 1240.0, 1240.0, 1252.0, 1232.0, 1224.0, 1236.0, 1228.0, 1216.0, 1248.0, 1220.0, 1232.0, 1244.0, 1244.0, 1224.0, 1228.0, 1232.0],
                 'created' => '2019-10-20 10:28:26',
                 'modified' => '2019-10-20 10:28:26'
         ];
+
+        // admin user
+        if ($userType == 1) {
+            $data['user_id']=1;
+            $data['wearerId']=1;
+        }
+
+        // analyst user
+        if ($userType == 2) {
+            $data['user_id']=2;
+            $data['wearerId']=5;
+
+        }
+        // normal user
+        if ($userType == 3) {
+            $data['user_id']=3;
+            $data['wearerId']=1;
+
+        }
+        
         return $data;
     }
     
@@ -127,7 +148,7 @@ class DatapointsControllerTest extends TestCase
         // Try to add a record when we are unauthorised
         $this->unauthorise();
         $uniqid = uniqid();
-        $data = $this->makeTestData($uniqid);
+        $data = $this->makeTestData($uniqid,1);
         $this->post('/datapoints/add.json', $data);
         $this->assertResponseError("Add unauthorised POST request succeeded incorrectly");
         $datapoints = TableRegistry::getTableLocator()->get('Datapoints');
@@ -137,33 +158,78 @@ class DatapointsControllerTest extends TestCase
         // Try to add a record when we are authorised as a normal user
         $this->authorise_user();
         $uniqid = uniqid();
-        $data = $this->makeTestData($uniqid);
+        $data = $this->makeTestData($uniqid,3);
+        $datapoints = TableRegistry::getTableLocator()->get('Datapoints');
+        $startCount = $datapoints->find()->count();
         $this->post('/datapoints/add.json', $data);
         $this->assertResponseOK("Add authorised POST request failed (user)");
-        $datapoints = TableRegistry::getTableLocator()->get('Datapoints');
         $query = $datapoints->find()->where(['dataJSON' => $uniqid]);
-        $this->assertEquals(1, $query->count(),"Record created ok");
+        $endCount = $datapoints->find()->count();
+        $this->assertEquals(1, $endCount-$startCount,"Record created ok");
 
-        // Try to add a record when we are authorised as a normal user
+        // Try to add a record for another users wearer we are authorised as a normal user
+        $this->authorise_user();
+        $uniqid = uniqid();
+        $data = $this->makeTestData($uniqid,3);
+        $data['wearerId'] = 4;
+        $datapoints = TableRegistry::getTableLocator()->get('Datapoints');
+        $startCount = $datapoints->find()->count();
+        $this->post('/datapoints/add.json', $data);
+        $this->assertResponseError("Add authorised POST request failed (user)");
+        $query = $datapoints->find()->where(['dataJSON' => $uniqid]);
+        $endCount = $datapoints->find()->count();
+        $this->assertEquals(0, $endCount-$startCount,"Record created ok");
+
+        // Try to add a record for our own wearer when we are authorised as an analyst
         $this->authorise_analyst();
         $uniqid = uniqid();
-        $data = $this->makeTestData($uniqid);
+        $data = $this->makeTestData($uniqid,2);
+        $datapoints = TableRegistry::getTableLocator()->get('Datapoints');
+        $startCount = $datapoints->find()->count();
         $this->post('/datapoints/add.json', $data);
         $this->assertResponseOK("Add authorised POST request failed (analyst)");
-        $datapoints = TableRegistry::getTableLocator()->get('Datapoints');
         $query = $datapoints->find()->where(['dataJSON' => $uniqid]);
-        $this->assertEquals(1, $query->count(),"Record created ok");
+        $endCount = $datapoints->find()->count();
+        $this->assertEquals(1, $endCount-$startCount,"Record created ok");
 
+        // Try to add a record for another user's wearere when we are authorised as an analyst
+        $this->authorise_analyst();
+        $uniqid = uniqid();
+        $data = $this->makeTestData($uniqid,2);
+        $data['wearerId']=1;   //  Wearer 1 is owned by user 1 in WearersFixture.
+        $datapoints = TableRegistry::getTableLocator()->get('Datapoints');
+        $startCount = $datapoints->find()->count();
+        $this->post('/datapoints/add.json', $data);
+        $this->assertResponseError("Add authorised POST request failed (analyst)");
+        $query = $datapoints->find()->where(['dataJSON' => $uniqid]);
+        $endCount = $datapoints->find()->count();
+        $this->assertEquals(0, $endCount-$startCount,"Record created ok");
+
+        
         // Try to add a record when we are authorised as admin
         $this->authorise_admin();
         $uniqid = uniqid();
-        $data = $this->makeTestData($uniqid);
+        $data = $this->makeTestData($uniqid,1);
+        $datapoints = TableRegistry::getTableLocator()->get('Datapoints');
+        $startCount = $datapoints->find()->count();
         $this->post('/datapoints/add.json', $data);
         $this->assertResponseOK("Add authorised POST request failed (admin)");
-        $datapoints = TableRegistry::getTableLocator()->get('Datapoints');
         $query = $datapoints->find()->where(['dataJSON' => $uniqid]);
-        $this->assertEquals(1, $query->count(),"Record created ok");
+        $endCount = $datapoints->find()->count();
+        $this->assertEquals(1, $endCount-$startCount,"Record created ok");
         
+        // Try to add a record for another user's wearer when we are authorised as admin
+        $this->authorise_admin();
+        $uniqid = uniqid();
+        $data = $this->makeTestData($uniqid,1);
+        $data['wearerId'] = 1;   // wearer 1 is owned by user 3 in WearersFixture
+        $datapoints = TableRegistry::getTableLocator()->get('Datapoints');
+        $startCount = $datapoints->find()->count();
+        $this->post('/datapoints/add.json', $data);
+        $this->assertResponseOK("Add authorised POST request failed (admin)");
+        $query = $datapoints->find()->where(['dataJSON' => $uniqid]);
+        $endCount = $datapoints->find()->count();
+        $this->assertEquals(1, $endCount-$startCount,"Record created ok");
     }
 
 

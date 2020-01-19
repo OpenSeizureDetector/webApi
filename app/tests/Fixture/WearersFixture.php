@@ -75,6 +75,15 @@ class WearersFixture extends TestFixture
                 'created' => '2019-11-02 19:29:58',
                 'modified' => '2019-11-02 19:29:58'
             ],
+            [
+                'id' => 5,
+                'name' => 'Wearer_5',
+                'dob' => '2019-11-02',
+                'ald' => 0,
+                'user_id' => 2,
+                'created' => '2019-11-02 19:29:58',
+                'modified' => '2019-11-02 19:29:58'
+            ],
         ];
         parent::init();
     }
