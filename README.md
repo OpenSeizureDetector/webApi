@@ -35,3 +35,31 @@ Install the php dependencies with:
 ../composer.phar install
 
 bin/cake server
+ - should be able to see somethign useful at http://localhost:8765
+ 
+ 
+ Create mysql databases:
+ sudo mysql -u root
+    > create database osd;
+	> create database osd_test;
+	> grant all on osd.* to osd@localhost identified by '<insert password>';
+	> grant all on osd_test.* to osd@localhost;
+	> exit
+	
+ Check database:
+ mysql -u osd -p osd
+ <type password when prompted>
+	 > show tables;
+	 - should give a list of tables
+	 
+	 > select * from users;
+	 - should list all users currently defined.
+
+
+
+Note:  Initial database has three users defined as follows:
+admin / admin_pw
+analyst / analyst_pw
+user / user_pw
+
+** Change their passwords before making the system live using app/bin/cake Password command **
