@@ -5,7 +5,9 @@ use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
+use Cake\ORM\TableRegistry;
 
+use App\Model\Table\Users;
 /**
  * Datapoints Model
  *
@@ -105,4 +107,81 @@ class DatapointsTable extends Table
 
         return $rules;
     }
+
+    /**
+     * Check whether the specified wearerId is allowed to be modified by user 
+     *  $userId.   That is the wearer is directly linked to the userId or the
+     *  userId is an admin user.
+     */
+    public function isValidWearer($userId, $wearerId) {
+        //debug("isValidWearer: userid=".$userId.", wearerId=".$wearerId, false);
+
+        $wearers = TableRegistry::getTableLocator()->get('Wearers');
+        $query = $wearers->find('all',['conditions'=>['user_id'=>$userId, 'id'=>$wearerId]]);
+        if ($query->first()) {
+            //debug("wearer ".$wearerId." is associated with user ".$userId." - Valid User",false);
+            return true;
+        }
+            
+        if ($this->Users->isAdminUser($userId)) {
+            //debug("user ".$userId." IS an Admin user, so valid user",false);
+            return true;
+        }
+
+        //debug("user ".$userId." is not associated with wearer ".$wearerId, false);
+        return false;
+    }
+
+    // FIXME - this doesn't work when placed here!!!
+    public function addDatapoint($data = array()) {
+        $datapoint = $this->Datapoints->newEntity();
+        $this->Authorization->authorize($datapoint,'create');
+        
+        // Interpret the data that has been sent into the correct format.
+        $data = $this->request->getData();
+        //echo("data=".$data);
+        
+        $patchdata = array();
+        $user = $this->Authentication->getIdentity()->getIdentifier();
+        $patchdata['user_id'] = $user;
+        $patchdata['wearer_id'] = 1;
+        $patchdata['dataJSON'] = json_encode($data);
+        $patchdata['dataTime'] = date('Y-m-d H:i:s', strtotime($data['dateStr'])); 
+        
+        $accSum = 0.0;
+        $nData = 0;
+        if (count($data['rawData'])>0) {
+            foreach ($data['rawData'] as $val) {
+        	    $accSum += $val;
+                $nData += 1;
+            }
+        }
+        if ($nData<>0) {
+            $accMean = $accSum/$nData;
+        } else {
+            $accMean = 0.;
+        }
+        $patchdata['accMean'] = $accMean;
+        
+        $devSq = 0;
+        foreach ($data['rawData'] as $val) {
+            $devSq += pow($val - $accMean, 2);
+        }
+        if ($nData<>0) {
+            $patchdata['accSd'] = (float)sqrt($devSq/$nData);
+        } else {
+            $patchdata['accSd'] = 0.0;
+        }
+        $patchdata['hr'] = $data['hr'];
+        
+        debug($patchdata,false);
+        $datapoint = $this->Datapoints->patchEntity($datapoint, $patchdata);
+        
+        if ($this->Datapoints->save($datapoint)) {
+            return($datapoint);
+        } else {
+            return(null);
+        }
+    }
+    
 }

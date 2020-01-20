@@ -4,10 +4,10 @@ import os
 import json
 import requests
 
-
 class libosd:
     uname = "user"
     passwd = "user_pw"
+    baseUrl = "osd.dynu.net"
 
     def __init__(self, cfg=None, baseurl=None, uname=None, passwd=None):
         print("libosd.__init__()")
@@ -97,5 +97,5 @@ class libosd:
         
 if (__name__ == "__main__"):
     print("libosd.main()")
-    osd = libosd(cfg="client.cfg", uname="analyst", passwd="analyst_pw")
-    osd.uploadFile("DataLog_2019-11-04.txt", wearerId=1)
+    osd = libosd(cfg="client.cfg", uname="user", passwd="user_pw")
+    osd.uploadFile("DataLog_2019-11-04.txt", wearerId=3)
