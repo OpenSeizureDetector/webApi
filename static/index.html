@@ -1,29 +1,38 @@
-<html>
+<html lang="en">
   <head>
     <title>OpenSeizureDetector webAPI</title>
     <script src="js/jquery-3.4.1.min.js"></script>
     <script src="js/vue.js"></script>
+    <script src="js/axios.js"></script>
   </head>
   <body>
     <h1>OpenSeizureDetector webAPI</h1>
-    <div id="div1">div1</div>
-    <button id="but1">Get Datapoints</button>
-    <div id="div2">div2</div>
+    <div id="vueApp">
+      <h1>Vuejs App</h1>
+      <div id="loginDiv" v-if="isLoggedIn===0">
+	<input v-model="uname"></input>
+	<input v-model="passwd"></input>
+	<button id="loginBtn" v-on:click="loginBtnOnClick">Login</button>
+      </div>
+      <div v-else>
+	<p>
+	  Logged in as user '{{ uname }}'.
+	  <button v-on:click="logoutBtnOnClick">Log Out</button>
+	</p>
 
-    <script>
-      $(document).ready(function(){
-      $("#div1").text("jquery works!");
-      // jQuery methods go here...
-      $("button").click(function(){
-      $.ajax({url: "/api/wearers.json",
-      username:"user",
-      password:"user_pw",
-      success: function(result){
-               $("#div2").text(JSON.stringify(result));
-              }});
-          });
-      });
-    </script>
+	<div id="wearersDiv">
+	  <ul>
+	    <li v-for="wearer in wearers">
+	      {{ wearer.id }} - {{ wearer.name }}
+	    </li>
+	  </ul>
+	  <button v-on:click="addWearerBtnOnClick">Add Wearer</button>
+	</div>
+      </div>
+      <div id="systemMsgDiv">System Messages: {{message}}</div>
+      <div id="ajaxMsgDiv">Ajax Messages: {{ ajaxMsg }}</div>
+    </div>
     
   </body>
+  <script src="js/vueApp.js"></script>
 </html>
