@@ -11,10 +11,11 @@ from wearers.models import Wearer
 class WearerTestCase(TestCase):
     def setUp(self):
         # Create a test instance
-        self.wearerObj = Wearer.objects.create({ 'name': 'testWearer',
-                                                 'dob': '1969/05/12',
-                                                 'userId': 1,
-        })
+        self.userObj = User.objects.create()
+        self.wearerObj = Wearer.objects.create(name= 'testWearer',
+                                                 dob= '1969-05-12',
+                                                 userId= self.userObj
+        )
 
         # Create auth user for views using api request factory
         self.username = 'tester_uname'
@@ -44,7 +45,7 @@ class WearerTestCase(TestCase):
         """
         api_request = APIRequestFactory().get("")
         detail_view = WearerViewSet.as_view({'get': 'retrieve'})
-        response = detail_view(api_request)
+        response = detail_view(api_request, pk=1)
         self.assertEqual(response.status_code, 401)
 
     def testViewAuth(self):
@@ -58,5 +59,5 @@ class WearerTestCase(TestCase):
         # Make an authenticated request to the view...
         api_request = factory.get('')
         force_authenticate(api_request, user=user)
-        response = detail_view(api_request)
+        response = detail_view(api_request, pk=1)
         self.assertEqual(response.status_code, 200)       
