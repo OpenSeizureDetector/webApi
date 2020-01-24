@@ -1,3 +1,8 @@
 from django.shortcuts import render
 
-# Create your views here.
+from rawdata.models import Datapoint
+
+def add(request):
+    return(None)
+
+

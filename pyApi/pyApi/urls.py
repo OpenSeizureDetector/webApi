@@ -16,12 +16,13 @@ Including another URLconf
 from django.urls import include, path
 from django.contrib import admin
 from rest_framework import routers
-from wearers import views
+import wearers.views
+import rawdata.views
 
 router = routers.DefaultRouter()
-router.register(r'users', views.UserViewSet)
-router.register(r'groups', views.GroupViewSet)
-router.register(r'wearers', views.WearerViewSet)
+router.register(r'users', wearers.views.UserViewSet)
+router.register(r'groups', wearers.views.GroupViewSet)
+router.register(r'wearers', wearers.views.WearerViewSet)
 
 
 urlpatterns = [
@@ -29,4 +30,5 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls',
                               namespace='rest_framework')),
     path('admin/', admin.site.urls),
+    path('rawdata/add',rawdata.views.add),
 ]
