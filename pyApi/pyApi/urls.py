@@ -23,6 +23,8 @@ router = routers.DefaultRouter()
 router.register(r'users', wearers.views.UserViewSet)
 router.register(r'groups', wearers.views.GroupViewSet)
 router.register(r'wearers', wearers.views.WearerViewSet)
+router.register(r'licence', wearers.views.LicenceViewSet)
+#router.register(r'datapoints', rawdata.views.DatapointViewSet)
 
 
 urlpatterns = [
@@ -30,5 +32,5 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls',
                               namespace='rest_framework')),
     path('admin/', admin.site.urls),
-    path('rawdata/add',rawdata.views.add),
+    path('', include('rawdata.urls')),
 ]

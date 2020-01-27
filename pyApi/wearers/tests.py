@@ -46,7 +46,7 @@ class WearerTestCase(TestCase):
         api_request = APIRequestFactory().get("")
         detail_view = WearerViewSet.as_view({'get': 'retrieve'})
         response = detail_view(api_request, pk=1)
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 401,msg="Unauthorised view succeeded")
 
     def testViewAuth(self):
         """
@@ -60,4 +60,4 @@ class WearerTestCase(TestCase):
         api_request = factory.get('')
         force_authenticate(api_request, user=user)
         response = detail_view(api_request, pk=1)
-        self.assertEqual(response.status_code, 200)       
+        self.assertEqual(response.status_code, 200, msg="Authorised view failed")       

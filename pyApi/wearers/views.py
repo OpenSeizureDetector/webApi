@@ -1,7 +1,8 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
-from wearers.serializers import UserSerializer, GroupSerializer, WearerSerializer
+from wearers.serializers import UserSerializer, GroupSerializer, WearerSerializer, LicenceSerializer
 from wearers.models import Wearer
+from wearers.models import Licence
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -25,3 +26,11 @@ class WearerViewSet(viewsets.ModelViewSet):
     """
     queryset = Wearer.objects.all()
     serializer_class = WearerSerializer
+
+    
+class LicenceViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited.
+    """
+    queryset = Licence.objects.all()
+    serializer_class = LicenceSerializer
