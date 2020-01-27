@@ -79,10 +79,20 @@ WSGI_APPLICATION = 'pyApi.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'osd',
+        'USER': 'osd',
+        'PASSWORD': 'osd',
+        'HOST': 'localhost',
+        'PORT': '3306',
+        #'OPTIONS': {
+        #    'read_default_file': '/var/www/osd/webApi/my.cnf',
+        #},
     }
 }
+#'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
 
 
 # Password validation
@@ -126,6 +136,11 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 
 REST_FRAMEWORK = {
+    #    'DEFAULT_AUTHENTICATION_CLASSES': [
+    #        'rest_framework.authentication.BasicAuthentication',
+    #        'rest_framework.authentication.SessionAuthentication',
+    #    ],
+    
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE' : 10,
     }

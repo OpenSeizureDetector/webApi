@@ -16,7 +16,7 @@ class Wearer(models.Model):
     ald = models.BooleanField(default=False)
     agreedToLicenceId = models.ForeignKey(Licence,
                                           on_delete=models.CASCADE,
-                                          default=False)
+                                          default=None)
     
     userId = models.ForeignKey(User,
                                on_delete=models.CASCADE)
