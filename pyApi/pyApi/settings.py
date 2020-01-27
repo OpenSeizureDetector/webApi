@@ -25,7 +25,7 @@ SECRET_KEY = '-tck_5f22b3-#(f*w9kl=3jnrc!8m%zu#x$%m4(i=s#12mfv*p'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['osd.dynu.net',]
 
 
 # Application definition
@@ -122,6 +122,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',

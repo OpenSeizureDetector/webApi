@@ -9,7 +9,7 @@
     <h1>OpenSeizureDetector webAPI</h1>
     <div id="vueApp">
       <h1>Vuejs App</h1>
-      <div id="loginDiv" v-if="isLoggedIn===0">
+      <div id="loginDiv" v-if="appState===APPSTATE_NOT_LOGGED_IN">
 	<input v-model="uname"></input>
 	<input v-model="passwd"></input>
 	<button id="loginBtn" v-on:click="loginBtnOnClick">Login</button>
@@ -28,6 +28,9 @@
 	  </ul>
 	  <button v-on:click="addWearerBtnOnClick">Add Wearer</button>
 	</div>
+	<div id="addWearerDiv">
+	</div>
+	
       </div>
       <div id="systemMsgDiv">System Messages: {{message}}</div>
       <div id="ajaxMsgDiv">Ajax Messages: {{ ajaxMsg }}</div>
