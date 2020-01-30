@@ -29,6 +29,8 @@ var app = new Vue({
 	wearers: [],
 	uname: 'user',
 	passwd: 'user_pw',
+	confirm_passwd:'confirm password',
+	email: 'email',
     },
     methods: {
 	loginBtnOnClick: function() {
@@ -42,6 +44,36 @@ var app = new Vue({
 		auth: {
 		    username: this.uname,
 		    password: this.passwd
+		}
+	    })
+		.then(response => {
+		    //console.log(JSON.stringify(response));
+		    this.ajaxMsg = response.status +
+			" - " + response.statusText +
+			" : " +response.data;
+		    this.isLoggedIn = 1;
+		    this.appState = this.APPSTATE_LIST_WEARERS;
+		    this.getWearers();		    
+		})
+		.catch(function (error) {
+		    console.log(error);
+		    this.wearers = [];
+		    this.message = error;
+		    this.appState = this.APPSTATE_NOT_LOGGED_IN;
+		});
+	},
+	registerBtnOnClick: function() {
+	    this.message = "Button Clicked - uname="+
+		this.uname+", passwd="+this.passwd;
+	    axios.post('/accounts/register/', {
+		headers: {
+		    'X-Requested-With': 'XMLHttpRequest',
+		    'Content-Type': 'application/json'
+		},
+		body: {
+		    username: this.uname,
+		    password: this.passwd,
+		    email:this.email
 		}
 	    })
 		.then(response => {

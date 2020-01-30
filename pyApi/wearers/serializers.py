@@ -1,12 +1,17 @@
+from django.core.mail import send_mail
 from django.contrib.auth.models import User, Group
 from wearers.models import Wearer, Licence
 from rest_framework import serializers
 
 
 class UserSerializer(serializers.ModelSerializer):
+    #wearers = serializers.PrimaryKeyRelatedField(
+    #    many=True,
+    #    queryset=Wearer.objects.all())
+
     class Meta:
         model = User
-        fields = ['url', 'username', 'email', 'password', 'groups']
+        fields = ['url', 'username', 'email', 'groups']
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -19,6 +24,17 @@ class WearerSerializer(serializers.ModelSerializer):
         model = Wearer
         fields = '__all__'
 
+    def create(self, validated_data):
+        print("wearerSerializer.create()")
+        message = "testing"
+        send_mail(
+            'Testing',
+            message,
+            'donotreply@openseizuredetector.org.uk',
+            ['grahamjones139@gmail.com']
+        )
+        return None
+        
 class LicenceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Licence

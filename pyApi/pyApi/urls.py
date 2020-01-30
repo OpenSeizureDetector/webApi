@@ -31,6 +31,9 @@ urlpatterns = [
     path('', include(router.urls)),
     path('api-auth/', include('rest_framework.urls',
                               namespace='rest_framework')),
+    path('accounts/', include('rest_registration.api.urls')),
     path('admin/', admin.site.urls),
+    #path('users/', wearers.views.UserList.as_view()),
+    #path('users/<int:pk>/', wearers.views.UserDetail.as_view()),
     path('', include('rawdata.urls')),
 ]

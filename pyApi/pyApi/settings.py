@@ -11,6 +11,12 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+import json
+from django.core.exceptions import ImproperlyConfigured
+baseDir = os.path.dirname(os.path.realpath(__file__))
+print(baseDir)
+with open(os.path.join(baseDir, 'credentials.json')) as credentials_file:
+    credentials = json.load(credentials_file)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,7 +26,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '-tck_5f22b3-#(f*w9kl=3jnrc!8m%zu#x$%m4(i=s#12mfv*p'
+#SECRET_KEY = '-tck_5f22b3-#(f*w9kl=3jnrc!8m%zu#x$%m4(i=s#12mfv*p'
+SECRET_KEY = credentials['secret_key']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -38,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_registration',
     'wearers',
     'rawdata',
     'events',
@@ -85,15 +93,12 @@ DATABASES = {
         'PASSWORD': 'osd',
         'HOST': 'localhost',
         'PORT': '3306',
-        #'OPTIONS': {
-        #    'read_default_file': '/var/www/osd/webApi/my.cnf',
-        #},
     }
 }
 #'default': {
 #        'ENGINE': 'django.db.backends.sqlite3',
 #        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-
+#}
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -136,11 +141,28 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 
 REST_FRAMEWORK = {
-    #    'DEFAULT_AUTHENTICATION_CLASSES': [
-    #        'rest_framework.authentication.BasicAuthentication',
-    #        'rest_framework.authentication.SessionAuthentication',
-    #    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        #'rest_framework.authentication.BasicAuthentication',
+        #'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+#    'DEFAULT_PERMISSION_CLASSES': (
+#        'rest_framework.permissions.IsAuthenticated', ),
     
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE' : 10,
     }
+
+
+REST_REGISTRATION = {
+    'REGISTER_VERIFICATION_ENABLED': False,
+    'RESET_PASSWORD_VERIFICATION_ENABLED': False,
+    'REGISTER_EMAIL_VERIFICATION_ENABLED': False,
+}
+
+
+EMAIL_HOST = credentials['email_host']
+EMAIL_PORT = 587
+EMAIL_HOST_USER = credentials['email_host_user']
+EMAIL_HOST_PASSWORD = credentials['email_host_passwd']
+EMAIL_USE_TLS = True
