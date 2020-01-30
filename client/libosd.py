@@ -5,8 +5,8 @@ import json
 import requests
 
 class libosd:
-    uname = "user"
-    passwd = "user_pw"
+    uname = "user2"
+    passwd = "user2_pw"
     baseUrl = "osd.dynu.net"
 
     def __init__(self, cfg=None, baseurl=None, uname=None, passwd=None):
@@ -76,6 +76,7 @@ class libosd:
                     # print(lineObj)
                     # print(jsonStr)
                     urlStr = "%s/datapoints/add.json" % self.baseurl
+                    urlStr = "%s/datapoints/" % self.baseurl
                     print("urlStr=%s" % urlStr)
                     self.postData(urlStr,
                                   lineObj)

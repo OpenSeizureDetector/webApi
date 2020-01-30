@@ -2,18 +2,28 @@
 A RESTful web API for storing and retrieving seizure detector data for classification and analysis - primarily intended to collect 'normal' and 'seizure' labelled data so we can train machine learning algorithms to tell the difference
 
 ## Structure
- 1 Based on CakePHP so that it can run on low cost web hosting providers.
+ 1 Based on the Django Rest Framework, because I had a sense-of-humour-failure trying to use cakePHP - this limits which commercial proiders we can use to
+ host it.
  1 Uses MySQL back end to be conventional.
- 1 Very simple RESTful API initially - no fancy login screens etc. in the first version.
- 1 The main elements are data samples, which is a 5 second sample of data with some calculated meta data stored.
- 1 Authentication is on a per-user basis, where a user is a user of the web api.
- 1 The person wearing the watch is called a 'Wearer'.   A single authentication user can manage the data for multiple wearers.
- 
+ 1 Very simple RESTful API initially, but utilise an open source library
+ to do user registration.
+ 1 The main elements are datapoints, which is a 5 second sample of data with some calculated meta data stored.
+ 1 Each wearer of an OpenSeizureDetector watch needs a different user account
+ for the API.
 
 ## Functions
-  1 Create Single dataSample, associated with a given wearer.
-  1 Categorise a given dataset
-  1 Download data for a given wearer
+| URL                                             | Function                                                                                                 | view                                                                                                                                                                                                     |
+| ---                                             | --------                                                                                                 | -                                                                                                                                                                                                        |
+| /datapoints/ - POST                             | to create a datapoint                                                         |                                                    |
+| /datapoints/<id> - GET                          | to retrieve a datapoint, PUT to update it, DELETE to delete it.                                         
+| /datapoints/<startDateTime>,<endDateTime> - GET | to retrieve datapoints within specified date/time range - returns datapoints for the authenticated user.  Includes any events in the time range. | /datapoints/<userId>,<startDateTime>,<endDateTime> - GET | to retrieve datapoints within specified date/time range - for the specified user - must be autenticated as an admin or analyst user to do this. | |
+| /profile/<userId> - GET | Retrieve user profile information |
+| /profile/<userId> - PUT | Update user profile information |
+| /event - POST | Create an event - mark a date/time for a specific user as an event with optional notes. |
+| /event/<id> - PUT | update an event |
+| /event/<id> - DELETE | delete an event
+| /eventCategories - GET | Retrieve list of valid event categories |
+
   
   
 ## Tests
