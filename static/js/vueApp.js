@@ -61,6 +61,7 @@ var app = new Vue({
 		    this.message = error;
 		    this.appState = this.APPSTATE_NOT_LOGGED_IN;
 		});
+
 	},
 	registerBtnOnClick: function() {
 	    this.message = "Button Clicked - uname="+

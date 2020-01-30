@@ -1,0 +1,32 @@
+<html lang="en">
+  <head>
+    <title>OpenSeizureDetector webAPI</title>
+    <script src="js/jquery-3.4.1.min.js"></script>
+    <script src="js/vue.js"></script>
+    <script src="js/axios.js"></script>
+  </head>
+  <body>
+    <h1>OpenSeizureDetector webAPI</h1>
+  </body>
+  <script>
+    $( document ).ready(function() {
+    console.log( "ready!" );
+    jsonObj = {};
+    let searchParams = new URLSearchParams(window.location.search);
+    jsonObj['user_id'] = searchParams.get('user_id');
+    //jsonObj['email'] = searchParams.get('email');
+    jsonObj['timestamp'] = searchParams.get('timestamp');
+    jsonObj['signature'] = searchParams.get('signature');
+    console.log(JSON.stringify(jsonObj));
+    axios.post('/accounts/verify-registration/', {
+		jsonObj,
+	    })
+		.then(response => {
+		    console.log(JSON.stringify(response));
+		})
+		.catch(function (error) {
+		    console.log(error);
+		});
+    });
+   </script>
+</html>
