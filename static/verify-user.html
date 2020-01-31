@@ -25,6 +25,8 @@
     console.log(response['status']);
     if(response['status']==200) {
     alert(response['data']['detail']);
+    window.location.replace("/");
+    window.location.href = "/";
     }
 		})
 		.catch(function (error) {
