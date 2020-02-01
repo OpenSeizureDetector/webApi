@@ -24,6 +24,7 @@ var app = new Vue({
 	APPSTATE_EDIT_WEARER: 4,
 	appState: 0,
 	isLoggedIn: 0,
+	token: '',
 	message: 'Hello Vue from vueApp.js!',
 	ajaxMsg: 'ajax messages appear here',
 	wearers: [],
@@ -33,31 +34,42 @@ var app = new Vue({
 	email: 'email',
     },
     methods: {
+	validateStatus: function (status) {
+	    return status < 500;
+	},
 	loginBtnOnClick: function() {
 	    this.message = "Button Clicked - uname="+
 		this.uname+", passwd="+this.passwd;
-	    axios.get('api/users.json', {
-		headers: {
-		    'X-Requested-With': 'XMLHttpRequest',
-		    'Content-Type': 'application/json'
-		},
-		auth: {
-		    username: this.uname,
-		    password: this.passwd
+	    axios(
+		{
+		    method: 'post',
+		    url:'/accounts/login/',
+		    data: {
+			login: this.uname,
+			password: this.passwd,
+		    },
+		    validateStatus: this.validateStatus,
 		}
-	    })
+	    )
 		.then(response => {
 		    //console.log(JSON.stringify(response));
 		    this.ajaxMsg = response.status +
 			" - " + response.statusText +
-			" : " +response.data;
-		    this.isLoggedIn = 1;
-		    this.appState = this.APPSTATE_LIST_WEARERS;
-		    this.getWearers();		    
+			" : " +JSON.stringify(response.data);
+		    this.message = response.statusText + " : "
+			+ response.data['detail'];
+		    if (response.status == 200) {
+			this.isLoggedIn = 1;
+			this.token = response.data['token'];
+			this.appState = this.APPSTATE_LIST_WEARERS;
+		    } else {
+			this.isLoggedIn = 0;
+			this.appState = this.APPSTATE_NOT_LOGGED_IN;
+		    }
+		    //this.getWearers();		    
 		})
 		.catch(function (error) {
 		    console.log(error);
-		    this.wearers = [];
 		    this.message = error;
 		    this.appState = this.APPSTATE_NOT_LOGGED_IN;
 		});
@@ -66,38 +78,72 @@ var app = new Vue({
 	registerBtnOnClick: function() {
 	    this.message = "Button Clicked - uname="+
 		this.uname+", passwd="+this.passwd;
-	    axios.post('/accounts/register/', {
-		headers: {
-		    'X-Requested-With': 'XMLHttpRequest',
-		    'Content-Type': 'application/json'
-		},
-		body: {
+	    axios({
+		method: 'POST',
+		url: '/accounts/register/',
+		data: {
 		    username: this.uname,
 		    password: this.passwd,
-		    email:this.email
-		}
+		    email:this.email,
+		    password_confirm: this.confirm_passwd,
+		},
+		validateStatus: this.validateStatus,
 	    })
 		.then(response => {
 		    //console.log(JSON.stringify(response));
 		    this.ajaxMsg = response.status +
 			" - " + response.statusText +
-			" : " +response.data;
+			" : " +JSON.stringify(response.data);
 		    this.isLoggedIn = 1;
-		    this.appState = this.APPSTATE_LIST_WEARERS;
-		    this.getWearers();		    
+		    //this.appState = this.APPSTATE_LIST_WEARERS;
+		    //this.getWearers();		    
 		})
 		.catch(function (error) {
 		    console.log(error);
 		    this.wearers = [];
 		    this.message = error;
 		    this.appState = this.APPSTATE_NOT_LOGGED_IN;
+		    console.log("error!");
 		});
 	},
 	logoutBtnOnClick: function() {
 	    this.message = "Logout Button Clicked";
-	    this.uname = "";
-	    this.passwd = "";
-	    this.isLoggedIn = 0;
+	    headersObj = {
+		"Authorization": "Token " + this.token,
+	    };
+	    console.log(JSON.stringify(headersObj));
+	    axios(
+		{
+		    method: 'POST',
+		    url:'/accounts/logout/',
+		    headers: headersObj,
+		    data: {
+			revoke_token: true,
+		    },
+		    validateStatus: this.validateStatus,
+		}
+	    )
+		.then(response => {
+		    //console.log(JSON.stringify(response));
+		    this.ajaxMsg = response.status +
+			" - " + response.statusText +
+			" : " +JSON.stringify(response);
+		    this.message = response.statusText + " : "
+			+ response.data['detail'];
+		    if (response.status == 200) {
+			this.isLoggedIn = 0;
+			this.appState = this.APPSTATE_LIST_WEARERS;
+		    } else {
+			this.isLoggedIn = 0;
+			this.appState = this.APPSTATE_NOT_LOGGED_IN;
+		    }
+		    //this.getWearers();		    
+		})
+		.catch(function (error) {
+		    console.log(error);
+		    this.message = error;
+		    this.appState = this.APPSTATE_NOT_LOGGED_IN;
+		});
 	},
 	getWearers: function() {
 	    // Retrieve a list of the wearers associated with the current
