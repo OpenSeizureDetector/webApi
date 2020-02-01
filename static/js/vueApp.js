@@ -24,6 +24,7 @@ var app = new Vue({
 	APPSTATE_EDIT_WEARER: 4,
 	appState: 0,
 	isLoggedIn: 0,
+	token: '',
 	message: 'Hello Vue from vueApp.js!',
 	ajaxMsg: 'ajax messages appear here',
 	wearers: [],
@@ -59,6 +60,7 @@ var app = new Vue({
 			+ response.data['detail'];
 		    if (response.status == 200) {
 			this.isLoggedIn = 1;
+			this.token = response.data['token'];
 			this.appState = this.APPSTATE_LIST_WEARERS;
 		    } else {
 			this.isLoggedIn = 0;
@@ -106,9 +108,42 @@ var app = new Vue({
 	},
 	logoutBtnOnClick: function() {
 	    this.message = "Logout Button Clicked";
-	    this.uname = "";
-	    this.passwd = "";
-	    this.isLoggedIn = 0;
+	    headersObj = {
+		"Authorization": "Token " + this.token,
+	    };
+	    console.log(JSON.stringify(headersObj));
+	    axios(
+		{
+		    method: 'POST',
+		    url:'/accounts/logout/',
+		    headers: headersObj,
+		    data: {
+			revoke_token: true,
+		    },
+		    validateStatus: this.validateStatus,
+		}
+	    )
+		.then(response => {
+		    //console.log(JSON.stringify(response));
+		    this.ajaxMsg = response.status +
+			" - " + response.statusText +
+			" : " +JSON.stringify(response);
+		    this.message = response.statusText + " : "
+			+ response.data['detail'];
+		    if (response.status == 200) {
+			this.isLoggedIn = 0;
+			this.appState = this.APPSTATE_LIST_WEARERS;
+		    } else {
+			this.isLoggedIn = 0;
+			this.appState = this.APPSTATE_NOT_LOGGED_IN;
+		    }
+		    //this.getWearers();		    
+		})
+		.catch(function (error) {
+		    console.log(error);
+		    this.message = error;
+		    this.appState = this.APPSTATE_NOT_LOGGED_IN;
+		});
 	},
 	getWearers: function() {
 	    // Retrieve a list of the wearers associated with the current
