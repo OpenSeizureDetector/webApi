@@ -18,10 +18,8 @@ class DatapointUploadCsv(APIView):
     def post(self, request, format=None):
         #print("DatapointUploadCsv - data=%s" % request.data)
         #print("DatapointUploadCsv - user=%s" % str(self.request.user))
-        #dataLines = request.data.split('\n')
         print("%d lines uploaded" % len(request.data))
         for lineStr in request.data:
-            # print("line is %d characters long" % len(lineStr))
             if len(lineStr)>0:
                 #print("processing line %s" % lineStr)
                 lineParts = lineStr.split(',')
