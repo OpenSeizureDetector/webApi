@@ -11,7 +11,7 @@ from rest_framework import permissions
 from django.contrib.auth.models import User
 
 from datapoints.models import Datapoint
-from datapoints.serializers import DatapointSerializer
+from datapoints.serializers import DatapointSerializer, DatapointSummarySerializer
 
 
 class DatapointUploadCsv(APIView):
@@ -75,14 +75,94 @@ class DatapointUploadCsv(APIView):
                 #print("skipping empty line")
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-class DatapointList(generics.ListCreateAPIView):
-    queryset = Datapoint.objects.all()
+class DatapointList(generics.ListAPIView):
     serializer_class = DatapointSerializer
     permission_classes = [
         permissions.IsAuthenticated,
     ]
+    queryset = Datapoint.objects.all()
 
 
+class DatapointSummaryList(generics.ListAPIView):
+    """
+    Returns summarised data for each datapoint 
+    (does not include the rawdata array)
+    """
+    serializer_class = DatapointSummarySerializer
+    permission_classes = [
+        permissions.IsAuthenticated,
+    ]
+    #queryset = Datapoint.objects.all()
+
+    def get_queryset(self):
+        """
+        gets a filtered dataset based on query parameters:
+           user : required userId
+           start : start date/time yyyy-mm-dd hh:mm:ss
+           end : end date/time yyyy-mm-dd hh:mm:ss
+           duration:  required duration (minutes)
+        If both start and end are specified, duration is ignored.
+        duration is used if only start or end is specified.
+        """
+        queryset = Datapoint.objects.all().order_by('dataTime')
+        user = self.request.query_params.get('user', None)
+        startDateStr = self.request.query_params.get('start', None)
+        endDateStr = self.request.query_params.get('end', None)
+        durationMinStr = self.request.query_params.get('duration', None)
+
+        # convert dates into datetime objects.
+        if startDateStr is not None:
+            startDate = datetime.datetime.strptime(
+                    startDateStr, "%Y-%m-%d %H:%M:%S")
+        else:
+            startDate = None
+
+        if endDateStr is not None:
+            endDate = datetime.datetime.strptime(
+                    endDateStr, "%Y-%m-%d %H:%M:%S")
+        else:
+            endDate = None
+
+        # Decide which start and end date to use, based on which parameters
+        # we have been given.
+        if (startDate is None and endDate is None):
+            print("no dates specified - returning all records")
+        else:
+            if (startDate is None):
+                print("startDate not specified - trying to derive it from endDate")
+                if (durationMinStr is not None):
+                    dt = datetime.timedelta(minutes=float(durationMinStr))
+                    startDate = endDate-dt
+                else:
+                    print("duration not specified, so we can't!")
+                    startDate = None
+                    endDate = None
+            if (endDate is None):
+                print("endDate not specified - trying to derive it from endDate")
+                if (durationMinStr is not None):
+                    dt = datetime.timedelta(minutes=float(durationMinStr))
+                    endDate = startDate+dt
+                else:
+                    print("duration not specified, so we can't!")
+                    startDate = None
+                    endDate = None
+            
+            
+        print("DatapointSummaryList.get_queryset() - user=%s, start=%s, end=%s, duration=%s" % (user,startDateStr, endDateStr, durationMinStr))
+        print("DatapointSummaryList.get_queryset() - user=%s, start=%s, end=%s, duration=%s" % (
+            user,
+            startDate.strftime("%Y-%m-%d %H:%M:%S"),
+            endDate.strftime("%Y-%m-%d %H:%M:%S"),
+            durationMinStr))
+
+        if user is not None:
+            queryset = queryset.filter(userId=user)
+        if startDate is not None and endDate is not None:
+            queryset = queryset.filter(dataTime__gte=startDate, dataTime__lte=endDate)
+        return queryset
+
+    
+    
 class DatapointDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Datapoint.objects.all()
     serializer_class = DatapointSerializer
