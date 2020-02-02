@@ -1,0 +1,2 @@
+Uploading 7700 lines one line at a time took just over 14 minutes (local network)
+Uploading the same data as one http request took 51 sec.   So avoiding multiple  http requests is the thing to do!

@@ -43,60 +43,77 @@ class libosd:
 
         print("baseurl=%s, uname=%s, passwd=%s" %
               (self.baseurl, self.uname, self.passwd))
+
+        self.getToken()
         
     def uploadFile(self, fname, wearerId=1):
-        print("uploadFile")
+        print("libosd.uploadFile")
+        #urlStr = "%s/datapoints/add.json" % self.baseurl
+        #urlStr = "%s/datapoints/" % self.baseurl
+        urlStr = "%s/uploadCsvData/" % self.baseurl
+        print("libosd: urlStr=%s" % urlStr)
         if (os.path.isfile(fname)):
             print("Opening file %s" % (fname))
             with open(fname) as infile:
                 lineStr = "start"
                 lineCount = 0
-                while (lineStr):
-                    lineStr = infile.readline()
-                    lineCount += 1
-                    lineParts = lineStr.split(',')
-                    lineObj = {}
-                    lineObj['dateStr'] = lineParts[0]
-                    fftArr = []
-                    for n in range(0, 10):
-                        fftArr.append(float(lineParts[n+1]))
-                    lineObj['fftArr'] = fftArr
-                    lineObj['specPower'] = float(lineParts[11])
-                    lineObj['roiPower'] = float(lineParts[12])
-                    lineObj['sampleFreq'] = float(lineParts[13])
-                    lineObj['statusStr'] = lineParts[14].strip()
-                    lineObj['hr'] = float(lineParts[15])
-                    lineObj['wearerId'] = wearerId
-                    rawDataArr = []
-                    for n in range(16, len(lineParts)):
-                        rawDataArr.append(float(lineParts[n]))
-                    lineObj['rawData'] = rawDataArr
-                    # jsonStr = json.dumps(lineObj)
+                #while (lineStr):
+                #    lineStr = infile.readline()
                     # print(lineStr)
-                    # print(lineObj)
-                    # print(jsonStr)
-                    urlStr = "%s/datapoints/add.json" % self.baseurl
-                    urlStr = "%s/datapoints/" % self.baseurl
-                    print("urlStr=%s" % urlStr)
-                    self.postData(urlStr,
-                                  lineObj)
-                    lineStr = None
-                print("uploadFile() - eof - linecount=%d" % lineCount)
+                #    self.postData(urlStr,
+                #                  lineStr)
+                    #lineStr = None
+                lineStrs = infile.readlines()
+                print("%d lines read from file" % len(lineStrs))
+                self.postData(urlStr, lineStrs)
+                print("libosd.uploadFile() - eof - linecount=%d" % lineCount)
 
     def postData(self, url, data):
-        print("postData() - url=%s, data=%s" % (url, data))
-        response = requests.post(url,
-                                 auth=(self.uname, self.passwd),
-                                 json=data)
+        headerObj = {
+                "Authorization": "Token %s" % self.token
+        }
+        #print("libosd.postData() - url=%s, data=%s" % (url, data))
+        #print("libosd.postData() - headerObj=",headerObj)
+        response = requests.post(
+            url,
+            headers=headerObj,
+            #auth=(self.uname, self.passwd),
+            json=data)
         # print("postData() - response=%s" % response.text)
         # print(response.status)
         # print(response.reason)
+        print("libosd.postdata(): Status Code=%d" % response.status_code)
+        # print(dir(response))
+        print("libosd.postdata(): Response=", response.text)
+
+    def getToken(self):
+        print("getToken")
+        urlStr = "%s/accounts/login/" % self.baseurl
+        print("urlStr=%s" % urlStr)
+        response = requests.post(
+            urlStr,
+            json = {
+                "login": self.uname,
+		"password": self.passwd
+                }
+        )
         print("Status Code=%d" % response.status_code)
+        if (response.status_code == 200):
+            jsonObj = json.loads(response.text)
+            self.token = jsonObj['token']
+            print("token=%s" % self.token)
+        else:
+            self.token = None
+            print("ERROR - Token not set")
         # print(dir(response))
         print(response.text)
 
+
+
+
+        
         
 if (__name__ == "__main__"):
     print("libosd.main()")
-    osd = libosd(cfg="client.cfg", uname="user", passwd="user_pw")
+    osd = libosd(cfg="client.cfg", uname="user15", passwd="user_pw1234")
     osd.uploadFile("DataLog_2019-11-04.txt", wearerId=3)
