@@ -1,2 +1,16 @@
 Uploading 7700 lines one line at a time took just over 14 minutes (local network)
 Uploading the same data as one http request took 51 sec.   So avoiding multiple  http requests is the thing to do!
+
+
+
+Retrieve data with: 
+http --json POST https://osd.dynu.net/accounts/login/ login='user15' password='user_pw1234'
+http --json GET "https://osd.dynu.net/dataSummary/?user=15" 'Authorization: Token 9b0674885d06b50965db15a2a444a6f0e85085c2'
+
+Data range tests
+http --json GET "https://osd.dynu.net/dataSummary/?user=14&start=2019-11-04 01:00:00&duration=10" 'Authorization: Token 9b0674885d06b50965db15a2a444a6f0e85085c2'
+http --json GET "https://osd.dynu.net/dataSummary/?user=14&end=2019-11-04 01:00:00&duration=10" 'Authorization: Token 9b0674885d06b50965db15a2a444a6f0e85085c2'
+http --json GET "https://osd.dynu.net/dataSummary/?user=14&start=2019-11-04 01:00:00&duration=1.0" 'Authorization: Token 9b0674885d06b50965db15a2a444a6f0e85085c2'
+http --json GET "https://osd.dynu.net/dataSummary/?user=14&start=2019-11-04 01:00:00&end=2019-11-04 01:01:00" 'Authorization: Token 9b0674885d06b50965db15a2a444a6f0e85085c2'
+
+
