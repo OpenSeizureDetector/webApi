@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'rest_registration',
     'django_filters',
     'datapoints',
+    'events',
 ]
 
 MIDDLEWARE = [
@@ -79,11 +80,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'webApi.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/2.2/ref/settings/#databases
-
 
 DATABASES = {
     'default': {
@@ -123,7 +119,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en-gb'
 
 TIME_ZONE = 'UTC'
 
@@ -144,7 +140,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         #'rest_framework.authentication.BasicAuthentication',
-        #'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ],
 #    'DEFAULT_PERMISSION_CLASSES': (

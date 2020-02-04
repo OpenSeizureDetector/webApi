@@ -12,16 +12,33 @@ from django.contrib.auth.models import User
 
 from datapoints.models import Datapoint
 from datapoints.serializers import DatapointSerializer, DatapointSummarySerializer
+from events.models import Event
+from events.serializers import EventSerializer
+
+UNVALIDATED_ALARM_TYPE = 0
+UNVALIDATED_WARNING_TYPE = 1
 
 
 class DatapointUploadCsv(APIView):
+    def createEvent(self,eventType, dataTime):
+        eventData = {
+            'userId' : self.request.user.pk,
+            'eventType' : eventType,
+            'dataTime' : dataTime,
+            'desc' : "Created from DatapointUploadCsv",
+        }
+        print("eventData=",eventData)
+        serializer = EventSerializer(data=eventData)
+        if serializer.is_valid():
+            serializer.save()
+    
     def post(self, request, format=None):
         #print("DatapointUploadCsv - data=%s" % request.data)
         #print("DatapointUploadCsv - user=%s" % str(self.request.user))
-        #dataLines = request.data.split('\n')
         print("%d lines uploaded" % len(request.data))
+        lastStatus="OK"
+        lastTime = None
         for lineStr in request.data:
-            # print("line is %d characters long" % len(lineStr))
             if len(lineStr)>0:
                 #print("processing line %s" % lineStr)
                 lineParts = lineStr.split(',')
@@ -65,6 +82,19 @@ class DatapointUploadCsv(APIView):
                 serializer = DatapointSerializer(data=dpData)
                 if serializer.is_valid():
                     serializer.save()
+                    # Create an event if appropriate
+                    if (lastStatus=="ALARM" and lineObj['statusStr']!="ALARM"):
+                        print("Creating alarm event",dpData)
+                        self.createEvent(
+                            UNVALIDATED_ALARM_TYPE,
+                            dpData['dataTime'])
+                    if (lastStatus=="WARNING" and lineObj['statusStr']!="ALARM"):
+                        print("Creating warning event",dpData)
+                        self.createEvent(
+                            UNVALIDATED_WARNING_TYPE,
+                            dpData['dataTime'])
+                    lastStatus = lineObj['statusStr']
+                    lastTime = dataDateStr
                 else:
                     return Response(
                         serializer.errors,
