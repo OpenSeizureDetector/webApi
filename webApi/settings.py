@@ -43,22 +43,26 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
     'rest_registration',
     'django_filters',
     'datapoints',
     'events',
+    'userdata',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    #'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'webApi.urls'
@@ -140,8 +144,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         #'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
+        #'rest_framework.authentication.SessionAuthentication',
     ],
 #    'DEFAULT_PERMISSION_CLASSES': (
 #        'rest_framework.permissions.IsAuthenticated', ),
@@ -174,3 +178,10 @@ EMAIL_PORT = credentials['email_port']
 EMAIL_HOST_USER = credentials['email_host_user']
 EMAIL_HOST_PASSWORD = credentials['email_host_passwd']
 EMAIL_USE_TLS = True
+
+
+CORS_ORIGIN_WHITELIST = [
+    "https://osd.dynu.net",
+    "http://localhost:8080",
+    "http://127.0.0.1:8080"
+]
