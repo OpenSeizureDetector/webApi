@@ -24,7 +24,12 @@ A RESTful web API for storing and retrieving seizure detector data for classific
 | /event/<id> - DELETE | delete an event
 | /eventCategories - GET | Retrieve list of valid event categories |
 
-  
+Retrieve all events for a given user:
+GET /events/?user=14
+Retrieve events for a given user over a given time frame
+GET /events/?user=14&start=2019-11-04 07:44:00&duration=5
+GET /events/?user=14&end=2019-11-04 07:49:00&duration=5
+GET /events/?user=14&start=2019-11-04 07:44:00&end=2019-11-04 07:49:00
   
 ## Tests
   1 Unauthenticated user uploads data - fail.
