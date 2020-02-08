@@ -1,8 +1,8 @@
 <template>
     <v-container fill-height>
         <v-layout align-center justify-center>
-          <v-flex xs12 sm8 md4>
-	    <h1>Login to OpenSeizureDetector WebAPI</h1>
+          <v-flex xs24 sm16 md8>
+	    <h1>Create Account to Use OpenSeizureDetector WebAPI</h1>
 
             <v-form ref="form" v-model="valid" lazy-validation>
               <v-text-field
@@ -18,13 +18,17 @@
 		required
 		v-model="password" :rules="passwordRules">
               </v-text-field>
-	      <v-btn color="primary" @click="submit">Login</v-btn>
+              <v-text-field
+		name="confirmpassword"
+		label="Confrm Password"
+		id="confirmpassword"
+                type="password"
+		required
+		v-model="confirmpassword" :rules="passwordRules">
+              </v-text-field>
+	      <v-btn color="primary" @click="submit">Create Account</v-btn>
             </v-form>
 	    
-	    <p>
-	      Not Registered?
-              <v-btn text to="/register">Create account</v-btn>
-	    </p>
             </v-flex>
         </v-layout>
     </v-container>
@@ -32,11 +36,13 @@
 
 <script>
 export default {
-    name: 'Login',
+    name: 'Register',
     data() { return {
 	valid: false,
 	uname: '',
+	email: '',
         password: '',
+        confirmpassword: '',
         passwordRules: [
             v => !!v || 'Password is required',
             v =>
@@ -48,10 +54,11 @@ export default {
     methods: {
 	submit() {
             if (this.$refs.form.validate()) {
-		this.$store.dispatch('login', {
-                    uname: this.uname,
-                    password: this.password
-		});
+		//this.$store.dispatch('login', {
+                //    uname: this.uname,
+                //    password: this.password
+		//});
+		console.log("FIXME - register button does not work!");
             }
 	}
     }
