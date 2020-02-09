@@ -42,6 +42,7 @@ GET /events/?user=14&start=2019-11-04 07:44:00&end=2019-11-04 07:49:00
 ## Installation
 From Ubuntu 18.04 LTS
 
+### Backend
 mkvirtualenv --python=/usr/bin/python3 webpy
 workon webpy
 pip install django django-rest-framework
@@ -62,3 +63,7 @@ it access to your mySql database.
 ./manage.py makemigrations
 ./manage.py migrate
 
+
+### Front End
+sudo apt install npm
+npm install -g @vue/cli
