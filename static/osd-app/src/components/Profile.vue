@@ -2,7 +2,7 @@
     <v-container fill-height>
         <v-layout align-center justify-center>
           <v-flex xs12 sm8 md4>
-	    <h1>Login to OpenSeizureDetector WebAPI</h1>
+	    <h1>User Profile</h1>
 
             <v-form ref="form" v-model="valid" lazy-validation>
               <v-text-field
@@ -16,14 +16,14 @@
 		id="password"
                 type="password"
 		required
-		v-model="password" :rules="passwordRules">
+		v-model="password"  :rules="passwordRules">
               </v-text-field>
-	      <v-btn color="primary" @click="submit">Login</v-btn>
+	      <v-btn color="primary" @click="submit">Update</v-btn>
             </v-form>
 	    
 	    <p>
 	      Not Registered?
-              <v-btn text to="/register">Create account</v-btn>
+              <v-btn text>Create account</v-btn>
 	    </p>
             </v-flex>
         </v-layout>
@@ -32,7 +32,7 @@
 
 <script>
 export default {
-    name: 'Login',
+    name: 'Profile',
     data() { return {
 	valid: false,
 	uname: '',
@@ -42,16 +42,13 @@ export default {
             v =>
                 v.length >= 6 ||
                 'Password must be greater than 6 characters'
-        ]
+        ],
     };
 	   },
     methods: {
 	submit() {
             if (this.$refs.form.validate()) {
-		this.$store.dispatch('login', {
-                    uname: this.uname,
-                    password: this.password
-		});
+		console.log("submit() - FIXME - this doesn't do anything");
             }
 	}
     }
