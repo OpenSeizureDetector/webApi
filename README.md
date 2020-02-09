@@ -37,6 +37,7 @@ A RESTful web API for storing and retrieving seizure detector data for classific
 ## Installation
 From Ubuntu 18.04 LTS
 
+### Backend
 mkvirtualenv --python=/usr/bin/python3 webpy
 workon webpy
 pip install django django-rest-framework
@@ -57,3 +58,7 @@ it access to your mySql database.
 ./manage.py makemigrations
 ./manage.py migrate
 
+
+### Front End
+sudo apt install npm
+npm install -g @vue/cli
