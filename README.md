@@ -36,45 +36,24 @@ A RESTful web API for storing and retrieving seizure detector data for classific
 
 ## Installation
 From Ubuntu 18.04 LTS
-sudo apt install php php-cli php-json php-pdo php-mysql php-zip 
-sudo apt install php-gd php-mbstring php-curl php-xml php-pear 
-sudo apt install php-bcmath php-intl
+
+mkvirtualenv --python=/usr/bin/python3 webpy
+workon webpy
+pip install django django-rest-framework
+pip install mysqlclient
+pip install django-rest-registration
+pip install django-filter
+pip install numpy
+pip install django-cors-headers
 git clone https://github.com/OpenSeizureDetector/webApi.git
-cd webApi/app
-Install the php dependencies with:
-../composer.phar install
+cd webApi
 
 Create a mysql database and associated user/password
-Execute mysql -u <user name> -p <database name> <createdb.sql
 
-Edit webApi/app/config/app.php to use database credentials that will give
+copy webApi/webApi/credentials.json.template to webApi/webApi/credentials.json
+Edit webApi/webApi/credentials.json to use database credentials that will give
 it access to your mySql database.
-bin/cake server
- - should be able to see somethign useful at http://localhost:8765
- 
- 
- Create mysql databases:
- sudo mysql -u root
-    > create database osd;
-	> create database osd_test;
-	> grant all on osd.* to osd@localhost identified by '<insert password>';
-	> grant all on osd_test.* to osd@localhost;
-	> exit
-	
- Check database:
- mysql -u osd -p osd
- <type password when prompted>
-	 > show tables;
-	 - should give a list of tables
-	 
-	 > select * from users;
-	 - should list all users currently defined.
 
+./manage.py makemigrations
+./manage.py migrate
 
-
-Note:  Initial database has three users defined as follows:
-admin / admin_pw
-analyst / analyst_pw
-user / user_pw
-
-** Change their passwords before making the system live using app/bin/cake Password command **
