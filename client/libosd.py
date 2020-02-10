@@ -5,8 +5,8 @@ import json
 import requests
 
 class libosd:
-    uname = "graham"
-    passwd = "testpwxyz"
+    uname = "user"
+    passwd = "user1_pw"
     baseUrl = "osd.dynu.net"
 
     def __init__(self, cfg=None, baseurl=None, uname=None, passwd=None):

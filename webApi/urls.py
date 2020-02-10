@@ -8,9 +8,12 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from rest_framework.routers import DefaultRouter
 from datapoints.views import DatapointList, DatapointSummaryList, DatapointUploadCsv
 from events.views import EventViewSet
+from userdata.views import ProfileViewSet, LicenceViewSet
 
 router = DefaultRouter()
 router.register(r'events', EventViewSet)
+router.register(r'profile', ProfileViewSet)
+router.register(r'licence', LicenceViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
