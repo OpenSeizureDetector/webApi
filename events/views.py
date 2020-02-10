@@ -31,7 +31,7 @@ class EventViewSet(viewsets.ModelViewSet):
         endDateStr = self.request.query_params.get('end', None)
         durationMinStr = self.request.query_params.get('duration', None)
         authUser = self.request.user
-        print("authUser="+str(authUser))
+        print("events.views.get_queryset(): authUser="+str(authUser))
 
         queryset = common.queryUtils.dateFilter(
             queryset,
@@ -41,6 +41,6 @@ class EventViewSet(viewsets.ModelViewSet):
 
         queryset = common.queryUtils.userFilter(
             queryset,
-            user, authUser.id)
+            user, authUser)
         return queryset
 

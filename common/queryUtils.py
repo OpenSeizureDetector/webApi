@@ -9,13 +9,14 @@ def userFilter(queryset, user, authUser):
     some users to access other users' data - this
     """
     if authUser is None:
-        print("authUser is None - returning None")
+        print("common.queryUtils.userFilter: authUser is None - returning None")
         return queryset.filter(pk=-1)
     else:
-        print("authUser is not None - filtering")
-    
+        print("common.queryUtils.userFilter: authUser is not None - filtering")
+    print("common.queryUtils.userFilter: user=",user)
+    print("common.queryUtils.userFilter: authUser=",authUser)
     if user is not None:
-        print("userFilter: authUser="+authUser)
+        print("common.queryUtils.userFilter: userFilter: authUser="+authUser)
         if (user == authUser):
             queryset = queryset.filter(userId=user)
         else:
@@ -23,8 +24,10 @@ def userFilter(queryset, user, authUser):
             # analyst, and if they are, return the data.
             queryset = queryset.filter(userId=authUser)
     else:
+        print("user is None - returning data for authUser")
         queryset = queryset.filter(userId=authUser)
-
+    print("common.queryUtils.userFilter: returning queryset = ",queryset.query)
+    return queryset
 
 def dateFilter(queryset,
                startDateStr, endDateStr, durationMinStr):

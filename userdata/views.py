@@ -11,7 +11,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         print("ProfileViewSet.perform_create()")
-        serializer.save(userId=self.request.user)
+        serializer.save(user=self.request.user)
 
 class LicenceViewSet(viewsets.ModelViewSet):
     queryset = Licence.objects.all()
