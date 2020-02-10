@@ -13,6 +13,12 @@ export default new Vuex.Store({
 	token: null
     },
     getters: {
+	baseUrl(state) {
+	    return state.baseUrl;
+	},
+	token(state) {
+	    return state.token;
+	},
 	isAuthenticated(state) {
 	    console.log("getters.isAuthenticated: "+state.isAuthenticated);
 	    return state.isAuthenticated;

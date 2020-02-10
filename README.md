@@ -61,4 +61,5 @@ it access to your mySql database.
 
 ### Front End
 sudo apt install npm
-npm install -g @vue/cli
+sudo npm install -g @vue/cli
+
