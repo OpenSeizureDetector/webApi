@@ -1,12 +1,30 @@
 <template>
     <v-container fill-height>
         <v-layout align-center justify-center>
-          <v-flex xs12 sm16 md16>
+          <v-flex xs12 sm12 md12>
 	    <h1>Events</h1>
+	    <p>Select Events by Date:</p>
+	    <v-flex xs12 sm12 md12>
+	      <v-datetime-picker xs5 sm5 md5
+				 label="Start"
+				 v-model="startDateTime"
+				 date-format="yyyy-MM-dd"
+				 time-format="HH:mm:ss">
+	      </v-datetime-picker>
+	      <v-datetime-picker  xs5 sm5 md5
+				  label="End"
+				  v-model="endDateTime"
+				  date-format="yyyy-MM-dd"
+				  time-format="HH:mm:ss">
+>
+	      </v-datetime-picker>
+ 	      <v-btn color="primary" @click="getEvents">Get Events</v-btn>
+	    </v-flex>
+	    <br/>
 	    url= {{url}}
 	    token={{token}}
+	    <br/>
             <v-form ref="form" v-model="valid" lazy-validation>
- 	      <v-btn color="primary" @click="getEvents">Get Events</v-btn>
 	      <ul id="events-list">
 		<li v-for="e in events">
 		  {{e.dataTime}} : {{e.eventType}}
@@ -34,10 +52,13 @@
 
 <script>
 import axios from 'axios';
+var dateFormat = require('dateformat');
 export default {
     name: 'Events',
     data() { return {
 	valid: false,
+	startDateTime: "2019-01-01 00:00:00",
+	endDateTime: "2021-01-01 00:00:00",
 	events: [],
 	eventTypes : [
 	    { value: 0 , text: "Alarm (unvalidated)" },
@@ -71,7 +92,12 @@ export default {
 		axios(
 		    {
 			method: 'get',
-			url: this.url+'/events/',
+			url: this.url+'/events/?start='+
+			    dateFormat(this.startDateTime,
+				       "yyyy-mm-dd hh:MM:ss")+
+			    '&end='+
+			    dateFormat(this.endDateTime,
+					       "yyyy-mm-dd hh:MM:ss"),
 			headers: { Authorization: `Token `+this.token },
 			data: {
 			},
