@@ -1,53 +1,42 @@
 <template>
-    <v-container fill-height>
-        <v-layout align-center justify-center>
-          <v-flex xs12 sm12 md12>
-	    <h1>Events</h1>
-	    <p>Select Events by Date:</p>
-	    <v-flex xs12 sm12 md12>
-	      <v-datetime-picker xs5 sm5 md5
-				 label="Start"
-				 v-model="startDateTime"
-				 date-format="yyyy-MM-dd"
-				 time-format="HH:mm:ss">
-	      </v-datetime-picker>
-	      <v-datetime-picker  xs5 sm5 md5
-				  label="End"
-				  v-model="endDateTime"
-				  date-format="yyyy-MM-dd"
-				  time-format="HH:mm:ss">
->
-	      </v-datetime-picker>
- 	      <v-btn color="primary" @click="getEvents">Get Events</v-btn>
-	    </v-flex>
-	    <br/>
-	    url= {{url}}
-	    token={{token}}
-	    <br/>
-            <v-form ref="form" v-model="valid" lazy-validation>
-	      <ul id="events-list">
-		<li v-for="e in events">
-		  {{e.dataTime}} : {{e.eventType}}
-		  <v-select
-		    v-model="e.eventType"
-		    :items="eventTypes"
-		    menu-props="auto"
-		    hide-details
-		    label="Select"
-		    single-line
-		    ></v-select>
-		  <v-text-field
-		    v-model="e.desc"
-		    label="Description"
-		    ></v-text-field>
- 		  <v-btn color="primary" @click="updateEvent">Update</v-btn>
-		</li>
-	      </ul>
-           </v-form>
-	    
-          </v-flex>
-        </v-layout>
-    </v-container>
+  <v-container>
+    <v-card>
+      <v-card-title>
+	<h1>Events</h1>
+      </v-card-title>
+      <v-card-text>
+	<p>Select Events by Date:</p>
+	<v-form ref="form" v-model="valid" lazy-validation>
+	  <v-datetime-picker
+	    label="Start"
+	    v-model="startDateTime"
+	    date-format="yyyy-MM-dd"
+	    time-format="HH:mm:ss">
+	  </v-datetime-picker>
+	  <v-datetime-picker
+	    label="End"
+	    v-model="endDateTime"
+	    date-format="yyyy-MM-dd"
+	    time-format="HH:mm:ss">
+	    >
+	  </v-datetime-picker>
+	</v-form>
+      </v-card-text>
+      <v-card-actions>
+	<v-btn color="primary" @click="getEvents">Get Events</v-btn>
+      </v-card-actions>
+    </v-card>
+    <v-data-table
+      :headers="tableHeaders"
+      :items="events"
+      :items-per-page="20"
+      class="elevation-1"
+      >
+      <template v-slot:item.eventType= {item}>
+	{{ eventTypes[item.eventType].text }}
+      </template>
+    </v-data-table>
+  </v-container>
 </template>
 
 <script>
@@ -68,7 +57,12 @@ export default {
 	    { value: 4 ,  text: "Tonic-Clonic Seizure" },
 	    { value: 5 ,  text: "Other Seizure" },
 	    { value: 6 ,  text: "Other Medical Issue" }
-	]
+	],
+	tableHeaders : [
+	    {text: "Date/Time", value: 'dataTime'},
+	    {text: "Event Type", value: 'eventType'},
+	    {text: "Notes", value: 'desc'}
+	    ],
     };
 	   },
     computed: {
@@ -77,8 +71,12 @@ export default {
             },
 	url () {
                 return this.$store.state.baseUrl;
-            }
-	},
+        },
+	eventTypeText(eventType) {
+	    return this.eventTypes[eventType];
+	}
+    },
+    
     methods: {
 	getEvents() {
 	    var self = this;
