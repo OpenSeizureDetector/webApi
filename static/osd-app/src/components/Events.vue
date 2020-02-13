@@ -2,10 +2,9 @@
   <v-container>
     <v-card>
       <v-card-title>
-	<h1>Events</h1>
+	<h1>Events - Select Events by Date</h1>
       </v-card-title>
       <v-card-text>
-	<p>Select Events by Date:</p>
 	<v-form ref="form" v-model="valid" lazy-validation>
 	  <v-row>
 	    <v-col>
@@ -26,10 +25,10 @@
 	      </v-datetime-picker>
 	    </v-col>
 	  </v-row>
+	<v-btn color="primary" @click="getEvents">Get Events</v-btn>
 	</v-form>
       </v-card-text>
       <v-card-actions>
-	<v-btn color="primary" @click="getEvents">Get Events</v-btn>
       </v-card-actions>
     </v-card>
     
@@ -43,7 +42,7 @@
 	<v-dialog v-model="dialog" max-width="500px">
           <template v-slot:activator="{ on }">
             <v-btn color="primary" dark class="mb-2"
-		   v-on="on">New Event</v-btn>
+		   v-on="on">Add New Event</v-btn>
           </template>
           <v-card>
             <v-card-title>
@@ -90,17 +89,24 @@
       </template>
       <template v-slot:item.dataTime = {item}>
 	<!--{{ dateStr(item.dataTime) }}-->
-	{{ item.dataTime }}
+	{{ dateStr(item.dataTime) }}
       </template>
       <template v-slot:item.eventType= {item}>
-	{{ eventTypes[item.eventType].text }}
+	<span  v-bind:style="{ backgroundColor: 
+		      (item.eventType < 2 ? 'LightYellow' : 'transparent' ),
+		      color:(item.eventType>3 ?'red' : 'black'),
+		      'font-weight':(item.eventType>3 ? 'bold' : 'normal')
+		      }" 
+		      >
+	  {{ eventTypes[item.eventType].text }}
+	  </span>
       </template>
       <template v-slot:item.action="{ item }">
 	<v-icon small class="mr-2" @click="editEvent(item)">
-          edit
-	</v-icon>
+          mdi-pencil
+</v-icon>
 	<v-icon small @click="deleteEvent(item)">
-          delete
+          mdi-delete
 	</v-icon>
       </template>
 
@@ -116,6 +122,7 @@ export default {
     data() { return {
 	dialog: false,
 	valid: false,
+	dateFormatStr : "yyyy-mm-dd hh:MM:ss",
 	startDateTime: "2019-01-01 00:00:00",
 	endDateTime: "2021-01-01 00:00:00",
 	events: [],
@@ -137,6 +144,7 @@ export default {
 	],
 	editedIndex : -1,
 	editedEvent : {
+	    id : null,
 	    dataTime : new Date(),
 	    eventType : 7,
 	    desc : "",
@@ -158,17 +166,6 @@ export default {
 	eventTypeText(eventType) {
 	    return this.eventTypes[eventType];
 	},
-	dateStr: function(dataTime) {
-	    var d;
-	    if (dataTime instanceof Date) {
-		console.log("dateSTr - dataTime is Date");
-		d = dataTime;
-	    } else {
-		console.log("dateStr - converting dataTime to Date");
-		d = Date(dataTime);
-	    }
-	    return dateFormat(d, "yyyy-mm-dd hh:MM:ss");
-	}
     },
     watch: {
       dialog (val) {
@@ -177,9 +174,27 @@ export default {
     },
     created() {
 	console.log("Events.vue.created()");
+	//this.getEvents();
+    },
+    mounted() {
+	console.log("Events.vue.mounted()");
+	this.getEvents();
     },
     
     methods: {
+	dateStr: function(dataTime) {
+	    var d;
+	    if (dataTime instanceof Date) {
+		//console.log("dateSTr - dataTime is already a Date object");
+		d = dataTime;
+	    } else {
+		//console.log("dateStr - converting dataTime to Date object");
+		d = Date.parse(dataTime);
+	    }
+	    var dStr = dateFormat(d, this.dateFormatStr); 
+	    //console.log("Converting "+dataTime+" to "+dStr);
+	    return dStr;
+	},
 	getEvents() {
 	    var self = this;
             if (this.$refs.form.validate()) {
@@ -192,10 +207,10 @@ export default {
 			method: 'get',
 			url: this.url+'/events/?start='+
 			    dateFormat(this.startDateTime,
-				       "yyyy-mm-dd hh:MM:ss")+
+				       self.dateFormatStr)+
 			    '&end='+
 			    dateFormat(this.endDateTime,
-					       "yyyy-mm-dd hh:MM:ss"),
+					       self.dateFormatStr),
 			headers: { Authorization: `Token `+this.token },
 			data: {
 			},
@@ -222,18 +237,120 @@ export default {
 		 //   })
 	    }
         },
-	updateEvent() {
-	    console.log("updateEvent()");
-	},
+	uploadToServer(eventObj) {
+	    // Upload the given event to the database.  If the ID is
+	    // included in the object, it uses PUT to update an existing
+	    // entry.  If ID is not specified it uses POST to create another one
+	    var self = this;
+	    var methodStr;
+	    var urlStr;
+	    const config = {
+		headers: { Authorization: `Token `+this.token }
+	    };
+	    console.log("uploadToServer()....event="+JSON.stringify(eventObj));
+	    if (eventObj['id'] != null) {
+		console.log("we have an existing record id, so updating it");
+		methodStr = "PUT";
+		urlStr = this.url+'/events/'+eventObj['id']+'/';
+	    } else {
+		console.log("no record id present - creating it");
+		methodStr = "POST";
+		urlStr = this.url+'/events/';
+	    }
+
+	    console.log(".........methodStr="+methodStr+" urlStr="+urlStr);
+	    axios(
+		{
+		    method: methodStr,
+		    url: urlStr,
+		    headers: { Authorization: `Token `+this.token },
+		    data: eventObj,
+		    validateStatus: function(status) {
+			return status<500;
+			},
+		}
+	    )
+		.then(response => {
+		    if (response.status == 200 ||
+		       response.status == 201 ) {
+			console.log(response.status +
+				    " - " + response.statusText +
+				    " : " +JSON.stringify(response.data));
+		    } else {
+			console.log(response.status +
+				    " - " + response.statusText +
+				    " : " +JSON.stringify(response.data));
+		    
+			alert("Failed to upload record: " +
+			      response.status +
+			      " - " + response.statusText +
+			      " : " +JSON.stringify(response.data));
+		    }
+		})
+        },
+	deleteOnServer(eventId) {
+	    // deletes event number eventId on the server.
+	    var self = this;
+	    var methodStr;
+	    var urlStr;
+	    const config = {
+		headers: { Authorization: `Token `+this.token }
+	    };
+	    methodStr = "DELETE";
+	    urlStr = this.url+'/events/'+eventId+'/';
+	    console.log(".........methodStr="+methodStr+" urlStr="+urlStr);
+	    axios(
+		{
+		    method: methodStr,
+		    url: urlStr,
+		    headers: { Authorization: `Token `+this.token },
+		    data: {},
+		    validateStatus: function(status) {
+			return status<500;
+			},
+		}
+	    )
+		.then(response => {
+		    if (response.status == 204) {
+			console.log(response.status +
+				    " - " + response.statusText +
+				    " : " +JSON.stringify(response.data));
+		    } else {
+			console.log(response.status +
+				    " - " + response.statusText +
+				    " : " +JSON.stringify(response.data));
+		    
+			alert("Failed to delete record: " +
+			      response.status +
+			      " - " + response.statusText +
+			      " : " +JSON.stringify(response.data));
+		    }
+		})
+        },
 	editEvent (event) {
             this.editedIndex = this.events.indexOf(event)
             this.editedEvent = Object.assign({}, event)
+	    console.log("Type of dataTime = "+typeof this.editedEvent['dataTime']);
+	    if (this.editedEvent['dataTime'] instanceof Date) {
+		console.log("editEvent: converting Date object to String");
+		this.editedEvent['dataTime'] = dateFormat(this.editedEvent['dataTime'], this.dateFormatStr); 
+		//this.editedEvent['dataTime']=Date.parse(this.editedEvent['dataTime']);
+	    } else {
+		console.log("editEvent - dataTime is already a String object - reformatting");
+		var d = Date.parse(this.editedEvent['dataTime']);
+		this.editedEvent['dataTime'] = dateFormat(d, this.dateFormatStr); 
+		console.log("dataTime="+this.editedEvent['dataTime']);
+		}
             this.dialog = true
 	},
 	
 	deleteEvent (event) {
-            const index = this.events.indexOf(event)
-            confirm('Are you sure you want to delete this event?') && this.events.splice(event, 1)
+            const index = this.events.indexOf(event);
+	    var eventId = event['id'];
+            if (confirm('Are you sure you want to delete this event?')) {
+		this.events.splice(index, 1);
+		this.deleteOnServer(eventId);
+	    }
 	},
 	
 	close () {
@@ -246,10 +363,11 @@ export default {
 
 	save () {
             if (this.editedIndex > -1) {
-		Object.assign(this.events[this.editedIndex], this.editedEvent)
+		Object.assign(this.events[this.editedIndex], this.editedEvent);
             } else {
 		this.events.push(this.editedEvent)
             }
+	    this.uploadToServer(this.editedEvent);
             this.close()
 	},
     },
