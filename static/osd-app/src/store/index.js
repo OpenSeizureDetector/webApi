@@ -43,7 +43,7 @@ export default new Vuex.Store({
 	    axios(
 		{
 		    method: 'post',
-		    url: url+'/accounts/login/',
+		    url: url+'/api/accounts/login/',
 		    data: {
 			login: uname,
 			password: password,
@@ -60,8 +60,8 @@ export default new Vuex.Store({
 				    " : " +JSON.stringify(response.data));
 			context.commit('setToken', response.data['token']);
 			context.commit('setIsAuthenticated', true);
-			console.log("redirecting to home page");
-			router.push({ path: '/home/' });
+			console.log("redirecting to events page");
+			router.push({ path: '/events/' });
 		    } else {
 			console.log(response.status +
 				    " - " + response.statusText +

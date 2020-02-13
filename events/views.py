@@ -8,7 +8,7 @@ import common.queryUtils
 class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all().order_by('dataTime')
     serializer_class = EventSerializer
-    #permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
         print("EventViewSet.perform_create()")

@@ -205,7 +205,7 @@ export default {
 		axios(
 		    {
 			method: 'get',
-			url: this.url+'/events/?start='+
+			url: this.url+'/api/events/?start='+
 			    dateFormat(this.startDateTime,
 				       self.dateFormatStr)+
 			    '&end='+
@@ -251,11 +251,11 @@ export default {
 	    if (eventObj['id'] != null) {
 		console.log("we have an existing record id, so updating it");
 		methodStr = "PUT";
-		urlStr = this.url+'/events/'+eventObj['id']+'/';
+		urlStr = this.url+'/api/events/'+eventObj['id']+'/';
 	    } else {
 		console.log("no record id present - creating it");
 		methodStr = "POST";
-		urlStr = this.url+'/events/';
+		urlStr = this.url+'/api/events/';
 	    }
 
 	    console.log(".........methodStr="+methodStr+" urlStr="+urlStr);
@@ -297,7 +297,7 @@ export default {
 		headers: { Authorization: `Token `+this.token }
 	    };
 	    methodStr = "DELETE";
-	    urlStr = this.url+'/events/'+eventId+'/';
+	    urlStr = this.url+'/api/events/'+eventId+'/';
 	    console.log(".........methodStr="+methodStr+" urlStr="+urlStr);
 	    axios(
 		{
