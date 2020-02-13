@@ -18,6 +18,6 @@ class EventSerializer(serializers.ModelSerializer):
     #            message='Skipping Duplicate event'
     #        )
     #    ]
-    #    read_only_fields = (
-    #        'userId',
-    #    ) 
+        read_only_fields = (
+            'userId',
+        ) 
