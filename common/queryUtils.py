@@ -1,6 +1,15 @@
 import datetime
 
 
+def fixMissingSeconds(dateTimeStr):
+    """ Expects a datetime string in format yyyy-mm-dd hh:mm:ss.
+    If the :ss part is missing off the end, it adds ':00'
+    to the end so that strptime will not bomb out with an error.
+    """
+    # FIXME - This would be a useful function to have!
+        
+
+
 def userFilter(queryset, user, authUser):
     """ return records for user 'user'.  authUser
     should be the authenticated user making the request so we can
