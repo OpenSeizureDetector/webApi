@@ -61,7 +61,7 @@ export default new Vuex.Store({
 			context.commit('setToken', response.data['token']);
 			context.commit('setIsAuthenticated', true);
 			console.log("redirecting to home page");
-			router.push({ path: '/home' });
+			router.push({ path: '/home/' });
 		    } else {
 			console.log(response.status +
 				    " - " + response.statusText +
