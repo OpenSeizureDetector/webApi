@@ -13,31 +13,31 @@ Vue.use(VueRouter);
 const routes = [
     {
 	path: '/',
-	alias: '/home',
+	alias: '/home/',
 	name: 'home',
 	component: Home,
 	meta: { 'auth': true }
     },
     {
-	path: '/login',
+	path: '/login/',
 	name: 'login',
 	component: Login,
 	meta: { 'auth': false }
     },
     {
-	path: '/register',
+	path: '/register/',
 	name: 'register',
 	component: Register,
 	meta: { 'auth': false }
     },
     {
-	path: '/profile',
+	path: '/profile/',
 	name: 'profile',
 	component: Profile,
 	meta: { 'auth': true }
     },
     {
-	path: '/about',
+	path: '/about/',
 	name: 'about',
 	component: About,
 	meta: { 'auth': false }
