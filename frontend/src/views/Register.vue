@@ -62,12 +62,48 @@ export default {
     methods: {
 	submit() {
             if (this.$refs.form.validate()) {
-		//this.$store.dispatch('login', {
-                //    uname: this.uname,
-                //    password: this.password
-		//});
-		alert("FIXME - register button does not work!");
-		console.log("FIXME - register button does not work!");
+	// Register a new user
+	   	    console.log("register("+uname+","+password+")");
+	    let url = context.state.baseUrl;
+	    console.log("....url="+url);
+	    axios(
+		{
+		    method: 'post',
+		    url: url+'/api/accounts/login/',
+		    data: {
+			login: uname,
+			password: password,
+		    },
+		    validateStatus: function(status) {
+			return status<500;
+		    },
+		}
+	    )
+		.then(response => {
+		    if (response.status == 200) {
+			console.log(response.status +
+				    " - " + response.statusText +
+				    " : " +JSON.stringify(response.data));
+			context.commit('setToken', response.data['token']);
+			context.commit('setIsAuthenticated', true);
+			console.log("redirecting to events page");
+			router.push({ path: '/events/' });
+		    } else {
+			console.log(response.status +
+				    " - " + response.statusText +
+				    " : " +JSON.stringify(response.data));
+			context.commit('setToken', null);
+			context.commit('setIsAuthenticated', false);
+		    }
+		})
+		.catch((err) => {
+		    console.log("catch(): err="+JSON.stringify(err));
+		    context.commit('setToken', null);
+		    context.commit('setIsAuthenticated', false);
+		});
+	},
+			alert("FIXME - register button does not work!");
+				console.log("FIXME - register button does not work!");
             }
 	}
     }

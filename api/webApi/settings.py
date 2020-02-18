@@ -32,7 +32,7 @@ SECRET_KEY = credentials['secret_key']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['osd.dynu.net', '127.0.0.1', 'isaac']
+ALLOWED_HOSTS = ['api.osd.dynu.net', '127.0.0.1', 'isaac']
 
 # Application definition
 

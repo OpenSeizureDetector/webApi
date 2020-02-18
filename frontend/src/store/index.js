@@ -83,7 +83,7 @@ export default new Vuex.Store({
 	},
 	getUserDetails(context) {
 	    console.log("getUserDetails");
-	}
+	},
     },
     modules: {
     }
