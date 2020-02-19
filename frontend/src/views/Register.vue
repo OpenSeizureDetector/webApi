@@ -102,8 +102,6 @@ export default {
 		    context.commit('setIsAuthenticated', false);
 		});
 	}
-			alert("FIXME - register button does not work!");
-				console.log("FIXME - register button does not work!");
             }
 	}
     };

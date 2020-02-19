@@ -7,6 +7,7 @@ import About from '../views/About.vue';
 import Login from '../views/Login.vue';
 import Logout from '../views/Logout.vue';
 import Register from '../views/Register.vue';
+import RegisterConfirm from '../views/RegisterConfirm.vue';
 import PageNotFound from '../views/PageNotFound.vue';
 import Profile from '../components/Profile.vue';
 
@@ -36,6 +37,12 @@ const routes = [
 	path: '/register/',
 	name: 'register',
 	component: Register,
+	meta: { 'auth': false }
+    },
+    {
+	path: '/confirm/',
+	name: 'registerconfirm',
+	component: RegisterConfirm,
 	meta: { 'auth': false }
     },
     {

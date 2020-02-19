@@ -165,8 +165,8 @@ REST_REGISTRATION = {
     'RESET_PASSWORD_VERIFICATION_ENABLED': True,
     'REGISTER_EMAIL_VERIFICATION_ENABLED': True,
     
-    'REGISTER_VERIFICATION_URL': 'https://api.osd.dynu.net/static/verify-user.html',
-    'RESET_PASSWORD_VERIFICATION_URL': 'https://api.osd.dynu.net/static/reset-password.htm',
+    'REGISTER_VERIFICATION_URL': 'https://osd.dynu.net/confirm',
+    'RESET_PASSWORD_VERIFICATION_URL': 'https://osd.dynu.net/reset-password',
     'REGISTER_EMAIL_VERIFICATION_URL': 'https://api.osd.dynu.net/static/verify-email.html',
     'VERIFICATION_FROM_EMAIL': 'donotreply@openseizuredetector.org.uk',
 }
