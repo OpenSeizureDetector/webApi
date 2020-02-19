@@ -5,6 +5,7 @@ import store from '../store';
 import Events from '../views/Events.vue';
 import About from '../views/About.vue';
 import Login from '../views/Login.vue';
+import Logout from '../views/Logout.vue';
 import Register from '../views/Register.vue';
 import PageNotFound from '../views/PageNotFound.vue';
 import Profile from '../components/Profile.vue';
@@ -24,6 +25,12 @@ const routes = [
 	name: 'login',
 	component: Login,
 	meta: { 'auth': false }
+    },
+    {
+	path: '/logout/',
+	name: 'logout',
+	component: Logout,
+	meta: { 'auth': true }
     },
     {
 	path: '/register/',

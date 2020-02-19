@@ -6,6 +6,7 @@
 			<v-spacer></v-spacer>
 			<v-btn v-if="!isAuthenticated" text to="/Login">Login/Register</v-btn>
 			<v-btn v-if="isAuthenticated" text to="/profile">Account</v-btn>
+			<v-btn v-if="isAuthenticated" text to="/Logout">Logout</v-btn>
 
     </v-app-bar>
     <v-navigation-drawer

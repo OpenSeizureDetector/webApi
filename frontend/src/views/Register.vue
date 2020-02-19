@@ -101,13 +101,12 @@ export default {
 		    context.commit('setToken', null);
 		    context.commit('setIsAuthenticated', false);
 		});
-	},
+	}
 			alert("FIXME - register button does not work!");
 				console.log("FIXME - register button does not work!");
             }
 	}
-    }
-};
+    };
 </script>
 
 <style scoped>

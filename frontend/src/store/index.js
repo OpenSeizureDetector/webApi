@@ -8,7 +8,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
 //export const store = new Vuex.Store({
     state: {
-	baseUrl: "https://osd.dynu.net",
+	baseUrl: "https://api.osd.dynu.net",
 	isAuthenticated: false,
 	token: null
     },
