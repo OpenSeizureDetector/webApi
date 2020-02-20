@@ -81,6 +81,37 @@ export default new Vuex.Store({
 	    context.commit('setToken', null);
 	    context.commit('setIsAuthenticated', false);
 	},
+	authRequest: function(context, payload) {
+	    var url = payload['url'];
+	    var action = payload['action'];
+	    var data = payload['data'];
+	    var successCb = payload['successCb'];
+	    var failCb = payload['failCb'];
+	    var headers = { Authorization: `Token `+context.state.token }
+	    console.log("store.authRequest: url="+url+", action="+action
+			+", data="+JSON.stringify(data)
+			+", headers="+JSON.stringify(headers)
+		       );
+	    axios(
+		{
+		    method: action,
+		    url: url,
+		    headers: headers,
+		    data: data,
+		    validateStatus: function(status) {
+			return status<500;
+		    },
+		}
+	    )
+	    .then(response => {
+		console.log("store.authRequest- response="+JSON.stringify(response));
+		successCb(response);
+	    })
+	    .catch((err) => {
+		console.log("store.authRequest.catch(): err="+JSON.stringify(err));
+		failCb(response)
+		});
+	},
 	getUserDetails(context) {
 	    console.log("getUserDetails");
 	},

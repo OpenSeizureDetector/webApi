@@ -10,8 +10,10 @@ import Register from '../views/Register.vue';
 import RegisterConfirm from '../views/RegisterConfirm.vue';
 import RequestPasswordReset from '../views/RequestPasswordReset.vue';
 import ResetPassword from '../views/ResetPassword.vue';
+//import RequestChangeEmail from '../views/RequestChangeEmail.vue';
+//import ChangeEmailConfirm from '../views/ChangeEmailConfirm.vue';
 import PageNotFound from '../views/PageNotFound.vue';
-import Profile from '../components/Profile.vue';
+import Profile from '../views/Profile.vue';
 
 Vue.use(VueRouter);
 
@@ -59,6 +61,19 @@ const routes = [
 	component: ResetPassword,
 	meta: { 'auth': false }
     },
+/*    {
+	path: '/request-change-email/',
+	name: 'request-change-email',
+	component: RequestChangeEmail,
+	meta: { 'auth': true }
+    },
+    {
+	path: '/change-email-confirm/',
+	name: 'change-email-confirm',
+	component: ChangeEmailConfirm,
+	meta: { 'auth': false }
+    },
+*/
     {
 	path: '/profile/',
 	name: 'profile',

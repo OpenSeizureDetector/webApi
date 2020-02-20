@@ -87,7 +87,6 @@ export default {
 		})
 		.catch((err) => {
 		    console.log("catch(): err="+JSON.stringify(err));
-		    alert("error - "+JSON.stringify(err));
 		});
 	} else {
 	  console.log("Register.submit() - validation failed");
