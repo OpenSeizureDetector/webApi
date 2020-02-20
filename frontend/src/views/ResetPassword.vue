@@ -1,31 +1,10 @@
 <template>
 <v-card>
   <v-card-title>
-    <h1>Create Account to Use OpenSeizureDetector WebAPI</h1>
+    <h1>Reset Password</h1>
   </v-card-title>
   <v-card-text>
     <v-form ref="form" v-model="valid" lazy-validation>
-      <v-text-field
-	name="uname"
-	label="User Name:" 
-        v-model="uname" required>
-      </v-text-field>
-      <v-text-field
-	name="firstname"
-	label="First Name:" 
-        v-model="firstname" required>
-      </v-text-field>
-      <v-text-field
-	name="lastname"
-	label="Last Name:" 
-        v-model="lastname" required>
-      </v-text-field>
-      <v-text-field
-        v-model="email"
-        :rules="emailRules"
-        label="E-mail"
-        required
-        ></v-text-field>
       <v-text-field
 	name="password"
 	label="Password"
@@ -43,27 +22,20 @@
     </v-form>
   </v-card-text>
   <v-card-actions>
-    <v-btn color="primary" @click="submit">Create Account</v-btn>
+    <v-btn color="primary" @click="submit">Reset Password</v-btn>
   </v-card-actions>
 </v-card>
 </template>
 
 <script>
 import axios from 'axios';
+import router from '../router';
 export default {
-    name: 'Register',
+    name: 'ResetPassword',
     data() { return {
 	valid: false,
-	uname: '',
-	firstname: '',
-	lastname: '',
-	email: '',
         password: '',
         confirmpassword: '',
-	emailRules: [
-	    v => !!v || 'E-mail is required',
-	    v => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'E-mail must be valid'
-        ],
         passwordRules: [
             v => !!v || 'Password is required',
             v =>
@@ -74,24 +46,22 @@ export default {
 	   },
     methods: {
 	submit() {
-		 console.log("Register.submit()");
+		 console.log("ResetPassword.submit()");
             if (this.$refs.form.validate()) {
 	// Register a new user
 	var data = {
-    "username": this.uname,
-    "first_name": this.firstname,
-    "last_name": this.lastname,
-    "email": this.email,
-    "password": this.password,
-    "password_confirm": this.confirmpassword
-};
-	  console.log("register: data = "+JSON.stringify(data));
+        user_id : this.$route.query.user_id,
+        timestamp : this.$route.query.timestamp,
+        signature : this.$route.query.signature,
+    	password: this.password,
+	};
+	  console.log("resetPassword: data = "+JSON.stringify(data));
 	    let url = this.$store.state.baseUrl
 	    console.log("....url="+url);
 	    axios(
 		{
 		    method: 'post',
-		    url: url+'/api/accounts/register/',
+		    url: url+'/api/accounts/reset-password/',
 		    data: data,
 		    validateStatus: function(status) {
 			return status<500;
@@ -99,15 +69,18 @@ export default {
 		}
 	    )
 		.then(response => {
-		    if (response.status == 201) {
+		    if (response.status == 200) {
 			console.log(response.status +
 				    " - " + response.statusText +
 				    " : " +JSON.stringify(response.data));
-			alert("User created successfully - you will receive a confirmation email in a few minutes"); 
+			alert("Password Reset successfully - please Login"); 
 			console.log("redirecting to login page");
 			router.push({ path: '/login/' });
 		    } else {
 			console.log(response.status +
+				    " - " + response.statusText +
+				    " : " +JSON.stringify(response.data));
+			alert("Unexpected Response: "+response.status +
 				    " - " + response.statusText +
 				    " : " +JSON.stringify(response.data));
 		    }

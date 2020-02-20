@@ -1,6 +1,6 @@
 <template>
 <div>
-<h1 v-if="isConfirmed">Registration confirmed ok - Please Login</h1>
+<h1 v-if="isConfirmed">Registration confirmed ok - Please <a href="/login">Login</a></h1>
 <h1 v-if="!isConfirmed">Confirmation Failed "{{ msg }}" :  please try again....</h1>
 </div>
 </template>

@@ -27,6 +27,8 @@
       
       <v-btn color="info"
 	     @click="onLogin">Login</v-btn>
+	     <br/>
+	     <a href="/request-password-reset">Reset Password</a>
     </v-card-actions>
   </v-card>
 </template>
