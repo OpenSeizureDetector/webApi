@@ -74,56 +74,56 @@ export default {
 	   },
     methods: {
 	submit() {
-		 console.log("Register.submit()");
+	    console.log("Register.submit()");
             if (this.$refs.form.validate()) {
-	// Register a new user
-	var data = {
-    "username": this.uname,
-    "first_name": this.firstname,
-    "last_name": this.lastname,
-    "email": this.email,
-    "password": this.password,
-    "password_confirm": this.confirmpassword
-};
-	  console.log("register: data = "+JSON.stringify(data));
-	    let url = this.$store.state.baseUrl
-	    console.log("....url="+url);
-	    axios(
-		{
-		    method: 'post',
-		    url: url+'/api/accounts/register/',
-		    data: data,
-		    validateStatus: function(status) {
-			return status<500;
-		    },
-		}
-	    )
-		.then(response => {
-		    if (response.status == 201) {
-			console.log(response.status +
-				    " - " + response.statusText +
-				    " : " +JSON.stringify(response.data));
-			alert("User created successfully - you will receive a confirmation email in a few minutes"); 
-			console.log("redirecting to login page");
-			router.push({ path: '/login/' });
-		    } else {
-			console.log(response.status +
-				    " - " + response.statusText +
-				    " : " +JSON.stringify(response.data));
+		// Register a new user
+		var data = {
+		    "username": this.uname,
+		    "first_name": this.firstname,
+		    "last_name": this.lastname,
+		    "email": this.email,
+		    "password": this.password,
+		    "password_confirm": this.confirmpassword
+		};
+		console.log("register: data = "+JSON.stringify(data));
+		let url = this.$store.state.baseUrl
+		console.log("....url="+url);
+		axios(
+		    {
+			method: 'post',
+			url: url+'/api/accounts/register/',
+			data: data,
+			validateStatus: function(status) {
+			    return status<500;
+			},
 		    }
-		})
-		.catch((err) => {
-		    console.log("catch(): err="+JSON.stringify(err));
-		    alert("error - "+JSON.stringify(err));
-		});
-	} else {
-	  console.log("Register.submit() - validation failed");
-	  alert("Form Validation Failed - Please check form");
-	  }
-           } 
-}	
-    };
-</script>
+		)
+		    .then(response => {
+			if (response.status == 201) {
+			    console.log(response.status +
+					" - " + response.statusText +
+					" : " +JSON.stringify(response.data));
+			    alert("User created successfully - you will receive a confirmation email in a few minutes"); 
+			    console.log("redirecting to login page");
+			    router.push({ path: '/login/' });
+			} else {
+			    console.log(response.status +
+					" - " + response.statusText +
+					" : " +JSON.stringify(response.data));
+			}
+		    })
+		    .catch((err) => {
+			console.log("catch(): err="+JSON.stringify(err));
+			alert("error - "+JSON.stringify(err));
+		    });
+	    } else {
+		console.log("Register.submit() - validation failed");
+		alert("Form Validation Failed - Please check form");
+	    }
+        } 
+    }	
+};
+  </script>
 
 <style scoped>
 </style>

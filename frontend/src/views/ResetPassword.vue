@@ -46,55 +46,55 @@ export default {
 	   },
     methods: {
 	submit() {
-		 console.log("ResetPassword.submit()");
+	    console.log("ResetPassword.submit()");
             if (this.$refs.form.validate()) {
-	// Register a new user
-	var data = {
-        user_id : this.$route.query.user_id,
-        timestamp : this.$route.query.timestamp,
-        signature : this.$route.query.signature,
-    	password: this.password,
-	};
-	  console.log("resetPassword: data = "+JSON.stringify(data));
-	    let url = this.$store.state.baseUrl
-	    console.log("....url="+url);
-	    axios(
-		{
-		    method: 'post',
-		    url: url+'/api/accounts/reset-password/',
-		    data: data,
-		    validateStatus: function(status) {
-			return status<500;
-		    },
-		}
-	    )
-		.then(response => {
-		    if (response.status == 200) {
-			console.log(response.status +
-				    " - " + response.statusText +
-				    " : " +JSON.stringify(response.data));
-			alert("Password Reset successfully - please Login"); 
-			console.log("redirecting to login page");
-			router.push({ path: '/login/' });
-		    } else {
-			console.log(response.status +
-				    " - " + response.statusText +
-				    " : " +JSON.stringify(response.data));
-			alert("Unexpected Response: "+response.status +
-				    " - " + response.statusText +
-				    " : " +JSON.stringify(response.data));
+		// Register a new user
+		var data = {
+		    user_id : this.$route.query.user_id,
+		    timestamp : this.$route.query.timestamp,
+		    signature : this.$route.query.signature,
+    		    password: this.password,
+		};
+		console.log("resetPassword: data = "+JSON.stringify(data));
+		let url = this.$store.state.baseUrl
+		console.log("....url="+url);
+		axios(
+		    {
+			method: 'post',
+			url: url+'/api/accounts/reset-password/',
+			data: data,
+			validateStatus: function(status) {
+			    return status<500;
+			},
 		    }
-		})
-		.catch((err) => {
-		    console.log("catch(): err="+JSON.stringify(err));
-		});
-	} else {
-	  console.log("Register.submit() - validation failed");
-	  alert("Form Validation Failed - Please check form");
-	  }
-           } 
-}	
-    };
+		)
+		    .then(response => {
+			if (response.status == 200) {
+			    console.log(response.status +
+					" - " + response.statusText +
+					" : " +JSON.stringify(response.data));
+			    alert("Password Reset successfully - please Login"); 
+			    console.log("redirecting to login page");
+			    router.push({ path: '/login/' });
+			} else {
+			    console.log(response.status +
+					" - " + response.statusText +
+					" : " +JSON.stringify(response.data));
+			    alert("Unexpected Response: "+response.status +
+				  " - " + response.statusText +
+				  " : " +JSON.stringify(response.data));
+			}
+		    })
+		    .catch((err) => {
+			console.log("catch(): err="+JSON.stringify(err));
+		    });
+	    } else {
+		console.log("Register.submit() - validation failed");
+		alert("Form Validation Failed - Please check form");
+	    }
+        } 
+    }	
+};
 </script>
 
 <style scoped>

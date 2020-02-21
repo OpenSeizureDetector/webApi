@@ -6,7 +6,7 @@ import router from '../router';
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-//export const store = new Vuex.Store({
+    //export const store = new Vuex.Store({
     state: {
 	baseUrl: "https://api.osd.dynu.net",
 	isAuthenticated: false,
@@ -103,13 +103,13 @@ export default new Vuex.Store({
 		    },
 		}
 	    )
-	    .then(response => {
-		console.log("store.authRequest- response="+JSON.stringify(response));
-		successCb(response);
-	    })
-	    .catch((err) => {
-		console.log("store.authRequest.catch(): err="+JSON.stringify(err));
-		failCb(response)
+		.then(response => {
+		    console.log("store.authRequest- response="+JSON.stringify(response));
+		    successCb(response);
+		})
+		.catch((err) => {
+		    console.log("store.authRequest.catch(): err="+JSON.stringify(err));
+		    failCb(response)
 		});
 	},
 	getUserDetails(context) {
@@ -118,5 +118,6 @@ export default new Vuex.Store({
     },
     modules: {
     }
-}
-			     );
+});
+
+

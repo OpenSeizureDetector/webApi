@@ -1,26 +1,26 @@
 <template>
-    <v-container fill-height>
-        <v-layout align-center justify-center>
-          <v-flex xs12 sm8 md4>
-	    <h1>User Profile</h1>
-
-    <v-form ref="form" v-model="valid" lazy-validation>
-    <h4>{{ profile.user }}</h4>
-              <v-text-field
-		name="uname"
-		label="User Name:" 
-                v-model="uname" required>
-              </v-text-field>
-	      <v-btn color="primary" @click="submit">Update</v-btn>
-            </v-form>
-	    
-	    <p>
-	      Not Registered?
-              <v-btn text>Create account</v-btn>
-	    </p>
-            </v-flex>
-        </v-layout>
-    </v-container>
+<v-container fill-height>
+  <v-layout align-center justify-center>
+    <v-flex xs12 sm8 md4>
+      <h1>User Profile</h1>
+      
+      <v-form ref="form" v-model="valid" lazy-validation>
+	<h4>{{ profile.user }}</h4>
+        <v-text-field
+	  name="uname"
+	  label="User Name:" 
+          v-model="uname" required>
+        </v-text-field>
+	<v-btn color="primary" @click="submit">Update</v-btn>
+      </v-form>
+      
+      <p>
+	Not Registered?
+        <v-btn text>Create account</v-btn>
+      </p>
+    </v-flex>
+  </v-layout>
+</v-container>
 </template>
 
 <script>
@@ -80,49 +80,49 @@ export default {
 	    });
 	},
 	getProfile1() {
-	   var url = this.$store.state.baseUrl + "/api/profile/";
+	    var url = this.$store.state.baseUrl + "/api/profile/";
 	    var self = this;
-		const config = {
-		    headers: { Authorization: `Token `+this.$store.state.token }
-		};
-		console.log("getProfile()....url="+url+", config="+JSON.stringify(config));
-		axios(
-		    {
-			method: 'get',
-			url: url,
-			headers: { Authorization: `Token `+this.token },
-			data: {
-			},
-			validateStatus: function(status) {
-			    return status<500;
-			},
+	    const config = {
+		headers: { Authorization: `Token `+this.$store.state.token }
+	    };
+	    console.log("getProfile()....url="+url+", config="+JSON.stringify(config));
+	    axios(
+		{
+		    method: 'get',
+		    url: url,
+		    headers: { Authorization: `Token `+this.token },
+		    data: {
+		    },
+		    validateStatus: function(status) {
+			return status<500;
+		    },
+		}
+	    )
+		.then(response => {
+		    if (response.status == 200) {
+			console.log(response.status +
+				    " - " + response.statusText +
+				    " : " +JSON.stringify(response.data));
+			self.profile = response.data['results'];
+			console.log("set profile to "+JSON.stringify(self.profile));
+		    } else {
+			console.log(response.status +
+				    " - " + response.statusText +
+				    " : " +JSON.stringify(response.data));
+			alert("Incorrect Response Code: " + response.status +
+			      " - " + response.statusText +
+			      " : " +JSON.stringify(response.data));
 		    }
-		)
-		    .then(response => {
-			if (response.status == 200) {
-			    console.log(response.status +
-					" - " + response.statusText +
-					" : " +JSON.stringify(response.data));
-			    self.profile = response.data['results'];
-			    console.log("set profile to "+JSON.stringify(self.profile));
-			} else {
-			    console.log(response.status +
-					" - " + response.statusText +
-					" : " +JSON.stringify(response.data));
-			    alert("Incorrect Response Code: " + response.status +
-					" - " + response.statusText +
-					" : " +JSON.stringify(response.data));
-			}
-		    })
-	   }
+		})
+	}
     },
     mounted() {
-    console.log("Events.vue.mounted()");
-    this.getProfile();
+	console.log("Events.vue.mounted()");
+	this.getProfile();
     },
-
+    
 };
-</script>
+  </script>
 
 <style scoped>
 </style>

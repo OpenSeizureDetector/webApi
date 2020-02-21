@@ -29,11 +29,11 @@ export default {
 	   },
     methods: {
 	submit() {
-		 console.log("RequestPasswordReset.submit()");
-	var data = {
-    "login": this.uname,
-    	     };
-	  console.log("requestPasswordReset.submit(): data = "+JSON.stringify(data));
+	    console.log("RequestPasswordReset.submit()");
+	    var data = {
+		"login": this.uname,
+    	    };
+	    console.log("requestPasswordReset.submit(): data = "+JSON.stringify(data));
 	    let url = this.$store.state.baseUrl
 	    console.log("....url="+url);
 	    axios(
@@ -65,12 +65,12 @@ export default {
 		})
 		.catch((err) => {
 		    console.log("catch(): err="+JSON.stringify(err));
-		    alert("error - "+JSON.stringify(err));
+		    //alert("error - "+JSON.stringify(err));
 		});
-           } 
-}	
-    };
-</script>
+        } 
+    }	
+};
+  </script>
 
 <style scoped>
 </style>
