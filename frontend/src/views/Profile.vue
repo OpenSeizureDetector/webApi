@@ -1,128 +1,171 @@
 <template>
+
 <v-container fill-height>
   <v-layout align-center justify-center>
-    <v-flex xs12 sm8 md4>
-      <h1>User Profile</h1>
+    <v-flex>
+      <h1>User Profile - User Id: {{ profile.user }}</h1>
       
       <v-form ref="form" v-model="valid" lazy-validation>
-	<h4>{{ profile.user }}</h4>
-        <v-text-field
-	  name="uname"
-	  label="User Name:" 
-          v-model="uname" required>
-        </v-text-field>
+	<v-row>
+	  <v-col>
+            <v-text-field
+	      name="uname"
+	      label="User Name:" 
+              v-model="profile.username" required>
+            </v-text-field>
+	  </v-col>
+	  <v-col>
+            <v-text-field
+	      name="email"
+	      label="email:" 
+              v-model="profile.email" required>
+            </v-text-field>
+	  </v-col>
+	</v-row>
+	<v-row>
+	  <v-col>
+            <v-text-field
+	      name="firstname"
+	      label="First Name:" 
+              v-model="profile.first_name" required>
+            </v-text-field>
+	  </v-col>
+	  <v-col>
+            <v-text-field
+	      name="lastname"
+	      label="Last Name:" 
+              v-model="profile.last_name" required>
+            </v-text-field>
+	  </v-col>
+	</v-row>
+	<v-row>
+	  <v-date-picker
+	    label="Date of Birth: {{ profile.dob }}"
+	    v-model="profile.dob"
+	    date-format="yyyy-MM-dd"
+	    >
+	  </v-date-picker>
+	</v-row>
+	<v-row>
+          <v-text-field
+	    name="medicalconditions"
+	    label="Medical Conditions:" 
+            v-model="profile.medicalConditions" required>
+          </v-text-field>
+	</v-row>
+	<v-row>
+	  <v-checkbox
+	    v-model="profile.licenceAccepted"
+	    label="Lience Agreement Accepted?: "
+	    ></v-checkbox>
+	</v-row>
 	<v-btn color="primary" @click="submit">Update</v-btn>
-      </v-form>
-      
-      <p>
-	Not Registered?
-        <v-btn text>Create account</v-btn>
-      </p>
+      </v-form>      
     </v-flex>
   </v-layout>
 </v-container>
 </template>
 
 <script>
-import axios from 'axios';
+  var dateFormat = require('dateformat');
 export default {
-    name: 'Profile',
-    data() { return {
-	valid: false,
-	profile : {
-	    uname: '',
-	    user: none,
-	    dob: none,
-	    medicalConditions: none,
-	},
-	uname: '',
-    };
-	   },
-    methods: {
-	submit() {
-            if (this.$refs.form.validate()) {
-		alert("submit() - FIXME - this doesn't do anything");
-            }
-	},
-	getProfile() {
-	    console.log("getProfile()....");
-	    var self = this;
-	    var url = this.$store.state.baseUrl + "/api/profile/";
-	    var action = "get";
-	    var data = {};
-	    this.$store.dispatch("authRequest",{
-		url: url,
-		action: action,
-		data: data,
-		successCb: function(response) {
-		    console.log("successCb - response="+JSON.stringify(response));
-		    if (response.status==200) {
-			if (response.data.count>0) {
-			    self.profile = response.data.results[0];
-			    console.log("proifle="+JSON.stringify(self.profile));
-			} else {
-			    console.log("no profile returned");
-			    self.profile = {};
-			}
-		    } else {
-			console.log("Unexpected status code "+response.status
-				    +": "+response.statusText);
-			alert("Unexpected status code "+response.status
-			      +": "+response.statusText);
-			self.profile={};
-		    }
-		},
-		failCb: function(response) {
-		    console.log("failCb - response="+JSON.stringify(response));
-		    alert("failCb - response="+JSON.stringify(response));
-		    
+	name: 'Profile',
+	data() { return {
+	    valid: false,
+	    profile : {
+		uname: 'none',
+		user: null,
+		dob: null,
+		medicalConditions: "",
+	    },
+	    profileDefault : {
+		uname: 'none',
+		user: null,
+		dob: null,
+		medicalConditions: "",
+	    },
+	};
+	       },
+	methods: {
+	    submit() {
+		if (this.$refs.form.validate()) {
+		    this.saveProfile();
 		}
-	    });
-	},
-	getProfile1() {
-	    var url = this.$store.state.baseUrl + "/api/profile/";
-	    var self = this;
-	    const config = {
-		headers: { Authorization: `Token `+this.$store.state.token }
-	    };
-	    console.log("getProfile()....url="+url+", config="+JSON.stringify(config));
-	    axios(
-		{
-		    method: 'get',
+	    },
+	    getProfile() {
+		console.log("getProfile()....");
+		var self = this;
+		var url = this.$store.state.baseUrl + "/api/profile/";
+		var action = "get";
+		var data = {};
+		this.$store.dispatch("authRequest",{
 		    url: url,
-		    headers: { Authorization: `Token `+this.token },
-		    data: {
+		    action: action,
+		    data: data,
+		    successCb: function(response) {
+			console.log("successCb - response="+JSON.stringify(response));
+			if (response.status==200) {
+			    if (response.data.count>0) {
+				self.profile = response.data.results[0];
+				console.log("profile="+JSON.stringify(self.profile));
+			    } else {
+				console.log("no profile returned");
+				self.profile = self.profileDefault;
+			    }
+			} else {
+			    console.log("Unexpected status code "+response.status
+					+": "+response.statusText);
+			    alert("Unexpected status code "+response.status
+				  +": "+response.statusText);
+			    self.profile = self.profileDefault;
+			}
 		    },
-		    validateStatus: function(status) {
-			return status<500;
-		    },
-		}
-	    )
-		.then(response => {
-		    if (response.status == 200) {
-			console.log(response.status +
-				    " - " + response.statusText +
-				    " : " +JSON.stringify(response.data));
-			self.profile = response.data['results'];
-			console.log("set profile to "+JSON.stringify(self.profile));
-		    } else {
-			console.log(response.status +
-				    " - " + response.statusText +
-				    " : " +JSON.stringify(response.data));
-			alert("Incorrect Response Code: " + response.status +
-			      " - " + response.statusText +
-			      " : " +JSON.stringify(response.data));
+		    failCb: function(response) {
+			console.log("failCb - response="+JSON.stringify(response));
+			alert("failCb - response="+JSON.stringify(response));
+			//self.profile={};
 		    }
-		})
+		});
+	    },
+	    saveProfile() {
+		console.log("saveProfile()....");
+		var self = this;
+		var url = this.$store.state.baseUrl + "/api/profile/"+self.profile.id+"/";
+		var action = "put";
+		var data = self.profile;
+		this.$store.dispatch("authRequest",{
+		    url: url,
+		    action: action,
+		    data: data,
+		    successCb: function(response) {
+			console.log("successCb - response="+JSON.stringify(response));
+			if (response.status==200) {
+			    if (response.data.count>0) {
+				self.profile = response.data.results[0];
+				console.log("profile="+JSON.stringify(self.profile));
+			    }
+			} else {
+			    console.log("Unexpected status code "+response.status
+					+": "+response.statusText);
+			    alert("Unexpected status code "+response.status
+				  +": "+response.statusText);
+			}
+		    },
+		    failCb: function(response) {
+			console.log("failCb - response="+JSON.stringify(response));
+			alert("failCb - response="+JSON.stringify(response));
+			//self.profile={};
+		    }
+		});
+	    },
+	},
+	mounted() {
+	    console.log("Events.vue.mounted()");
+	    this.getProfile();
 	}
-    },
-    mounted() {
-	console.log("Events.vue.mounted()");
-	this.getProfile();
-    },
-    
-};
-  </script>
-
-<style scoped>
+	
+    };
+</script>
+		
+		<style scoped>
 </style>

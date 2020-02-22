@@ -15,7 +15,7 @@ def userFilter(queryset, user, authUser):
     should be the authenticated user making the request so we can
     decide if we can return data for the requested user or not.
     FIXME - we need to get user group associations working so we can allow
-    some users to access other users' data - this
+    some users to access other users' data
     """
     if authUser is None:
         print("common.queryUtils.userFilter: authUser is None - returning None")

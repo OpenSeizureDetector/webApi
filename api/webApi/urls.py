@@ -9,11 +9,12 @@ from django.views.generic import TemplateView
 from rest_framework.routers import DefaultRouter
 from datapoints.views import DatapointList, DatapointSummaryList, DatapointUploadCsv
 from events.views import EventViewSet
-from userdata.views import ProfileViewSet, LicenceViewSet
+from userdata.views import UserViewSet, ProfileViewSet, LicenceViewSet
 
 
 router = DefaultRouter()
 router.register(r'api/events', EventViewSet)
+router.register(r'api/user', UserViewSet)
 router.register(r'api/profile', ProfileViewSet)
 router.register(r'api/licence', LicenceViewSet)
 

@@ -109,7 +109,7 @@ export default new Vuex.Store({
 		})
 		.catch((err) => {
 		    console.log("store.authRequest.catch(): err="+JSON.stringify(err));
-		    failCb(response)
+		    failCb(err)
 		});
 	},
 	getUserDetails(context) {
