@@ -3,15 +3,16 @@
 <v-container fill-height>
   <v-layout align-center justify-center>
     <v-flex>
-      <h1>User Profile - User Id: {{ profile.user }}</h1>
+      <h1>Profile - User: {{ profile.username }}</h1>
       
       <v-form ref="form" v-model="valid" lazy-validation>
 	<v-row>
 	  <v-col>
             <v-text-field
-	      name="uname"
-	      label="User Name:" 
-              v-model="profile.username" required>
+	      name="profile.userId"
+	      label="User Id:" 
+              v-model="profile.user"
+	      readonly=true required>
             </v-text-field>
 	  </v-col>
 	  <v-col>
@@ -20,6 +21,18 @@
 	      label="email:" 
               v-model="profile.email" required>
             </v-text-field>
+	  </v-col>
+	  <v-col>
+	  <v-checkbox
+	    v-model="profile.is_superuser"
+	    label="Admin" readonly=true
+	    ></v-checkbox>
+	  </v-col>
+	  <v-col>
+	  <v-checkbox
+	    v-model="profile.is_staff"
+	    label="Analyst" readonly=true
+	    ></v-checkbox>
 	  </v-col>
 	</v-row>
 	<v-row>
@@ -76,13 +89,19 @@ export default {
 		uname: 'none',
 		user: null,
 		dob: null,
-		medicalConditions: "",
+		medicalConditions : "",
+		licenceAccepted : false,
+		is_superuser : false,
+		is_staff : false,
 	    },
 	    profileDefault : {
 		uname: 'none',
 		user: null,
 		dob: null,
-		medicalConditions: "",
+		medicalConditions : "",
+		licenceAccepted : false,
+		is_superuser : false,
+		is_staff : false,
 	    },
 	};
 	       },
@@ -133,6 +152,7 @@ export default {
 		var url = this.$store.state.baseUrl + "/api/profile/"+self.profile.id+"/";
 		var action = "put";
 		var data = self.profile;
+		console.log("sending data "+JSON.stringify(data));
 		this.$store.dispatch("authRequest",{
 		    url: url,
 		    action: action,

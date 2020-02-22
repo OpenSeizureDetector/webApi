@@ -31,8 +31,7 @@ class Profile(models.Model):
                                 on_delete=models.CASCADE)
     dob = models.DateField(blank=True, null=True)
     medicalConditions = models.TextField(blank=True, default='none specified')
-    licenceAccepted = models.OneToOneField(Licence,on_delete=models.CASCADE,
-                                           blank=True, null=True)
+    licenceAccepted = models.BooleanField(blank=True, default=False)
 
     @receiver(post_save, sender=User)
     def create_user_profile(sender, instance, created, **kwargs):
