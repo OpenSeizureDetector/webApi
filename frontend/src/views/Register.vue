@@ -110,11 +110,17 @@ export default {
 			    console.log(response.status +
 					" - " + response.statusText +
 					" : " +JSON.stringify(response.data));
+			    var errMsg = "Problem Creating User: ";
+			    for (const key in response.data) {
+				errMsg = errMsg + ": "+key+" - "+response.data[key];
+			    }
+			    alert(errMsg+": Please Try Again");
+    
 			}
 		    })
 		    .catch((err) => {
 			console.log("catch(): err="+JSON.stringify(err));
-			alert("error - "+JSON.stringify(err));
+			//alert("error - "+JSON.stringify(err));
 		    });
 	    } else {
 		console.log("Register.submit() - validation failed");

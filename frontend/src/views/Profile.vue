@@ -3,18 +3,9 @@
 <v-container fill-height>
   <v-layout align-center justify-center>
     <v-flex>
-      <h1>Profile - User: {{ profile.username }}</h1>
-      
+      <h1>Profile - User: {{ profile.username }} ID: {{ profile.user }}</h1>
       <v-form ref="form" v-model="valid" lazy-validation>
 	<v-row>
-	  <v-col>
-            <v-text-field
-	      name="profile.userId"
-	      label="User Id:" 
-              v-model="profile.user"
-	      readonly=true required>
-            </v-text-field>
-	  </v-col>
 	  <v-col>
             <v-text-field
 	      name="email"

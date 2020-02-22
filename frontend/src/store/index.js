@@ -66,12 +66,14 @@ export default new Vuex.Store({
 			console.log(response.status +
 				    " - " + response.statusText +
 				    " : " +JSON.stringify(response.data));
+			alert(JSON.stringify(response.data));
 			context.commit('setToken', null);
 			context.commit('setIsAuthenticated', false);
 		    }
 		})
 		.catch((err) => {
 		    console.log("catch(): err="+JSON.stringify(err));
+		    alert(JSON.stringify(err));
 		    context.commit('setToken', null);
 		    context.commit('setIsAuthenticated', false);
 		});
