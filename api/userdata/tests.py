@@ -7,7 +7,7 @@ import json
 
 
 class UserRegistrationAPIViewTestCase(APITestCase):
-    url = "/api/accounts/register"
+    url = "/api/accounts/register/"
 
     def test_invalid_password(self):
         """
@@ -20,7 +20,7 @@ class UserRegistrationAPIViewTestCase(APITestCase):
             "confirm_password": "INVALID_PASSWORD"
         }
         response = self.client.post(self.url, user_data)
-        self.assertEqual(400, response.status_code)
+        self.assertEqual(400, response.status_code, response.content)
 
     def test_user_registration(self):
         """
@@ -29,12 +29,11 @@ class UserRegistrationAPIViewTestCase(APITestCase):
         user_data = {
             "username": "testuser",
             "email": "test@testuser.com",
-            "password": "123123",
-            "confirm_password": "123123"
+            "password": "testpwxyz",
+            "password_confirm": "testpwxyz"
         }
         response = self.client.post(self.url, user_data)
         self.assertEqual(201, response.status_code)
-        self.assertTrue("token" in json.loads(response.content))
 
     def test_unique_username_validation(self):
         """
@@ -43,54 +42,64 @@ class UserRegistrationAPIViewTestCase(APITestCase):
         user_data_1 = {
             "username": "testuser",
             "email": "test@testuser.com",
-            "password": "123123",
-            "confirm_password": "123123"
+            "password": "testpwxyz",
+            "password_confirm": "testpwxyz"
         }
         response = self.client.post(self.url, user_data_1)
-        self.assertEqual(201, response.status_code)
+        self.assertEqual(201, response.status_code, response.content)
 
         user_data_2 = {
             "username": "testuser",
             "email": "test2@testuser.com",
-            "password": "123123",
-            "confirm_password": "123123"
+            "password": "testpwxyz",
+            "password_confirm": "testpwxyz"
         }
         response = self.client.post(self.url, user_data_2)
-        self.assertEqual(400, response.status_code)
-
+        self.assertEqual(400, response.status_code, response.content)
 
 class UserLoginAPIViewTestCase(APITestCase):
-    url = "/api/accounts/login"
+    url = "/api/accounts/login/"
 
     def setUp(self):
+        print("Running UserLoginAPIViewTestCase....");
         self.username = "john"
         self.email = "john@snow.com"
         self.password = "you_know_nothing"
         self.user = User.objects.create_user(self.username, self.email, self.password)
 
     def test_authentication_without_password(self):
-        response = self.client.post(self.url, {"username": "snowman"})
+        response = self.client.post(self.url, {"login": self.username}, secure=True, follow=True)
+        #print("test_authentication_without_password: response=%s, %s" %
+        #      (str(response.status_code), str(response.content)))
         self.assertEqual(400, response.status_code)
 
     def test_authentication_with_wrong_password(self):
-        response = self.client.post(self.url, {"username": self.username, "password": "I_know"})
+        response = self.client.post(self.url, {"login": self.username, "password": "wrong_password"}, secure=True, follow=True)
+        #print("test_authentication_with_wrong_password: response=%s, %s" %
+        #      (str(response.status_code), str(response.content)))
         self.assertEqual(400, response.status_code)
 
     def test_authentication_with_valid_data(self):
-        response = self.client.post(self.url, {"username": self.username, "password": self.password})
+        response = self.client.post(self.url, {"login": self.username, "password": self.password}, secure=True, follow=True)
+        #print("test_authentication_with_valid_data: response=%s, %s" %
+        #      (str(response.status_code), str(response.content)))
         self.assertEqual(200, response.status_code)
-        self.assertTrue("auth_token" in json.loads(response.content))
+        self.assertTrue("token" in json.loads(response.content))
 
 
-class UserTokenAPIViewTestCase(APITestCase):
+
+
+
+class ProfileAPIViewTestCase(APITestCase):
     def url(self, key):
-        return reverse("users:token", kwargs={"key": key})
+        #return reverse("users:token", kwargs={"key": key})
+        return("/api/profile/")
 
     def setUp(self):
         self.username = "john"
         self.email = "john@snow.com"
         self.password = "you_know_nothing"
-        self.user = User.objects.create_user(self.username, self.email, self.password)
+        self.user = User.objects.create_user(self.username, self.email, self.password, is_superuser=True)
         self.token = Token.objects.create(user=self.user)
         self.api_authentication()
 
@@ -106,28 +115,73 @@ class UserTokenAPIViewTestCase(APITestCase):
     def api_authentication(self):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
-    def test_delete_by_key(self):
-        response = self.client.delete(self.url(self.token.key))
-        self.assertEqual(204, response.status_code)
-        self.assertFalse(Token.objects.filter(key=self.token.key).exists())
-
-    def test_delete_current(self):
-        response = self.client.delete(self.url('current'))
-        self.assertEqual(204, response.status_code)
-        self.assertFalse(Token.objects.filter(key=self.token.key).exists())
-
-    def test_delete_unauthorized(self):
-        response = self.client.delete(self.url(self.token_2.key))
-        self.assertEqual(404, response.status_code)
-        self.assertTrue(Token.objects.filter(key=self.token_2.key).exists())
-
     def test_get(self):
-        # Test that unauthorized access returns 404
-        response = self.client.get(self.url(self.token_2.key))
-        self.assertEqual(404, response.status_code)
+        print("running ProfileApiViewTest - test_get()")
 
-        for key in [self.token.key, 'current']:
-            response = self.client.get(self.url(key))
-            self.assertEqual(200, response.status_code)
-            self.assertEqual(self.token.key, response.data['auth_token'])
-            self.assertIn('created', response.data)
+        # Test that unauthorized access returns 401
+        urlStr = self.url("")
+        print("test_get - url="+urlStr)
+        self.client.credentials(HTTP_AUTHOARIZATION=None)
+        response = self.client.get(urlStr)
+        self.assertEqual(401, response.status_code,
+                         "Unauthorised request succeeded  "+str(response.content))
+
+        # Test that failed authorization returns 401
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + 'invalid token')
+        response = self.client.get(urlStr)
+        self.assertEqual(401, response.status_code,
+                         "Unauthorised request succeeded  "+str(response.content))
+
+
+        # Test that correctly authenticated superuser request returns 200
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        response = self.client.get(urlStr)
+        self.assertEqual(200, response.status_code, response.content)
+        contentStr = response.content.decode('utf-8')
+        # And that we return the correct user data
+        results = json.loads(contentStr)['results']
+        self.assertEqual(2,len(results),
+                         "Expected to receive data for both users for superuser request")
+        self.assertEqual(1,results[0]['user'])
+        self.assertEqual(2,results[1]['user'])
+
+        # And it works if we request our user data in the URL - but only get a single record, not an array
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        url=urlStr+"1/"
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code, response.content)
+        contentStr = response.content.decode('utf-8')
+        # And that we return the correct user data
+        results = json.loads(contentStr)
+        self.assertEqual(1,results['user'])
+
+        # And if we authenticate as user 2, we get user 2's data.
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token_2.key)
+        url=urlStr+"2/"
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code, response.content)
+        contentStr = response.content.decode('utf-8')
+        print(contentStr)
+        # And that we return the correct user data
+        results = json.loads(contentStr)
+        self.assertEqual(2,results['user'])
+
+        # But user 2 can not see user1's data.
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token_2.key)
+        url=urlStr+"1/"
+        response = self.client.get(url)
+        #FIXME - I think this should really return 403 rather than 404
+        self.assertEqual(404, response.status_code, response.content)
+
+        # and user 1 can  see user2's data because he is a superuser.
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        url=urlStr+"2/"
+        response = self.client.get(url)
+        self.assertEqual(200, response.status_code, response.content)
+        contentStr = response.content.decode('utf-8')
+        print(contentStr)
+        # And that we return the correct user data
+        results = json.loads(contentStr)
+        self.assertEqual(2,results['user'])
+
+
