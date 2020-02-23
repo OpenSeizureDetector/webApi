@@ -103,7 +103,7 @@ class ProfileAPIViewTestCase(APITestCase):
         self.token = Token.objects.create(user=self.user)
         self.api_authentication()
 
-        self.user_2 = User.objects.create_user("mary", "mary@earth.com", "super_secret")
+        self.user_2 = User.objects.create_user("mary", "mary@earth.com", "super_secret", first_name="Mary", last_name="Smith")
         self.token_2 = Token.objects.create(user=self.user_2)
 
     def tearDown(self):
@@ -185,3 +185,59 @@ class ProfileAPIViewTestCase(APITestCase):
         self.assertEqual(2,results['user'])
 
 
+    def test_put(self):
+        print("running ProfileApiViewTest - test_put()")
+        urlStr = "/api/profile/%d/" % self.user_2.id
+        # first just get a profile as a normal user.
+        self.client.credentials(HTTP_AUTHORIZATION='Token '
+                                + self.token_2.key)
+        response = self.client.get(urlStr)
+        self.assertEqual(200, response.status_code, response.content)
+        contentStr = response.content.decode('utf-8')
+        #print("test_put() - contentStr=",contentStr)
+        # And that we return the correct user data
+        results = json.loads(contentStr)
+        self.assertEqual(self.user_2.id,results['user'],contentStr)
+
+        # Now try to modify the email address of the user.
+        putData = results.copy()
+        putData['first_name']="Mary2"
+        putData['dob']="1975-09-23"
+        putData['medicalConditions']="Updated Medical Conditions"
+        print("test_put - putdata=",putData)
+
+        response = self.client.put(urlStr,putData)
+        self.assertEqual(200, response.status_code, response.content)
+        contentStr = response.content.decode('utf-8')
+        print("test_put() - contentStr=",contentStr)
+        # And that we return the correct user data
+        results = json.loads(contentStr)
+        self.assertEqual(putData['dob'],
+                         results['dob'],contentStr)
+        self.assertEqual(putData['medicalConditions'],
+                         results['medicalConditions'],contentStr)
+        #self.assertEqual(putData['first_name'],
+        #                 results['first_name'],contentStr)
+
+        #Attempt to change someone else's data - should fail!
+        putData['id']=self.user.id
+        putData['user']=self.user.id
+        url = "/api/profile/%d/" % self.user.id
+        print("test_put - change someone else's data: url="+url,putData)
+        self.client.credentials(HTTP_AUTHORIZATION='Token '
+                                + self.token_2.key)
+        response = self.client.put(urlStr,putData)
+        #self.assertEqual(405, response.status_code, response.content)
+
+        #Now Retrieve all the users's profiles so we can see what we've done.
+                # Test that correctly authenticated superuser request returns 200
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        response = self.client.get("/api/profile/")
+        self.assertEqual(200, response.status_code, response.content)
+        contentStr = response.content.decode('utf-8')
+        results = json.loads(contentStr)['results']
+        print("test-put - after modification: ",results)
+        self.assertEqual(2,len(results),
+                         "Expected to receive data for both users for superuser request")
+        self.assertEqual(1,results[0]['user'])
+        self.assertEqual(2,results[1]['user'])

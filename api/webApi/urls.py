@@ -14,12 +14,12 @@ from userdata.views import UserViewSet, ProfileViewSet, LicenceViewSet
 
 router = DefaultRouter()
 router.register(r'api/events', EventViewSet)
-router.register(r'api/user', UserViewSet)
+#router.register(r'api/user', UserViewSet)
 router.register(r'api/profile', ProfileViewSet)
-router.register(r'api/licence', LicenceViewSet)
+#router.register(r'api/licence', LicenceViewSet)
 
 urlpatterns = [
-    path('api/admin/', admin.site.urls),
+    #path('api/admin/', admin.site.urls),
     path('api/accounts/', include('rest_registration.api.urls')),
     path('api/datapoints/', csrf_exempt(DatapointList.as_view())),
     path('api/dataSummary/', DatapointSummaryList.as_view()),

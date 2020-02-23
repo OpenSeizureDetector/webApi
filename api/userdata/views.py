@@ -31,7 +31,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
         user = self.request.query_params.get('user', None)
         authUser = self.request.user.id
         print("ProfileViewSet.get_queryset - user=%s, authUser=%s" %
-              (user, authUser))
+              (user, authUser),dir(self.request),dir(self.request.query_params),self.request.query_params.keys(),self.request.query_params.get('pk'))
         if not self.request.user.is_superuser:
             queryset = queryset.filter(user=authUser)
         return queryset
