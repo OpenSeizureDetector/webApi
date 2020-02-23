@@ -1,7 +1,7 @@
 <template>
   <span>
     <v-app-bar app color="brown darken4" dark>
-			<v-toolbar-title>{{appTitle}}</v-toolbar-title>
+			<v-toolbar-title>OpenSeizureDetector WebAPI</v-toolbar-title>
 			<v-btn text to="/About">About</v-btn>
 			<v-spacer></v-spacer>
 			<v-btn v-if="!isAuthenticated" text to="/Login">Login/Register</v-btn>

@@ -27,7 +27,7 @@ urlpatterns = [
     #path('events/', EventViewSet.as_view()),
     path('', include(router.urls)),
     path('favicon.ico',RedirectView.as_view(url='/static/favicon.ico')),
-    path(r'^$', TemplateView.as_view(template_name='index.html')),
+    path(r'', TemplateView.as_view(template_name='index.html')),
     #path('', RedirectView.as_view(url='/static/index.html')),
 
 ]
