@@ -42,7 +42,13 @@ GET /events/?user=14&start=2019-11-04 07:44:00&end=2019-11-04 07:49:00
 ## Installation
 From Ubuntu 18.04 LTS
 
+```
+apt install build-essential python3-dev vitualenvwrapper mysql-server mysql-client-dev
+source /usr/lib/virtualenvwrapper/virtualenvwrapper.sh
+```
+
 ### Backend
+```
 mkvirtualenv --python=/usr/bin/python3 webpy
 workon webpy
 pip install django django-rest-framework
@@ -53,18 +59,97 @@ pip install numpy
 pip install django-cors-headers
 git clone https://github.com/OpenSeizureDetector/webApi.git
 cd webApi
-
+```
+ 
 Create a mysql database and associated user/password
 
 copy webApi/webApi/credentials.json.template to webApi/webApi/credentials.json
-Edit webApi/webApi/credentials.json to use database credentials that will give
-it access to your mySql database.
 
+Edit webApi/webApi/credentials.json to use database credentials that will give it access to your mySql database, and provide a secret key string for use with encryption.
+
+```
 ./manage.py makemigrations
 ./manage.py migrate
-
+```
 
 ### Front End
+```
 sudo apt install npm
 sudo npm install -g @vue/cli
+```
+ 
+# Deployment
+## Development
+Use the django development server with
+```
+./manage.py runserver
+```
+The site should be visible on http://localhost:8000
+ 
+## Production 
+Use the gunicorn interface with the nginx web server, controlled with the 'supervisor' process as follows (from https://medium.com/swlh/deploying-django-apps-for-production-on-ubuntu-server-18-04-using-gunicorn-supervisor-nginx
+ 
+ ```
+ sudo apt install supervisor nginx
+ pip install gunicorn
+ cd api
+ ln -s webApi/wsgi.py webApi/webApi.wsgi
+ ```
+ Test that gunicorn can server the web api django project with:
+ ```
+ gunicorn --bind 0.0.0.0:8000 webApi.wsgi
+ ```
+ Then set up supervisor to start gunicorn and re-start it if it crashes etc.   Create /etc/supervisor/conf.d/gunicorn.conf which should look somehing like:
+ ```
+ [program:django_project]
+directory=<path>/webapi/api
+command=<path_to_virtual_env>/bin/gunicorn webApi.wsgi:application --workers 3 --bind 127.0.0.1:8000 --log-level info;
+stdout_logfile = <path>/logs/gunicorn/access.log
+stderr_logfile = <path>/logs/gunicorn/error.log
+stdout_logfile_maxbytes=5000000
+stderr_logfile_maxbytes=5000000
+stdout_logfile_backups=100000
+stderr_logfile_backups=100000
+autostart=true
+autorestart=true
+startsecs=10
+stopasgroup=true
+priority=99
+```
+Create the directory <path>/logs/gunicorn as used for the log files above.
 
+Start Supervisor
+``` 
+sudo supervisorctl reread
+sudo supervisorctl update
+```
+ 
+Configure nginx by creaing /etc/nginx/sites_available/webApi which contains
+ 
+```
+ server {
+    listen 80;
+    server_name <your_server_domain_name_or_IP>;
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location /static/ {
+        root <path>api;
+    }
+    location / {
+        include proxy_params;
+        proxy_pass http://127.0.0.1:8000;
+    }
+}
+```
+ 
+Then enable the site with
+ ```
+ sudo ln -s /etc/nginx/sites-available/webApi /etc/nginx/sites-enabled
+ ```
+ Test nginx configuration with
+ ```
+ sudo nginx -t
+ ```
+ Then restart nginx with 
+ ```
+ sudo systemctl restart nginx
+ ```
