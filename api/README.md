@@ -101,7 +101,7 @@ Use the gunicorn interface with the nginx web server, controlled with the 'super
  ```
  Then set up supervisor to start gunicorn and re-start it if it crashes etc.   Create /etc/supervisor/conf.d/gunicorn.conf which should look somehing like:
  ```
- [program:django_project]
+ [program:osd_webApi]
 directory=<path>/webapi/api
 command=<path_to_virtual_env>/bin/gunicorn webApi.wsgi:application --workers 3 --bind 127.0.0.1:8000 --log-level info;
 stdout_logfile = <path>/logs/gunicorn/access.log
@@ -153,3 +153,41 @@ Then enable the site with
  ```
  sudo systemctl restart nginx
  ```
+ 
+ If you change anything related to hostnames, you need to change both /etc/nginx/sites-available/webApi and also <path>webApi/api/webApi/settings.py to include the new hostname or ip address.
+ You then restart the gunicorn process using supervisor with 
+ ```
+ supervisorctl reread
+ supervisorctl update
+```
+ ...and then re-start the NGINX web server with
+ ```
+ systemctl restart nginx
+ ```
+ 
+ 
+ # Enable Encryption
+ The API is transferring users' personal data to our server so the data transfer must be encrypted for privacy.
+ 
+ To achieve this we use LetsEncrypt certificates by doing the following.
+ 
+ Install certbot (Which runs under snapd)
+ ```
+ sudo apt install snapd
+ sudo snap install core
+ sudo snap refresh core
+ sudo snap install --classic certbot
+ sudo ln -s /snap/bin/certbot /usr/bin/certbot
+ ```
+ Then obtain and install a certificate for the installed host names using
+ ```
+ sudo certbot --nginx
+ ```
+ And follow the prompts to select which host name you want certificates for etc.   This should also set certbox to renew teh certificate automatically without needing regular user interaction.
+ 
+ The certificates are saved in /etc/letsencrypt/live/<host name>
+ 
+ You should now be able to access the server with https://osdapi.ddns.net (or whatever hostname you used).
+ 
+ 
+ 
