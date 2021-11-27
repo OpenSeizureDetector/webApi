@@ -30,9 +30,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = credentials['secret_key']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['api.osd.dynu.net', '127.0.0.1', 'isaac']
+ALLOWED_HOSTS = ['api.osd.dynu.net', '127.0.0.1', 'isaac', '185.237.98.234', 'osdapi.ddns.net']
 
 # Application definition
 
