@@ -205,5 +205,6 @@ This involves also configuring the DNS entries in your DNS provider by adding ex
 For my Virtual Private Servier I am using noip.com to give it a domain name (osdapi.ddns.net).  I had to pay for their extended service to be able to make these configuration changes.
 
 There was a lot of fiddling to get this working, so I think I'll need to re-write a step-by step procedure using a new server installation....
+To debug issues with the mail authentication I used https:/mail-tester.com, which was excellent - well worth the 10Euro to use it for a week!
 
  
