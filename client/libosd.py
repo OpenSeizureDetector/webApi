@@ -5,12 +5,14 @@ import json
 import requests
 
 class libosd:
+    DEBUG = False
     uname = "user"
     passwd = "user1_pw"
     baseUrl = "osd.dynu.net"
 
-    def __init__(self, cfg=None, baseUrl=None, uname=None, passwd=None):
-        print("libosd.__init__()")
+    def __init__(self, cfg=None, baseUrl=None, uname=None, passwd=None, debug=False):
+        self.DEBUG = debug
+        if (self.DEBUG): print("libosd.__init__()")
 
         if (cfg is not None):
             if (os.path.isfile(cfg)):
@@ -19,13 +21,13 @@ class libosd:
                     jsonObj = json.load(infile)
                 print(jsonObj)
                 if ("uname" in jsonObj):
-                    print("found uname - %s" % jsonObj["uname"])
+                    if (self.DEBUG): print("found uname - %s" % jsonObj["uname"])
                     self.uname = jsonObj["uname"]
                 if ("passwd" in jsonObj):
-                    print("found passwd - %s" % jsonObj["passwd"])
+                    if (self.DEBUG): print("found passwd - %s" % jsonObj["passwd"])
                     self.passwd = jsonObj["passwd"]
                 if ("baseurl" in jsonObj):
-                    print("found baseurl - %s" % jsonObj["baseurl"])
+                    if (self.DEBUG): print("found baseurl - %s" % jsonObj["baseurl"])
                     self.baseUrl = jsonObj["baseurl"]
             else:
                 print("ERROR - file %s does not exist" % cfg)
@@ -39,27 +41,27 @@ class libosd:
         if (passwd is not None):
             self.passwd = passwd
         if (baseUrl is not None):
-            print("setting baseUrl")
+            if (self.DEBUG): print("setting baseUrl")
             self.baseUrl = baseUrl
 
-        print("baseUrl=%s, uname=%s, passwd=%s" %
+        if (self.DEBUG): print("baseUrl=%s, uname=%s, passwd=%s" %
               (self.baseUrl, self.uname, self.passwd))
 
         self.getToken()
         
     def getEvents(self, wearerId =1):
-        print("libOsd.getEvents, wearerId=%d, baseUrl=%s" % (wearerId, self.baseUrl))
+        if (self.DEBUG): print("libOsd.getEvents, wearerId=%d, baseUrl=%s" % (wearerId, self.baseUrl))
         urlStr = "%s/events" % self.baseUrl
-        print("getEvents - urlStr=%s" % urlStr)
+        if (self.DEBUG): print("getEvents - urlStr=%s" % urlStr)
         retVal = self.getData(urlStr,None)
         return retVal
 
     def getEvent(self, eventId):
-        print("libOsd.getEvent, eventId=%d, baseUrl=%s" % (eventId, self.baseUrl))
+        if (self.DEBUG): print("libOsd.getEvent, eventId=%d, baseUrl=%s" % (eventId, self.baseUrl))
         urlStr = "%s/events/%d" % (self.baseUrl, eventId)
-        print("getEvent - urlStr=%s" % urlStr)
+        if (self.DEBUG): print("getEvent - urlStr=%s" % urlStr)
         retVal = self.getData(urlStr,None)
-        print("getEvent, returning: ",retVal)
+        if (self.DEBUG): print("getEvent, returning: ",retVal)
         return retVal
 
 
@@ -72,14 +74,14 @@ class libosd:
             "userId": wearerId
             }
         urlStr = "%s/events/" % self.baseUrl
-        print("addEvent - urlStr=%s" % urlStr)
+        if (self.DEBUG): print("addEvent - urlStr=%s" % urlStr)
         retVal = self.postData(urlStr,data)
-        print("addEvent - retVal=",retVal)
+        if (self.DEBUG): print("addEvent - retVal=",retVal)
         return retVal
 
     def updateEvent(self, eventId, eventType = None, dataTime = None, desc = None, wearerId = None):
         data = self.getEvent(eventId)
-        print("updateEvent - eventId=%d, data=" % eventId,data)
+        if (self.DEBUG): print("updateEvent - eventId=%d, data=" % eventId,data)
         if (eventType is not None):
             data['eventType'] = eventType
         if (dataTime is not None):
@@ -89,7 +91,7 @@ class libosd:
         if (wearerId is not None):
             data['wearerId'] = wearerId
         urlStr = "%s/events/%d/" % (self.baseUrl, eventId)
-        print("updateEvent - urlStr=%s" % urlStr)
+        if (self.DEBUG): print("updateEvent - urlStr=%s" % urlStr)
         retVal = self.putData(urlStr,data)
         return retVal
         
@@ -116,12 +118,12 @@ class libosd:
                 self.postData(urlStr, lineStrs)
                 print("libosd.uploadFile() - eof - linecount=%d" % lineCount)
 
-    def postData(self, url, data):
+    def postData(self, url, data, toObj=True):
         headerObj = {
                 "Authorization": "Token %s" % self.token
         }
-        #print("libosd.postData() - url=%s, data=%s" % (url, data))
-        #print("libosd.postData() - headerObj=",headerObj)
+        if (self.DEBUG): print("libosd.postData() - url=%s, data=%s" % (url, data))
+        if (self.DEBUG): print("libosd.postData() - headerObj=",headerObj)
         response = requests.post(
             url,
             headers=headerObj,
@@ -130,16 +132,23 @@ class libosd:
         # print("postData() - response=%s" % response.text)
         # print(response.status)
         # print(response.reason)
-        print("libosd.postdata(): Status Code=%d" % response.status_code)
+        if (self.DEBUG): print("libosd.postdata(): Status Code=%d" % response.status_code)
         # print(dir(response))
-        print("libosd.postdata(): Response=", response.text)
+        if (self.DEBUG): print("libosd.postdata(): Response=", response.text)
+        if (toObj):
+            retVal = json.loads(response.text)
+        else:
+            retVal = response.txt
+        if (self.DEBUG): print("libosd.postdata(): Returning=", retVal)
+        return(retVal)
+
 
     def putData(self, url, data):
         headerObj = {
                 "Authorization": "Token %s" % self.token
         }
-        #print("libosd.postData() - url=%s, data=%s" % (url, data))
-        #print("libosd.postData() - headerObj=",headerObj)
+        if (self.DEBUG): print("libosd.postData() - url=%s, data=%s" % (url, data))
+        if (self.DEBUG): print("libosd.postData() - headerObj=",headerObj)
         response = requests.put(
             url,
             headers=headerObj,
@@ -148,16 +157,18 @@ class libosd:
         # print("postData() - response=%s" % response.text)
         # print(response.status)
         # print(response.reason)
-        print("libosd.putdata(): Status Code=%d" % response.status_code)
+        if (self.DEBUG): print("libosd.putdata(): Status Code=%d" % response.status_code)
         # print(dir(response))
-        print("libosd.putdata(): Response=", response.text)
-        
+        if (self.DEBUG): print("libosd.putdata(): Response=", response.text)
+        return(response.text)
+
+
     def getData(self, url, data,toObj=True):
         headerObj = {
                 "Authorization": "Token %s" % self.token
         }
-        #print("libosd.getData() - url=%s, data=%s" % (url, data))
-        #print("libosd.getData() - headerObj=",headerObj)
+        if (self.DEBUG): print("libosd.getData() - url=%s, data=%s" % (url, data))
+        if (self.DEBUG): print("libosd.getData() - headerObj=",headerObj)
         response = requests.get(
             url,
             headers=headerObj,
@@ -166,20 +177,19 @@ class libosd:
         # print("getData() - response=%s" % response.text)
         # print(response.status)
         # print(response.reason)
-        print("libosd.getdata(): Status Code=%d" % response.status_code)
+        if (self.DEBUG): print("libosd.getdata(): Status Code=%d" % response.status_code)
         # print(dir(response))
         if (toObj):
             retVal = json.loads(response.text)
         else:
             retVal = response.txt
-        print("libosd.getdata(): Returning=", retVal)
+        if (self.DEBUG): print("libosd.getdata(): Returning=", retVal)
         return(retVal)
 
-        
     def getToken(self):
-        print("getToken")
+        if (self.DEBUG): print("getToken")
         urlStr = "%s/accounts/login/" % self.baseUrl
-        print("urlStr=%s" % urlStr)
+        if (self.DEBUG): print("urlStr=%s" % urlStr)
         response = requests.post(
             urlStr,
             json = {
@@ -187,16 +197,17 @@ class libosd:
 		"password": self.passwd
                 }
         )
-        print("Status Code=%d" % response.status_code)
+        if (self.DEBUG): print("Status Code=%d" % response.status_code)
         if (response.status_code == 200):
             jsonObj = json.loads(response.text)
             self.token = jsonObj['token']
-            print("token=%s" % self.token)
+            if (self.DEBUG): print("token=%s" % self.token)
         else:
             self.token = None
             print("ERROR - Token not set")
         # print(dir(response))
-        print(response.text)
+        if (self.DEBUG): print(response.text)
+        return(response.text)
 
 
 
@@ -207,17 +218,18 @@ if (__name__ == "__main__"):
     print("libosd.main()")
     osd = libosd(cfg="client.cfg", uname="graham4", passwd="testpwd1")
     #osd.uploadFile("DataLog_2019-11-04.txt", wearerId=3)
-    eventsObj = osd.getEvents()
-    print("eventsObj = ", eventsObj)
+    #eventsObj = osd.getEvents()
+    #print("eventsObj = ", eventsObj)
 
     retVal = osd.addEvent(eventType=4, dataTime="2021-11-30T20:35:00Z",
                           desc="testing addEvent",
                           wearerId=3)
     print("addEvent - retVal=",retVal)
+    print("addEvent - new EventId = %d" % retVal['id'])
 
-    eventsObj = osd.getEvents()
-    print("eventsObj = ", eventsObj)
-    print(eventsObj['results'])
+    #eventsObj = osd.getEvents()
+    #print("eventsObj = ", eventsObj)
+    #print(eventsObj['results'])
 
     retVal = osd.updateEvent(eventId=2, eventType=3)
     print(retVal)

@@ -1,0 +1,11 @@
+{
+    -2 : "Warning (Unvalidated)",
+    -1 : "Alarm (Unvalidated)",
+    0 : "Unknown",
+    1 : "False Warning",
+    2 : "False Alarm",
+    3 : "Tonic Clonic Seizure",
+    4 : "Other Seizure",
+    5 : "Other Medical Issue"
+}
+    
