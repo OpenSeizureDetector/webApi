@@ -1,9 +1,11 @@
 import { Button, Card, CardActions, CardContent, CardHeader, TextField, Typography } from "@mui/material";
 import { useReducer } from "react";
+import { Link } from "react-router-dom";
 import { useSetRecoilState } from "recoil";
 import { LoginFn } from "../api/auth";
 import { authState, tokenState } from "../state/authState";
 import { useStyles } from "./styles";
+import "../App.css";
 
 export const Login = () => {
     const classes = useStyles();
@@ -48,7 +50,7 @@ export const Login = () => {
                             error={state.hasError}
                             fullWidth
                             id="username"
-                            type="email"
+                            type="text"
                             label="Username"
                             placeholder="Username"
                             margin="normal"
@@ -86,9 +88,11 @@ export const Login = () => {
                     </div>
                     <div className={classes.row}>
                         <Typography className={classes.minimiseWidth}>New user?</Typography>
-                        <Button
-                            color="info"
-                        >Create Account</Button>
+                        <Link to="register">
+                            <Button
+                                color="info"
+                            >Create Account</Button>
+                        </Link>
                     </div>
                 </CardContent>
             </Card>

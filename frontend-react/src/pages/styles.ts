@@ -11,7 +11,7 @@ export const useStyles = makeStyles((theme: Theme) =>
             display: 'flex',
             flexWrap: 'wrap',
             flexDirection: 'column',
-            alignItems: 'center'
+            alignItems: 'center',
         },
         loginBtn: {
             marginTop: 16,
@@ -24,7 +24,8 @@ export const useStyles = makeStyles((theme: Theme) =>
         },
         card: {
             marginTop: '5%',
-            maxWidth: '90%'
+            maxWidth: '90%',
+            width: 550
         },
         actions: {
             padding: '8px 16px!important'
@@ -36,6 +37,9 @@ export const useStyles = makeStyles((theme: Theme) =>
         },
         minimiseWidth: {
             width: 'max-content'
+        },
+        spacer16: {
+            marginTop: 16
         }
     })
 );
