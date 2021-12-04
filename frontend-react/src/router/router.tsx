@@ -2,7 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { Home } from "../pages/Home";
 import { Login } from "../pages/Login";
-import { authState } from "../state/auth";
+import { authState } from "../state/authState";
 
 export const Routing = () => {
     const isAuthorized = useRecoilValue(authState);

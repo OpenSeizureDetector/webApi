@@ -1,5 +1,5 @@
 import { useSetRecoilState } from "recoil"
-import { authState } from "../state/auth"
+import { authState } from "../state/authState"
 
 export const Home = () => {
     const setAuthState = useSetRecoilState(authState);

@@ -23,14 +23,16 @@ export const useStyles = makeStyles((theme: Theme) =>
             color: '#fff'
         },
         card: {
-            marginTop: 160,
+            marginTop: '5%',
             maxWidth: '90%'
         },
         actions: {
             padding: '8px 16px!important'
         },
-        alignRight: {
-            marginRight: 0
+        row: {
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center'
         },
         minimiseWidth: {
             width: 'max-content'

@@ -1,15 +1,43 @@
 import { Button, Card, CardActions, CardContent, CardHeader, TextField, Typography } from "@mui/material";
 import { useReducer } from "react";
-import { useSetRecoilState } from "recoil"
-import { authState } from "../state/auth"
+import { useSetRecoilState } from "recoil";
+import { LoginFn } from "../api/auth";
+import { authState, tokenState } from "../state/authState";
 import { useStyles } from "./styles";
 
 export const Login = () => {
     const classes = useStyles();
     const [state, dispatch] = useReducer(reducer, initialState);
-
     const setAuthState = useSetRecoilState(authState);
-    const login = () => setAuthState(true);
+    const setToken = useSetRecoilState(tokenState);
+
+    const handleUsernameChange: React.ChangeEventHandler<HTMLInputElement> = event => {
+        dispatch({
+            type: 'setUsername',
+            payload: event.target.value
+        });
+    }
+
+    const handlePasswordChange: React.ChangeEventHandler<HTMLInputElement> = event => {
+        dispatch({
+            type: 'setPassword',
+            payload: event.target.value
+        });
+    }
+
+    const handleLogin = async () => {
+        let token = await LoginFn(state.username, state.password);
+        if (token) {
+            setAuthState(true);
+            setToken(token);
+        } else {
+            dispatch({
+                type: 'loginFailed',
+                payload: 'Incorrect username or password'
+            });
+        }
+    }
+
     return(
         <form className={classes.container} autoComplete="off">
             <Card className={classes.card}>
@@ -24,6 +52,7 @@ export const Login = () => {
                             label="Username"
                             placeholder="Username"
                             margin="normal"
+                            onChange={handleUsernameChange}
                         />
                         <TextField
                             error={state.hasError}
@@ -34,6 +63,7 @@ export const Login = () => {
                             placeholder="Password"
                             margin="normal"
                             helperText={state.helperText}
+                            onChange={handlePasswordChange}
                         />
                     </div>
                 </CardContent>
@@ -43,15 +73,23 @@ export const Login = () => {
                         size="large"
                         color="secondary"
                         className={classes.loginBtn}
-                        onClick={login} >
+                        onClick={handleLogin} >
                         Login
                     </Button>
                 </CardActions>
                 <CardContent>
-                    <div className={classes.alignRight}>
+                    <div className={classes.row}>
                         <Typography className={classes.minimiseWidth}>Forgotten your password?</Typography>
+                        <Button
+                            color="info"
+                        >Reset Password</Button>
                     </div>
-                    <Typography>New user?</Typography>
+                    <div className={classes.row}>
+                        <Typography className={classes.minimiseWidth}>New user?</Typography>
+                        <Button
+                            color="info"
+                        >Create Account</Button>
+                    </div>
                 </CardContent>
             </Card>
         </form>
