@@ -63,9 +63,9 @@ cd webApi
  
 Create a mysql database and associated user/password
 
-copy webApi/webApi/credentials.json.template to webApi/webApi/credentials.json
+copy webApi/api/webApi/credentials.json.template to webApi/api/webApi/credentials.json
 
-Edit webApi/webApi/credentials.json to use database credentials that will give it access to your mySql database, and provide a secret key string for use with encryption.
+Edit webApi/api/webApi/credentials.json to use database credentials that will give it access to your mySql database, and provide a secret key string for use with encryption.
 
 ```
 ./manage.py makemigrations
