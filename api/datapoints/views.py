@@ -112,6 +112,12 @@ class DatapointList(generics.ListCreateAPIView):
     ]
     queryset = Datapoint.objects.all()
 
+    def perform_create(self, serializer):
+        print("DatapointList.perform_create()")
+        serializer.save(userId=self.request.user)
+
+
+
 
 class DatapointSummaryList(generics.ListAPIView):
     """
