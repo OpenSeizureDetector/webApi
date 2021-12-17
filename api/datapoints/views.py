@@ -105,7 +105,7 @@ class DatapointUploadCsv(APIView):
                 #print("skipping empty line")
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-class DatapointList(generics.ListAPIView):
+class DatapointList(generics.ListCreateAPIView):
     serializer_class = DatapointSerializer
     permission_classes = [
         permissions.IsAuthenticated,
