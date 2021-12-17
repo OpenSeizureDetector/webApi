@@ -32,7 +32,7 @@ SECRET_KEY = credentials['secret_key']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['api.osd.dynu.net', '127.0.0.1', 'isaac', '185.237.98.234', 'osdapi.ddns.net']
+ALLOWED_HOSTS = ['api.osd.dynu.net', '127.0.0.1', 'isaac', '185.237.98.234', 'osdapi.ddns.net', 'localhost']
 
 # Application definition
 
@@ -184,5 +184,7 @@ CORS_ORIGIN_WHITELIST = [
     "https://osd.dynu.net",
     "https://api.osd.dynu.net",
     "http://localhost:8080",
-    "http://127.0.0.1:8080"
+    "http://127.0.0.1:8080",
+    "http://localhost:3000",
+    "http://192.168.0.10:3000"
 ]
