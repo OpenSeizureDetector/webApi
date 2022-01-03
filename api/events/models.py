@@ -11,18 +11,24 @@ class Event(models.Model):
 
     UNVALIDATED_ALARM_TYPE = 0
     UNVALIDATED_WARNING_TYPE = 1
-    FALSE_ALARM_TYPE = 2
-    FALSE_WARNING_TYPE = 3
-    TC_SEIZURE_TYPE = 4
-    OTHER_SEIZURE_TYPE = 5
-    OTHER_MEDICAL_TYPE = 6
+    UNVALIDATED_FALL_TYPE = 2
+    FALSE_ALARM_TYPE = 3
+    FALSE_WARNING_TYPE = 4
+    FALSE_FALL_TYPE = 5
+    TC_SEIZURE_TYPE = 6
+    OTHER_SEIZURE_TYPE = 7
+    FALL_TYPE = 8
+    OTHER_MEDICAL_TYPE = 9
     
     eventTypes = [
         "Unvalidated Alarm",
         "Unvalidated Warning",
+        "Unvalidated Fall",
         "False Alarm",
         "False Warning",
+        "False Fall",
         "Tonic-Clonic Seizure",
         "Other Seizure",
+        "Fall",
         "Other Medical Issue",
         ]
