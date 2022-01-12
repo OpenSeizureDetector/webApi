@@ -118,6 +118,19 @@ class libosd:
                 self.postData(urlStr, lineStrs)
                 print("libosd.uploadFile() - eof - linecount=%d" % lineCount)
 
+    def addDatapoint(self, eventId, dataTime, wearerId):
+        data = {
+            "eventId": eventId,
+            "dataTime": dataTime,
+            "userId": wearerId
+            }
+        urlStr = "%s/datapoints/" % self.baseUrl
+        if (self.DEBUG): print("addDatapoint - urlStr=%s" % urlStr)
+        retVal = self.postData(urlStr,data)
+        if (self.DEBUG): print("addDatapoint - retVal=",retVal)
+        return retVal
+
+
     def postData(self, url, data, toObj=True):
         headerObj = {
                 "Authorization": "Token %s" % self.token
@@ -216,20 +229,26 @@ class libosd:
         
 if (__name__ == "__main__"):
     print("libosd.main()")
-    osd = libosd(cfg="client.cfg", uname="graham4", passwd="testpwd1")
+    osd = libosd(cfg="client.cfg", uname="graham4", passwd="testpwd1", debug=True)
     #osd.uploadFile("DataLog_2019-11-04.txt", wearerId=3)
     #eventsObj = osd.getEvents()
     #print("eventsObj = ", eventsObj)
 
-    retVal = osd.addEvent(eventType=4, dataTime="2021-11-30T20:35:00Z",
-                          desc="testing addEvent",
-                          wearerId=3)
-    print("addEvent - retVal=",retVal)
-    print("addEvent - new EventId = %d" % retVal['id'])
+    #retVal = osd.addEvent(eventType=4, dataTime="2021-11-30T20:35:00Z",
+    #                      desc="testing addEvent",
+    #                      wearerId=3)
+    #print("addEvent - retVal=",retVal)
+    #print("addEvent - new EventId = %d" % retVal['id'])
 
-    #eventsObj = osd.getEvents()
-    #print("eventsObj = ", eventsObj)
-    #print(eventsObj['results'])
+    eventsObj = osd.getEvents()
+    print("eventsObj = ", eventsObj)
+    print(eventsObj['results'])
 
-    retVal = osd.updateEvent(eventId=2, eventType=3)
-    print(retVal)
+    #retVal = osd.updateEvent(eventId=2, eventType=3)
+    #print(retVal)
+
+
+    #retVal = osd.addDatapoint(eventId=4, dataTime="2021-11-30T20:35:00Z",
+    #                          wearerId=4)
+    #print("addDatapoint - retVal=",retVal)
+    
