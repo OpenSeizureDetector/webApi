@@ -5,6 +5,8 @@ import { useSetRecoilState } from "recoil";
 import { LoginFn } from "../api/auth";
 import { authState, tokenState } from "../state/authState";
 import { useStyles } from "./styles";
+import { useNavigate } from 'react-router-dom';
+
 import "../App.css";
 
 export const Login = () => {
@@ -12,6 +14,7 @@ export const Login = () => {
     const [state, dispatch] = useReducer(reducer, initialState);
     const setAuthState = useSetRecoilState(authState);
     const setToken = useSetRecoilState(tokenState);
+    const navigate = useNavigate();
 
     const handleUsernameChange: React.ChangeEventHandler<HTMLInputElement> = event => {
         dispatch({
@@ -32,6 +35,8 @@ export const Login = () => {
         if (token) {
             setAuthState(true);
             setToken(token);
+	    console.log("redirecting to Events page");
+	    navigate('/event');
         } else {
             dispatch({
                 type: 'loginFailed',
