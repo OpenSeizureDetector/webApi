@@ -3,6 +3,7 @@ import datetime
 import numpy as np
 from django.http import Http404
 from django.contrib.auth.models import User
+from rest_framework import viewsets
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -105,6 +106,18 @@ class DatapointUploadCsv(APIView):
                 #print("skipping empty line")
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+
+class DatapointViewSet(viewsets.ModelViewSet):
+    queryset = Datapoint.objects.all().order_by('dataTime')
+    serializer_class = DatapointSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        print("DatapointViewSet.perform_create()")
+        serializer.save(userId=self.request.user)
+
+
+
 class DatapointList(generics.ListCreateAPIView):
     serializer_class = DatapointSerializer
     permission_classes = [
@@ -130,6 +143,12 @@ class DatapointSummaryList(generics.ListAPIView):
     ]
     #queryset = Datapoint.objects.all()
 
+    def perform_create(self, serializer):
+        print("datapointSummaryList.perform_create()")
+        serializer.save(userId=self.request.user)
+
+
+    
     def get_queryset(self):
         """
         gets a filtered dataset based on query parameters:

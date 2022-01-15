@@ -7,13 +7,16 @@ class DatapointSerializer(serializers.ModelSerializer):
     class Meta:
         model = Datapoint
         fields = "__all__"
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Datapoint.objects.all(),
-                fields=['dataTime', 'userId'],
-                message='Skipping Duplicate datapoint'
-            )
-        ]
+        #validators = [
+        #    UniqueTogetherValidator(
+        #        queryset=Datapoint.objects.all(),
+        #        fields=['dataTime', 'userId'],
+        #        message='Skipping Duplicate datapoint'
+        #    )
+        #]
+        read_only_fields = (
+            'userId',
+        ) 
 
 class DatapointSummarySerializer(serializers.ModelSerializer):
     class Meta:
@@ -26,3 +29,6 @@ class DatapointSummarySerializer(serializers.ModelSerializer):
             "accSd",
             "hr"
         ]
+        read_only_fields = (
+            'userId',
+        ) 
