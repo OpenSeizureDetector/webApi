@@ -219,7 +219,8 @@ class libosd:
             self.token = None
             print("ERROR - Token not set")
         # print(dir(response))
-        if (self.DEBUG): print(response.text)
+        if (self.DEBUG): print("libosd.getToken(): Response Headers", response.headers)
+        if (self.DEBUG): print("libosd.getToken(): response.txt=",response.text)
         return(response.text)
 
 
@@ -240,9 +241,9 @@ if (__name__ == "__main__"):
     #print("addEvent - retVal=",retVal)
     #print("addEvent - new EventId = %d" % retVal['id'])
 
-    eventsObj = osd.getEvents()
-    print("eventsObj = ", eventsObj)
-    print(eventsObj['results'])
+    #eventsObj = osd.getEvents()
+    #print("eventsObj = ", eventsObj)
+    #print(eventsObj['results'])
 
     #retVal = osd.updateEvent(eventId=2, eventType=3)
     #print(retVal)

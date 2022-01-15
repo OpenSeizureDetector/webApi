@@ -1,11 +1,30 @@
 {
-    -2 : "Warning (Unvalidated)",
-    -1 : "Alarm (Unvalidated)",
-    0 : "Unknown",
-    1 : "False Warning",
-    2 : "False Alarm",
-    3 : "Tonic Clonic Seizure",
-    4 : "Other Seizure",
-    5 : "Other Medical Issue"
+    "Seizure": [
+	"Tonic-Clonic",
+	"Other"
+    ],
+    "Fall": [
+	"Stumble",
+	"Controlled",
+	"Uncontrolled"
+    ],
+    "Other Medical Issue": [
+	"Fever",
+	"Cold",
+	"Other"
+    ],
+    "False Alarm": [
+	"Brushing Teeth",
+	"Brushing Hair",
+	"Computer Games",
+	"Cycling",
+	"Knitting",
+	"Motor Vehicle",
+	"Other (Please describe in notes)"
+	"Pushing Pram/Wheelchair",
+	"Talking",
+	"Typing",
+	"Unknown",
+	"Washing Up",
+    ]
 }
-    

@@ -1,76 +1,41 @@
 import { Button, Card, CardActions, CardContent, CardHeader, TextField, Typography } from "@mui/material";
 import { useReducer } from "react";
 import { Link } from "react-router-dom";
-import { useSetRecoilState } from "recoil";
-import { LoginFn } from "../api/auth";
+//import { LoginFn } from "../api/auth";
+import { useRecoilState } from "recoil";
 import { authState, tokenState } from "../state/authState";
 import { useStyles } from "./styles";
-import { useNavigate } from 'react-router-dom';
-
 import "../App.css";
 
-export const Login = () => {
+export const Event = () => {
+    console.log("Event()");
     const classes = useStyles();
-    const [state, dispatch] = useReducer(reducer, initialState);
-    const setAuthState = useSetRecoilState(authState);
-    const setToken = useSetRecoilState(tokenState);
-    const navigate = useNavigate();
+    const [state, ] = useReducer(reducer, initialState);
+    const [authValue,] = useRecoilState(authState);
+    const [tokenValue,] = useRecoilState(tokenState);
+    console.log("tokenValue="+tokenValue);
 
-    const handleUsernameChange: React.ChangeEventHandler<HTMLInputElement> = event => {
-        dispatch({
-            type: 'setUsername',
-            payload: event.target.value
-        });
+    const handleSave = async () => {
+        //let token = await LoginFn(state.username, state.password);
+        
     }
 
-    const handlePasswordChange: React.ChangeEventHandler<HTMLInputElement> = event => {
-        dispatch({
-            type: 'setPassword',
-            payload: event.target.value
-        });
-    }
-
-    const handleLogin = async () => {
-        let token = await LoginFn(state.username, state.password);
-        if (token) {
-            setAuthState(true);
-            setToken(token);
-	    console.log("redirecting to Events page");
-	    navigate('/event');
-        } else {
-            dispatch({
-                type: 'loginFailed',
-                payload: 'Incorrect username or password'
-            });
-        }
-    }
-
-    return(
-        <form className={classes.container} autoComplete="off">
+    if (authValue)
+      return (
+            <form className={classes.container} autoComplete="off">
             <Card className={classes.card}>
-                <CardHeader className={classes.header} title="OpenSeizureDetector Web API" />
+                <CardHeader className={classes.header} title="OpenSeizureDetector: Edit Event" />
                 <CardContent>
                     <div>
+    		    
                         <TextField
                             error={state.hasError}
                             fullWidth
-                            id="username"
+                            id="desc"
                             type="text"
-                            label="Username"
-                            placeholder="Username"
+                            label="Description"
+                            placeholder="Event Description"
                             margin="normal"
-                            onChange={handleUsernameChange}
-                        />
-                        <TextField
-                            error={state.hasError}
-                            fullWidth
-                            id="password"
-                            type="password"
-                            label="Password"
-                            placeholder="Password"
-                            margin="normal"
-                            helperText={state.helperText}
-                            onChange={handlePasswordChange}
                         />
                     </div>
                 </CardContent>
@@ -80,8 +45,8 @@ export const Login = () => {
                         size="large"
                         color="secondary"
                         className={classes.loginBtn}
-                        onClick={handleLogin} >
-                        Login
+                        onClick={handleSave} >
+                        Save
                     </Button>
                 </CardActions>
                 <CardContent>
@@ -102,7 +67,15 @@ export const Login = () => {
                 </CardContent>
             </Card>
         </form>
-    )
+	);    
+
+    return (
+    <div>
+<h1> Not Logged In</h1>
+       <a href="../Login">Login</a>
+       </div>
+       );
+
 }
 
 type State = {
