@@ -5,8 +5,10 @@ from django.contrib.auth.models import User, Group
 
 class Event(models.Model):
     userId = models.ForeignKey(User, on_delete=models.CASCADE)
-    eventType = models.IntegerField()
+    osdAlarmState = models.IntegerField()
     dataTime = models.DateTimeField()
+    type = models.TextField(blank=True, null=True)
+    subType = models.TextField(blank=True, null=True)
     desc = models.TextField(blank=True, null=True)
 
     UNVALIDATED_ALARM_TYPE = 0
