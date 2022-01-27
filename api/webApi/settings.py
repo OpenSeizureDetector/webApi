@@ -172,13 +172,21 @@ REST_REGISTRATION = {
     'RESET_PASSWORD_VERIFICATION_ENABLED': True,
     'REGISTER_EMAIL_VERIFICATION_ENABLED': True,
     
-    'REGISTER_VERIFICATION_URL': 'https://osdapi.ddns.net/confirm',
-    'RESET_PASSWORD_VERIFICATION_URL': 'https://osdapi.ddns.net/reset-password',
+    'REGISTER_VERIFICATION_URL': 'https://osdapi.ddns.net/static/confirm.html',
+    'RESET_PASSWORD_VERIFICATION_URL': 'https://osdapi.ddns.net/static/reset_password.html',
     'REGISTER_EMAIL_VERIFICATION_URL': 'https://osdapi.ddns.net/static/verify-email.html',
     'VERIFICATION_FROM_EMAIL': 'donotreply@osdapi.ddns.net',
     'REGISTER_EMAIL_VERIFICATION_EMAIL_TEMPLATES': {
         'body': 'register_email_templates/body.txt',
         'subject': 'register_email_templates/subject.txt'
+    },
+    'REGISTER_VERIFICATION_EMAIL_TEMPLATES': {
+        'body': 'register_verification_templates/body.txt',
+        'subject': 'register_verification_templates/subject.txt'
+    },
+    'RESET_PASSWORD_VERIFICATION_EMAIL_TEMPLATES': {
+        'body': 'reset_password_verification_templates/body.txt',
+        'subject': 'reset_password_verification_templates/subject.txt'
     }
 }
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'

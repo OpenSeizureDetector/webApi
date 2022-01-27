@@ -1,44 +1,31 @@
-<html lang="en">
+<html>
   <head>
-    <title>OpenSeizureDetector webAPI</title>
-    <script src="js/vue.js"></script>
-    <script src="js/axios.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <title>OSD WebAPI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
   </head>
   <body>
-    <h1>OpenSeizureDetector webAPI</h1>
-    <div id="vueApp">
-      <h1>Vuejs App</h1>
-      <div id="loginDiv" v-if="appState===APPSTATE_NOT_LOGGED_IN">
-	<input v-model="uname"></input>
-	<input v-model="passwd"></input>
-	<button id="loginBtn" v-on:click="loginBtnOnClick">Login</button>
-	<br/>
-	<input v-model="confirm_passwd"></input>
-	<input v-model="email"></input>
-	<button id="registerBtn" v-on:click="registerBtnOnClick">Register</button>
-      </div>
-      <div v-else>
-	<p>
-	  Logged in as user '{{ uname }}'.
-	  <button v-on:click="logoutBtnOnClick">Log Out</button>
-	</p>
-
-	<div id="wearersDiv">
-	  <ul>
-	    <li v-for="wearer in wearers">
-	      {{ wearer.id }} - {{ wearer.name }}
-	    </li>
-	  </ul>
-	  <button v-on:click="addWearerBtnOnClick">Add Wearer</button>
-	</div>
-	<div id="addWearerDiv">
-	</div>
-	
-      </div>
-      <div id="systemMsgDiv">System Messages: {{message}}</div>
-      <div id="ajaxMsgDiv">Ajax Messages: {{ ajaxMsg }}</div>
+    <div class="container bg-primary text-white border py-3 my-3">
+      <h1>Open Seizure Detector WebAPI</h1>
+      <p> Home Page</p>
     </div>
-    
+    <div class="container bg-white text-dark border py-3 my-3">
+      <p>
+      This page is the home for the OpenSeizureDetector WebAPI.  It is a
+      tool to allow the collection of seizure-like data from the
+      OpenSeizureDetector seizure detector and alarm system.
+      This data will be used to improve the detection algorithms and reduce
+      false alarms in the future.
+      </p>
+      <p><a href="/static/register.html">Create New User Account</a>
+      <p><a href="/static/request_password_reset.html">Reset Password</a>
+      </p>
+      <p>For further details please see <a href="https://openseizuredetector.org.uk">OpenSeizureDetector.org.uk</a>
+      </p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
   </body>
-  <script src="js/vueApp.js"></script>
 </html>
