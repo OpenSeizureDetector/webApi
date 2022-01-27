@@ -1,7 +1,7 @@
 <template>
 <v-card>
   <v-card-title>
-    <h1>Create Account to Use OpenSeizureDetector WebAPI</h1>
+    <h1>Create OSD WebAPI Account</h1>
   </v-card-title>
   <v-card-text>
     <v-form ref="form" v-model="valid" lazy-validation>

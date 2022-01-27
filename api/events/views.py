@@ -9,6 +9,8 @@ class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all().order_by('dataTime')
     serializer_class = EventSerializer
     permission_classes = [permissions.IsAuthenticated]
+    # from: https://stackoverflow.com/questions/48319957/djangofilterbackend-field-null
+    filter_fileds = {'type' : ['isnull']}
 
     def perform_create(self, serializer):
         print("EventViewSet.perform_create()")
@@ -25,13 +27,14 @@ class EventViewSet(viewsets.ModelViewSet):
         If both start and end are specified, duration is ignored.
         duration is used if only start or end is specified.
         """
-        queryset = Event.objects.all().order_by('dataTime')
         user = self.request.query_params.get('user', None)
         startDateStr = self.request.query_params.get('start', None)
         endDateStr = self.request.query_params.get('end', None)
         durationMinStr = self.request.query_params.get('duration', None)
         authUser = self.request.user
         print("events.views.get_queryset(): authUser="+str(authUser))
+
+        queryset = Event.objects.all().order_by('dataTime')
 
         queryset = common.queryUtils.dateFilter(
             queryset,

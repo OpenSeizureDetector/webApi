@@ -14,7 +14,7 @@ import os
 import json
 from django.core.exceptions import ImproperlyConfigured
 baseDir = os.path.dirname(os.path.realpath(__file__))
-print(baseDir)
+#print("settings.py: baseDir="+baseDir)
 with open(os.path.join(baseDir, 'credentials.json')) as credentials_file:
     credentials = json.load(credentials_file)
 
@@ -70,7 +70,10 @@ ROOT_URLCONF = 'webApi.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'static/dist')],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'static/dist'),
+            os.path.join(BASE_DIR, 'templates')
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -82,6 +85,8 @@ TEMPLATES = [
         },
     },
 ]
+
+#print("TEMPLATES[0]:DIRS=",TEMPLATES[0]['DIRS'])
 
 WSGI_APPLICATION = 'webApi.wsgi.application'
 
@@ -171,9 +176,16 @@ REST_REGISTRATION = {
     'RESET_PASSWORD_VERIFICATION_URL': 'https://osdapi.ddns.net/reset-password',
     'REGISTER_EMAIL_VERIFICATION_URL': 'https://osdapi.ddns.net/static/verify-email.html',
     'VERIFICATION_FROM_EMAIL': 'donotreply@osdapi.ddns.net',
+    'REGISTER_EMAIL_VERIFICATION_EMAIL_TEMPLATES': {
+        'body': 'register_email_templates/body.txt',
+        'subject': 'register_email_templates/subject.txt'
+    }
 }
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_EMAIL_REQUIRED = True
+
+#print("settings.py: REGISTER_EMAIL_VERIFICATION_EMAIL_TEMPLATES=")
+#print(REST_REGISTRATION['REGISTER_EMAIL_VERIFICATION_EMAIL_TEMPLATES'])
 
 EMAIL_HOST = credentials['email_host']
 EMAIL_PORT = credentials['email_port']
@@ -190,3 +202,6 @@ CORS_ORIGIN_WHITELIST = [
     "http://localhost:3000",
     "http://192.168.0.10:3000"
 ]
+
+
+print(TEMPLATES)

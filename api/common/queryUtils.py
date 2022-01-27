@@ -91,3 +91,21 @@ def dateFilter(queryset,
     return queryset
 
 
+def eventTypeFilter(queryset, eventType):
+    #FIXME - this is not finished https://stackoverflow.com/questions/48319957/djangofilterbackend-field-null suggests that using filter_fields = {'eventType' : [isnull']} should work so may not need this
+    """ return records where eventType is the specified event Type
+    """
+    print("common.queryUtils.eventTypeFilter: eventType=",eventType)
+    if user is not None:
+        print("common.queryUtils.userFilter: userFilter: authUser="+authUser)
+        if (user == authUser):
+            queryset = queryset.filter(userId=user)
+        else:
+            # FIXME: this should check if the authUser is an admin or
+            # analyst, and if they are, return the data.
+            queryset = queryset.filter(userId=authUser)
+    else:
+        print("user is None - returning data for authUser")
+        queryset = queryset.filter(userId=authUser)
+    print("common.queryUtils.userFilter: returning queryset = ",queryset.query)
+    return queryset

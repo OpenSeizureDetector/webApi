@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>{% if email_already_used %}Your e-mail addess is already in use for an account at https://osdapi.ddns.net.{% else %}Please verify new e-mail address to register at https://osdapi.ddns.net{% endif %}</title>
+  </head>
+  <body>
+    {% if email_already_used %}
+    <p>
+      This message was generated automatically by https://osdapi.ddns.net <br/>
+      You or someone else requested change to this e-mail address for which there is an existing account.
+      You need to either remove this account assigned to this e-mail address or change the e-mail address of it.
+    </p>
+    <p>
+      If this wasn't you, please just ignore this email.
+    </p>
+    {% else %}
+    <p>
+      This message was generated automatically by https://osdapi.ddns.net <br/>
+      Someone has attempted to create an account at https://osdapi.ddns.net using this email address.   If this was you, please
+      verify the email address {{ email }} by clicking
+      <a href="{{ verification_url }}">here</a>.
+    </p>
+    <p>If you did not attempt to create this account, please report this to graham@openseizuredetector.org.uk
+      </p
+    {% endif %}
+  </body>
+</html>

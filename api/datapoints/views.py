@@ -113,7 +113,7 @@ class DatapointViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        print("DatapointViewSet.perform_create()")
+        #print("DatapointViewSet.perform_create()")
         serializer.save(userId=self.request.user)
 
 
@@ -126,7 +126,7 @@ class DatapointList(generics.ListCreateAPIView):
     queryset = Datapoint.objects.all()
 
     def perform_create(self, serializer):
-        print("DatapointList.perform_create()")
+        #print("DatapointList.perform_create()")
         serializer.save(userId=self.request.user)
 
 
@@ -144,7 +144,7 @@ class DatapointSummaryList(generics.ListAPIView):
     #queryset = Datapoint.objects.all()
 
     def perform_create(self, serializer):
-        print("datapointSummaryList.perform_create()")
+        #print("datapointSummaryList.perform_create()")
         serializer.save(userId=self.request.user)
 
 

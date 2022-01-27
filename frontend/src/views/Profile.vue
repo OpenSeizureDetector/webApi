@@ -44,7 +44,7 @@
 	</v-row>
 	<v-row>
 	  <v-date-picker
-	    label="Date of Birth: {{ profile.dob }}"
+	    label="Date of Birth: " <!--{{ profile.dob }}-->
 	    v-model="profile.dob"
 	    date-format="yyyy-MM-dd"
 	    >
