@@ -1,27 +1,70 @@
 <html>
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>New User Regisration</title>
     <script src="js/jquery-3.4.1.min.js"></script>
     <script src="js/axios.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
   </head>
   <body>
-    <h1>OSD WebAPI New User Registration</h1>
-    <div>
-      <label>User Name:</label><input id="username"></input><label id="usernameErr"></label><br/>
-      <label>First Name:</label><input id="first_name"></input><label id="firstnameErr"></label><br/>
-      <label>Surname:</label><input id="last_name"></input><label id="lastnameErr"></label><br/>
-      <label>Email:</label><input id="email"></input><label id="emailErr"></label><br/>
-      <label>Password:</label><input type='password' id="password"></input><label id="passwordErr"></label><br/>
-      <label>Confirm Password:</label><input type='password' id="password_confirm"></input><label id="password_confirmErr"></label>
-      
+    <h1>Open Seizure Detector WebAPI</h1><h1> New User Registration</h1>
+    <form>
+      <div class="row mb-3">
+	<label for="username" class="col-sm-2 col-form-label">User Name:</label>
+	<div class="col-sm-10">
+	  <input id="username"></input>
+	  <label id="usernameErr"></label>
+	</div>
+      </div>
+      <div class="row mb-3">
+	<label for="first_name" class="col-sm-2 col-form-label">First Name:</label>
+	<div class="col-sm-10">
+	  <input id="first_name"></input>
+	  <label id="firstnameErr"></label>
+	</div>
+      </div>
+      <div class="row mb-3">
+	<label for="last_name" class="col-sm-2 col-form-label">Surname:</label>
+	<div class="col-sm-10">
+	  <input id="last_name"></input>
+	  <label id="lastnameErr"></label>
+	</div>
+      </div>
+      <div class="row mb-3">
+	<label for="email" class="col-sm-2 col-form-label">Email:</label>
+	<div class="col-sm-10">
+	  <input id="email"></input>
+	  <label id="emailErr"></label>
+	</div>
+      </div>
+      <div class="row mb-3">
+	<label for="password" class="col-sm-2 col-form-label">Password:</label>
+	<div class="col-sm-10">
+	  <input type='password' id="password"></input>
+	  <label id="passwordErr"></label>
+	</div>
+      </div>
+      <div class="row mb-3">
+	<label for="password_confirm" class="col-sm-2 col-form-label">Confirm Password:</label>
+	<div class="col-sm-10">
+	  <input type='password' id="password_confirm"></input>
+	  <label id="password_confirmErr"></label>
+	</div>
+      </div>
       <br/>
       <button id="submitBtn">Submit</button>
-    </div>
+    </form>
     <script>
     $( document ).ready(function() {
     console.log( "ready!" );
 
-	$("#submitBtn").click(function () {
+	$("#submitBtn").submit(function (e) {
+	    e.preventDefault(); // stop page refresh
+	});
+
+	$("#submitBtn").click(function (e) {
+	    e.preventDefault();
     data = {};
 	data['username'] = $('#username').val();
 	data['first_name'] = $('#first_name').val();
@@ -60,6 +103,7 @@
 	});
     });
    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
   </body>
 </html>
