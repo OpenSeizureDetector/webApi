@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics
 from rest_framework import permissions
+from rest_framework.exceptions import PermissionDenied
 from django.contrib.auth.models import User
 
 from datapoints.models import Datapoint
@@ -18,6 +19,38 @@ from events.serializers import EventSerializer
 
 UNVALIDATED_ALARM_TYPE = 0
 UNVALIDATED_WARNING_TYPE = 1
+
+
+class DatapointViewSet(viewsets.ModelViewSet):
+    queryset = Datapoint.objects.all().order_by('dataTime')
+    serializer_class = DatapointSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        #print("DatapointViewSet.perform_create()")
+        serializer.save(userId=self.request.user)
+
+    def get_queryset(self):
+        """
+        gets a filtered dataset based on query parameters:
+           eventId = event for which we want to return the associated datapoints
+        """
+        eventId = int(self.request.query_params.get('eventId', None))
+        print("datapoints.views.get_queryset - eventId = %d" % eventId)
+        authUser = self.request.user
+        print("datapoints.views.get_queryset(): authUser="+str(authUser))
+
+        if (authUser.is_staff):
+            queryset = Datapoint.objects.all().order_by('dataTime')
+            queryset = queryset.filter(eventId=eventId)
+        else:
+            raise PermissionDenied(detail="Non-Staff User")
+
+        return queryset
+
+        
+
+# FIXME - I don't think the code below is used, but need to check!!!
 
 
 class DatapointUploadCsv(APIView):
@@ -105,16 +138,6 @@ class DatapointUploadCsv(APIView):
                 pass
                 #print("skipping empty line")
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-
-class DatapointViewSet(viewsets.ModelViewSet):
-    queryset = Datapoint.objects.all().order_by('dataTime')
-    serializer_class = DatapointSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def perform_create(self, serializer):
-        #print("DatapointViewSet.perform_create()")
-        serializer.save(userId=self.request.user)
 
 
 

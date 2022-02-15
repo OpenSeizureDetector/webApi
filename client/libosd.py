@@ -49,10 +49,25 @@ class libosd:
 
         self.getToken()
         
-    def getEvents(self, wearerId =1):
-        if (self.DEBUG): print("libOsd.getEvents, wearerId=%d, baseUrl=%s" % (wearerId, self.baseUrl))
-        urlStr = "%s/events" % self.baseUrl
+    def getEvents(self, userId =1):
+        if (self.DEBUG): print("libOsd.getEvents, userId=%d, baseUrl=%s" % (userId, self.baseUrl))
+        urlStr = "%s/events/?user=%d" % (self.baseUrl, userId)
         if (self.DEBUG): print("getEvents - urlStr=%s" % urlStr)
+        retVal = self.getData(urlStr,None)
+        return retVal
+
+    def getDataPointsByEvent(self, eventId =1):
+        if (self.DEBUG): print("libOsd.getDataPointsByEvent, eventId=%d, baseUrl=%s" % (eventId, self.baseUrl))
+        urlStr = "%s/datapoints/?eventId=%d" % (self.baseUrl, eventId)
+        if (self.DEBUG): print("getDataPointsByEvent - urlStr=%s" % urlStr)
+        retVal = self.getData(urlStr,None)
+        return retVal
+
+    
+    def getUnvalidatedEvents(self, wearerId =1):
+        if (self.DEBUG): print("libOsd.getUnvalidatedEvents, wearerId=%d, baseUrl=%s" % (wearerId, self.baseUrl))
+        urlStr = "%s/events/?type__isnull=true" % self.baseUrl
+        if (self.DEBUG): print("getUnvalidatedEvents - urlStr=%s" % urlStr)
         retVal = self.getData(urlStr,None)
         return retVal
 
@@ -188,15 +203,16 @@ class libosd:
             #auth=(self.uname, self.passwd),
             json=data)
         # print("getData() - response=%s" % response.text)
-        # print(response.status)
-        # print(response.reason)
         if (self.DEBUG): print("libosd.getdata(): Status Code=%d" % response.status_code)
-        # print(dir(response))
-        if (toObj):
-            retVal = json.loads(response.text)
+        if (response.status_code==200):
+            # print(dir(response))
+            if (toObj):
+                retVal = json.loads(response.text)
+            else:
+                retVal = response.txt
         else:
-            retVal = response.txt
-        if (self.DEBUG): print("libosd.getdata(): Returning=", retVal)
+            retVal = None
+        if (self.DEBUG): print("libosd.getdata(): Returning") #=", retVal)
         return(retVal)
 
     def getToken(self):
@@ -232,8 +248,10 @@ if (__name__ == "__main__"):
     print("libosd.main()")
     osd = libosd(cfg="client.cfg", uname="graham4", passwd="testpwd1", debug=True)
     #osd.uploadFile("DataLog_2019-11-04.txt", wearerId=3)
-    #eventsObj = osd.getEvents()
-    #print("eventsObj = ", eventsObj)
+    eventsObj = osd.getEvents()
+    print("eventsObj = ", eventsObj)
+    #unvalidatedEventsObj = osd.getUnvalidatedEvents()
+    #print("unvalidatedEventsObj = ", unvalidatedEventsObj)
 
     #retVal = osd.addEvent(eventType=4, dataTime="2021-11-30T20:35:00Z",
     #                      desc="testing addEvent",

@@ -1,4 +1,5 @@
 import datetime
+from rest_framework.exceptions import PermissionDenied
 
 
 def fixMissingSeconds(dateTimeStr):
@@ -23,15 +24,21 @@ def userFilter(queryset, user, authUser):
     else:
         print("common.queryUtils.userFilter: authUser is not None - filtering")
     print("common.queryUtils.userFilter: user=",user)
-    print("common.queryUtils.userFilter: authUser=",authUser)
+    print("common.queryUtils.userFilter: authUser=",(authUser))
     if user is not None:
-        print("common.queryUtils.userFilter: userFilter: authUser="+authUser)
+        print("common.queryUtils.userFilter: userFilter: authUser=",(authUser))
         if (user == authUser):
+            # the authenticated user is asking for his own data - OK
             queryset = queryset.filter(userId=user)
         else:
-            # FIXME: this should check if the authUser is an admin or
-            # analyst, and if they are, return the data.
-            queryset = queryset.filter(userId=authUser)
+            if (authUser.is_staff):
+                print("common.queryUtils.userFilter: staff user asking for someone else's data - OK");
+                # we use the is_staff parameter to signify a researcher.
+                queryset = queryset.filter(userId=user)
+            else:
+                print("common.queryUtils.userFilter: non-staff user asking for someone else's data returning error");
+                #queryset = None
+                raise PermissionDenied(detail="Non-Staff User")
     else:
         print("user is None - returning data for authUser")
         queryset = queryset.filter(userId=authUser)
