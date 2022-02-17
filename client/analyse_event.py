@@ -82,10 +82,6 @@ class EventAnalyser:
 
 
             
-    def plotAcc(self,tsLst,accLst):
-        fig, ax = plt.subplots()
-        ax.plot(tsLst,accLst)
-        fig.savefig("plot.png")
 
     def analyseEvent(self, eventId):
         print("analyse_event: eventId=%d" % eventId)
@@ -108,6 +104,10 @@ class EventAnalyser:
         specPowerLst = []
         roiPowerLst = []
         roiRatioLst = []
+        alarmRatioThreshLst = []
+        alarmStateLst = []
+        hrLst = []
+        o2satLst = []
         for dp in dataPointsObj:
             currTs = dateStr2secs(dp['dataTime'])
             print(dp['dataTime'], currTs)
@@ -118,22 +118,46 @@ class EventAnalyser:
             specPowerLst.append(dataObj['specPower'])
             roiPowerLst.append(dataObj['roiPower'])
             roiRatioLst.append(dataObj['roiPower']/dataObj['specPower'])
+            alarmStateLst.append(dataObj['alarmState'])
+            alarmRatioThreshLst.append(dataObj['alarmRatioThresh']/10.)
+            hrLst.append(dataObj['hr'])
+            o2satLst.append(dataObj['o2Sat'])
 
             # Add to the raw data lists
             accLst = dataObj['rawData']
-            print(accLst, type(accLst))
+            # FIXME:  IT is not good to hard code the length of an array!
             for n in range(0,125):
                 accelLst.append(accLst[n])
                 rawTimestampLst.append((currTs + n*1./25.)-alarmTime)
 
         #for n in range(0,len(rawTimestampLst)):
         #    print(n,rawTimestampLst[n],accelLst[n])
-        self.plotAcc(rawTimestampLst, accelLst)
+        fig, ax = plt.subplots()
+        ax.plot(rawTimestampLst,accelLst)
+        fig.savefig("plot.png")
 
-        fig, ax = plt.subplots(2,1)
-        ax[0].plot(analysisTimestampLst, specPowerLst)
-        ax[0].plot(analysisTimestampLst, roiPowerLst)
-        ax[1].plot(analysisTimestampLst, roiRatioLst)
+        fig, ax = plt.subplots(4,1, figsize=(5,9))
+        fig.suptitle('Event Number %d, %s\n%s, %s\n%s' % (
+            eventId,
+            eventObj['dataTime'],
+            eventObj['type'],
+            eventObj['subType'],
+            eventObj['desc']),
+                     fontsize=11)
+        ax[0].plot(rawTimestampLst,accelLst)
+        ax[0].set_title("Raw Data")
+        ax[1].plot(analysisTimestampLst, specPowerLst)
+        ax[1].plot(analysisTimestampLst, roiPowerLst)
+        ax[1].set_title("Spectrum / ROI Powers")
+        ax[2].plot(analysisTimestampLst, hrLst)
+        ax[2].plot(analysisTimestampLst, o2satLst)
+        ax[2].set_title("Heart Rate / O2 Sat")
+        ax[3].plot(analysisTimestampLst, roiRatioLst)
+        ax[3].plot(analysisTimestampLst, alarmRatioThreshLst)
+        ax[3].plot(analysisTimestampLst, alarmStateLst)
+        ax[3].set_title("ROI Ratio & Alarm State")
+        fig.tight_layout()
+        fig.subplots_adjust(top=0.85)
         fig.savefig("plot2.png")
 
 
