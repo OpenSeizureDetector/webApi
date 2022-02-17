@@ -1,0 +1,165 @@
+#!/usr/bin/python3
+
+import argparse
+import json
+import libosd
+import sys
+import dateutil.parser
+
+import matplotlib.pyplot as plt
+
+
+def dateStr2secs(dateStr):
+    parsed_t = dateutil.parser.parse(dateStr)
+    return parsed_t.timestamp()
+
+
+def runTest():
+    # Note, in test DB graham4 is a staff (researcher) user
+    #              and graham29 is a normal user
+
+    for unameStr in ("graham29", "graham4"):
+        print("**********************")
+        print("Trying as user %s" % unameStr)
+        print("**********************")
+        osd = libosd.libosd(cfg="client.cfg", uname=unameStr,
+                            passwd="testpwd1", debug=True)
+        eventsObj = osd.getEvents(userId=38)
+        if (eventsObj is not None):
+            for event in eventsObj:
+                print(event)
+        else:
+            print("ERROR - No Data Returned");
+
+        datapointsObj = osd.getDataPointsByEvent(eventId=395)
+        if (datapointsObj is not None):
+            for dp in datapointsObj:
+                #print("dp=",dp)
+                dpObj = json.loads(dp['dataJSON'])
+                dataObj = json.loads(dpObj['dataJSON'])
+                #print(dataObj.keys())
+                print("%s, %d, %d, %.0f, %.0f, %.2f" % (dataObj['dataTime'],
+                                                  dp['id'], dp['eventId'],
+                                                  dataObj['specPower'],dataObj['roiPower'],
+                                                  dataObj['roiPower']/dataObj['specPower']                                      ))
+        else:
+            print("ERROR - No Data Returned")
+
+            
+class EventAnalyser:
+    configObj = None
+
+    def __init__(self, configFname = "credentials.json"):
+        print("EventAnalyser.__init__: configFname=%s" % configFname)
+        self.loadConfig(configFname)
+        print("self.configObj=",self.configObj)
+        self.osd = libosd.libosd(cfg="client.cfg",
+                                 uname=self.configObj["uname"],
+                                 passwd=self.configObj["passwd"],
+                                 debug=True)
+            
+    def loadConfig(self,configFname):
+        # Opening JSON file
+        try:
+            f = open(configFname)
+            print("Opened File")
+            self.configObj = json.load(f)
+            f.close()
+            print("configObj=",self.configObj)
+        except BaseException as e:
+            print("Error Opening File %s" % configFname)
+            print("OS error: {0}".format(e))
+            print(sys.exc_info())
+            self.configObj = None
+
+    def listEvents(self):
+        eventsObj = self.osd.getEvents()
+        if (eventsObj is not None):
+            for event in eventsObj:
+                print(event)
+        else:
+            print("ERROR - No Data Returned");
+
+
+            
+    def plotAcc(self,tsLst,accLst):
+        fig, ax = plt.subplots()
+        ax.plot(tsLst,accLst)
+        fig.savefig("plot.png")
+
+    def analyseEvent(self, eventId):
+        print("analyse_event: eventId=%d" % eventId)
+        eventObj = self.osd.getEvent(eventId)
+        print("eventObj=", eventObj)
+        alarmTime = dateStr2secs(eventObj['dataTime'])
+        # FIXME - plan ahead for when we pass 3 direction values,
+        #  not magnitude!
+        rawDataType = 0  # 0 = magnitude, 1=3 directions.
+        
+        dataPointsObj = self.osd.getDataPointsByEvent(eventId)
+        # Make sure we are sorted into time order
+        dataPointsObj.sort(key=lambda dp: dateStr2secs(dp['dataTime']))
+
+        # Collect all the raw data into a single list with associated
+        # time from the alarm (in seconds)
+        rawTimestampLst = []
+        accelLst = []
+        analysisTimestampLst = []
+        specPowerLst = []
+        roiPowerLst = []
+        roiRatioLst = []
+        for dp in dataPointsObj:
+            currTs = dateStr2secs(dp['dataTime'])
+            print(dp['dataTime'], currTs)
+            dpObj = json.loads(dp['dataJSON'])
+            dataObj = json.loads(dpObj['dataJSON'])
+            print(dataObj)
+            analysisTimestampLst.append(currTs - alarmTime)
+            specPowerLst.append(dataObj['specPower'])
+            roiPowerLst.append(dataObj['roiPower'])
+            roiRatioLst.append(dataObj['roiPower']/dataObj['specPower'])
+
+            # Add to the raw data lists
+            accLst = dataObj['rawData']
+            print(accLst, type(accLst))
+            for n in range(0,125):
+                accelLst.append(accLst[n])
+                rawTimestampLst.append((currTs + n*1./25.)-alarmTime)
+
+        #for n in range(0,len(rawTimestampLst)):
+        #    print(n,rawTimestampLst[n],accelLst[n])
+        self.plotAcc(rawTimestampLst, accelLst)
+
+        fig, ax = plt.subplots(2,1)
+        ax[0].plot(analysisTimestampLst, specPowerLst)
+        ax[0].plot(analysisTimestampLst, roiPowerLst)
+        ax[1].plot(analysisTimestampLst, roiRatioLst)
+        fig.savefig("plot2.png")
+
+
+            
+if (__name__=="__main__"):
+    print("analyse_event.py.main()")
+    parser = argparse.ArgumentParser(description='analyse event')
+    parser.add_argument('--config', default="credentials.json",
+                        help='name of json file containing api login token')
+    parser.add_argument('--event', default=None,
+                        help='ID Number of the event to analyse')
+    parser.add_argument('--list', action="store_true",
+                        help='List all events in the database')
+    argsNamespace = parser.parse_args()
+    args = vars(argsNamespace)
+    print(args)
+
+    #analyse_event(configFname=args['config'])
+
+    analyser = EventAnalyser(configFname=args['config'])
+
+    if (args['event'] is not None):
+        print("Analysing Event Number %d" % int(args['event']))
+        analyser.analyseEvent(int(args['event']))
+    elif (args['list']):
+        analyser.listEvents()
+    else:
+        print("Not doing anything")
+

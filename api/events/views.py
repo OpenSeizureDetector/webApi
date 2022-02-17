@@ -5,6 +5,7 @@ from events.models import Event
 from events.serializers import EventSerializer
 import common.queryUtils
 
+
 class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all().order_by('dataTime')
     serializer_class = EventSerializer
@@ -15,7 +16,6 @@ class EventViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         print("EventViewSet.perform_create()")
         serializer.save(userId=self.request.user)
-
 
     def get_queryset(self):
         """

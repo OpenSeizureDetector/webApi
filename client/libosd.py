@@ -49,20 +49,15 @@ class libosd:
 
         self.getToken()
         
-    def getEvents(self, userId =1):
-        if (self.DEBUG): print("libOsd.getEvents, userId=%d, baseUrl=%s" % (userId, self.baseUrl))
-        urlStr = "%s/events/?user=%d" % (self.baseUrl, userId)
+    def getEvents(self, userId=None):
+        if (self.DEBUG): print("libOsd.getEvents, baseUrl=%s" % (self.baseUrl))
+        if (userId is not None):
+            urlStr = "%s/events/?user=%d" % (self.baseUrl, userId)
+        else:
+            urlStr = "%s/events/" % (self.baseUrl)
         if (self.DEBUG): print("getEvents - urlStr=%s" % urlStr)
         retVal = self.getData(urlStr,None)
         return retVal
-
-    def getDataPointsByEvent(self, eventId =1):
-        if (self.DEBUG): print("libOsd.getDataPointsByEvent, eventId=%d, baseUrl=%s" % (eventId, self.baseUrl))
-        urlStr = "%s/datapoints/?eventId=%d" % (self.baseUrl, eventId)
-        if (self.DEBUG): print("getDataPointsByEvent - urlStr=%s" % urlStr)
-        retVal = self.getData(urlStr,None)
-        return retVal
-
     
     def getUnvalidatedEvents(self, wearerId =1):
         if (self.DEBUG): print("libOsd.getUnvalidatedEvents, wearerId=%d, baseUrl=%s" % (wearerId, self.baseUrl))
@@ -78,8 +73,6 @@ class libosd:
         retVal = self.getData(urlStr,None)
         if (self.DEBUG): print("getEvent, returning: ",retVal)
         return retVal
-
-
 
     def addEvent(self, eventType, dataTime, desc, wearerId):
         data = {
@@ -110,6 +103,13 @@ class libosd:
         retVal = self.putData(urlStr,data)
         return retVal
         
+    def getDataPointsByEvent(self, eventId =1):
+        if (self.DEBUG): print("libOsd.getDataPointsByEvent, eventId=%d, baseUrl=%s" % (eventId, self.baseUrl))
+        urlStr = "%s/datapoints/?eventId=%d" % (self.baseUrl, eventId)
+        if (self.DEBUG): print("getDataPointsByEvent - urlStr=%s" % urlStr)
+        retVal = self.getData(urlStr,None)
+        return retVal
+
  
     def uploadFile(self, fname, wearerId=1):
         print("libosd.uploadFile")

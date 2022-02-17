@@ -10,7 +10,6 @@ def fixMissingSeconds(dateTimeStr):
     # FIXME - This would be a useful function to have!
         
 
-
 def userFilter(queryset, user, authUser):
     """ return records for user 'user'.  authUser
     should be the authenticated user making the request so we can
@@ -40,8 +39,13 @@ def userFilter(queryset, user, authUser):
                 #queryset = None
                 raise PermissionDenied(detail="Non-Staff User")
     else:
-        print("user is None - returning data for authUser")
-        queryset = queryset.filter(userId=authUser)
+        if (authUser.is_staff):
+            print("common.queryUtils.userFilter: staff user asking for events - returning all of them");
+            # we use the is_staff parameter to signify a researcher.
+            #queryset = queryset.filter(userId=user)
+        else:
+            print("authUser is not staff, user is None - returning data for authUser")
+            queryset = queryset.filter(userId=authUser)
     print("common.queryUtils.userFilter: returning queryset = ",queryset.query)
     return queryset
 
