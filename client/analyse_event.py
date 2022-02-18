@@ -2,9 +2,11 @@
 
 import argparse
 import json
-import libosd
+import libosd.webApiConnection
+import libosd.osdAppConnection
 import sys
 import dateutil.parser
+import time
 
 import matplotlib.pyplot as plt
 
@@ -53,7 +55,7 @@ class EventAnalyser:
         print("EventAnalyser.__init__: configFname=%s" % configFname)
         self.loadConfig(configFname)
         print("self.configObj=",self.configObj)
-        self.osd = libosd.libosd(cfg="client.cfg",
+        self.osd = libosd.webApiConnection.WebApiConnection(cfg="client.cfg",
                                  uname=self.configObj["uname"],
                                  passwd=self.configObj["passwd"],
                                  debug=True)
@@ -81,21 +83,22 @@ class EventAnalyser:
             print("ERROR - No Data Returned");
 
 
-            
+    def getEventDataPoints(self, eventId):
+        eventObj = self.osd.getEvent(eventId)
+        print("eventObj=", eventObj)
+        dataPointsObj = self.osd.getDataPointsByEvent(eventId)
+        # Make sure we are sorted into time order
+        dataPointsObj.sort(key=lambda dp: dateStr2secs(dp['dataTime']))
+        return(eventObj, dataPointsObj)
 
     def analyseEvent(self, eventId):
         print("analyse_event: eventId=%d" % eventId)
-        eventObj = self.osd.getEvent(eventId)
-        print("eventObj=", eventObj)
+        eventObj, dataPointsObj = self.getEventDataPoints(eventId)
         alarmTime = dateStr2secs(eventObj['dataTime'])
         # FIXME - plan ahead for when we pass 3 direction values,
         #  not magnitude!
         rawDataType = 0  # 0 = magnitude, 1=3 directions.
         
-        dataPointsObj = self.osd.getDataPointsByEvent(eventId)
-        # Make sure we are sorted into time order
-        dataPointsObj.sort(key=lambda dp: dateStr2secs(dp['dataTime']))
-
         # Collect all the raw data into a single list with associated
         # time from the alarm (in seconds)
         rawTimestampLst = []
@@ -160,7 +163,42 @@ class EventAnalyser:
         fig.subplots_adjust(top=0.85)
         fig.savefig("plot2.png")
 
+    def testEvent(self, eventId, addr):
+        ''' Retrieve event Number eventId from the remote database
+        and feed its data to an OSD App at address addr.
+        '''
+        print("test_event: eventId=%d" % eventId)
+        eventObj, dataPointsObj = self.getEventDataPoints(eventId)
 
+        f = open("Event_%d_data.json" % eventId,"w")
+        f.write(json.dumps(eventObj))
+        f.write(json.dumps(dataPointsObj))
+        f.close
+
+        osdAppConnection = libosd.osdAppConnection.OsdAppConnection(addr)
+
+        for dp in dataPointsObj:
+            currTs = dateStr2secs(dp['dataTime'])
+            print(dp['dataTime'], currTs)
+            dpObj = json.loads(dp['dataJSON'])
+            dataObj = json.loads(dpObj['dataJSON'])
+            print(dataObj)
+            
+            # Create raw data list
+            accelLst = []
+            # FIXME:  IT is not good to hard code the length of an array!
+            for n in range(0,125):
+                accelLst.append(dataObj['rawData'][n])
+
+            rawDataObj = {"dataType": "raw", "Mute": 0}
+            rawDataObj['HR'] = dataObj['hr']
+            rawDataObj['data'] = accelLst
+            # FIXME - add o2sat
+            dataJSON = json.dumps(rawDataObj)
+            print(dataJSON)
+            osdAppConnection.sendData(dataJSON)
+            time.sleep(5)
+        
             
 if (__name__=="__main__"):
     print("analyse_event.py.main()")
@@ -171,6 +209,8 @@ if (__name__=="__main__"):
                         help='ID Number of the event to analyse')
     parser.add_argument('--list', action="store_true",
                         help='List all events in the database')
+    parser.add_argument('--test',
+                        help='Address of Device running OpenSeizureDetector Ap for Testing')
     argsNamespace = parser.parse_args()
     args = vars(argsNamespace)
     print(args)
@@ -180,8 +220,13 @@ if (__name__=="__main__"):
     analyser = EventAnalyser(configFname=args['config'])
 
     if (args['event'] is not None):
-        print("Analysing Event Number %d" % int(args['event']))
-        analyser.analyseEvent(int(args['event']))
+        if (args['test'] is not None):
+            print("Running Event Number %d on test server %s" %
+                  (int(args['event']), args['test']))
+            analyser.testEvent(int(args['event']), args['test'])
+        else:
+            print("Analysing Event Number %d" % int(args['event']))
+            analyser.analyseEvent(int(args['event']))
     elif (args['list']):
         analyser.listEvents()
     else:

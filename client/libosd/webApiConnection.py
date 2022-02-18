@@ -4,7 +4,7 @@ import os
 import json
 import requests
 
-class libosd:
+class WebApiConnection:
     DEBUG = False
     uname = "user"
     passwd = "user1_pw"

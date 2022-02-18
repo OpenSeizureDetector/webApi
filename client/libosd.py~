@@ -1,7 +1,0 @@
-#!/usr/bin/env python
-
-
-
-class libosd:
-    def __init__(self, uname="", passwd=""):
-        print("libosd.__init__()"
