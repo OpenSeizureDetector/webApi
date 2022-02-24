@@ -91,6 +91,153 @@ class EventAnalyser:
         dataPointsObj.sort(key=lambda dp: dateStr2secs(dp['dataTime']))
         return(eventObj, dataPointsObj)
 
+    def loadEvent(self, eventId):
+        print("loadEvent: eventId=%d" % eventId)
+        self.eventId = eventId
+        self.eventObj, self.dataPointsObj = self.getEventDataPoints(eventId)
+        alarmTime = dateStr2secs(self.eventObj['dataTime'])
+        self.dataTime = dateutil.parser.parse(self.eventObj['dataTime'])
+        self.dataTimeStr = self.dataTime.strftime("%Y-%m-%d %H:%M")
+
+
+        # Collect all the raw data into a single list with associated
+        # time from the alarm (in seconds)
+        self.rawTimestampLst = []
+        self.accelLst = []
+        self.analysisTimestampLst = []
+        self.specPowerLst = []
+        self.roiPowerLst = []
+        self.roiRatioLst = []
+        self.roiRatioThreshLst = []
+        self.alarmRatioThreshLst = []
+        self.alarmStateLst = []
+        self.hrLst = []
+        self.o2satLst = []
+        for dp in self.dataPointsObj:
+            currTs = dateStr2secs(dp['dataTime'])
+            #print(dp['dataTime'], currTs)
+            dpObj = json.loads(dp['dataJSON'])
+            dataObj = json.loads(dpObj['dataJSON'])
+            #print(dataObj)
+            self.analysisTimestampLst.append(currTs - alarmTime)
+            self.specPowerLst.append(dataObj['specPower'])
+            self.roiPowerLst.append(dataObj['roiPower'])
+            roiRatio = dataObj['roiPower']/dataObj['specPower']
+            self.roiRatioLst.append(roiRatio)
+            if (dataObj['roiPower']>=dataObj['alarmThresh']):
+                self.roiRatioThreshLst.append(roiRatio)
+            else:
+                self.roiRatioThreshLst.append(0.)
+            self.alarmStateLst.append(dataObj['alarmState'])
+            self.alarmRatioThreshLst.append(dataObj['alarmRatioThresh']/10.)
+            self.hrLst.append(dataObj['hr'])
+            self.o2satLst.append(dataObj['o2Sat'])
+
+            # Add to the raw data lists
+            accLst = dataObj['rawData']
+            # FIXME:  IT is not good to hard code the length of an array!
+            for n in range(0,125):
+                self.accelLst.append(accLst[n])
+                self.rawTimestampLst.append((currTs + n*1./25.)-alarmTime)
+        
+    def plotRawDataGraph(self,outFname="rawData.png"):
+        print("plotRawDataGraph")
+        fig, ax = plt.subplots(2,1, figsize=(8,8))
+        fig.suptitle('Event Number %d, %s\n%s, %s' % (
+            self.eventId,
+            self.dataTimeStr,
+            self.eventObj['type'],
+            self.eventObj['subType']),
+                     fontsize=11)
+        ax[0].plot(self.rawTimestampLst,self.accelLst)
+        ax[0].set_title("Raw Data")
+        ax[0].set_ylabel("Acceleration (~milli-g)")
+        ax[0].grid(True)
+        ax[1].plot(self.analysisTimestampLst, self.hrLst)
+        ax[1].plot(self.analysisTimestampLst, self.o2satLst)
+        ax[1].legend(['HR (bpm)','O2 Sat (%)'])
+        ax[1].set_title("Heart Rate / O2 Sat")
+        ax[1].set_xlabel("Time (seconds)")
+        ax[1].grid(True)
+        fig.tight_layout()
+        fig.subplots_adjust(top=0.85)
+        fig.savefig(outFname)
+        print("Graph written to %s" % outFname)
+
+    def plotAnalysisGraph(self,outFname="analysis.png"):
+        print("plotAnalysisGraph")
+        fig, ax = plt.subplots(2,1, figsize=(8,8))
+        fig.suptitle('Event Number %d, %s\n%s, %s' % (
+            self.eventId,
+            self.dataTimeStr,
+            self.eventObj['type'],
+            self.eventObj['subType']),
+                     fontsize=11)
+        ax[0].plot(self.analysisTimestampLst, self.specPowerLst)
+        ax[0].plot(self.analysisTimestampLst, self.roiPowerLst)
+        ax[0].legend(['Spectrum Power','ROI Power'])
+        ax[0].set_ylabel("Average Power per bin")
+        ax[0].set_title("Spectrum / ROI Powers")
+        ax[0].grid(True)
+        ax[1].plot(self.analysisTimestampLst, self.roiRatioThreshLst)
+        ax[1].plot(self.analysisTimestampLst, self.roiRatioLst, '.')
+        ax[1].plot(self.analysisTimestampLst, self.alarmRatioThreshLst)
+        ax[1].plot(self.analysisTimestampLst, self.alarmStateLst)
+        ax[1].set_title("ROI Ratio & Alarm State")
+        ax[1].legend(['ROI Ratio (thresholded)','ROI Ratio (raw)', 'Alarm Ratio Threshold','Alarm State'])
+        ax[1].set_ylabel("Number")
+        ax[1].set_xlabel("Time (seconds)")
+        ax[1].grid(True)
+        fig.tight_layout()
+        fig.subplots_adjust(top=0.85)
+        fig.savefig(outFname)
+        print("Graph written to %s" % outFname)
+
+
+    def plotSpectrumGraph(self,outFname="spectrum.png"):
+        print("plotSpectrumGraph")
+        # Find the datapoint at the event time.
+        for n in range (0,len(self.analysisTimestampLst)):
+            #print(n,self.analysisTimestampLst[n])
+            if (abs(self.analysisTimestampLst[n])<=1.):
+                #print("Found datapoint close to zero")
+                zeroDpN = n
+                zeroDp = self.dataPointsObj[n]
+        #print(zeroDp)
+        specLst = []
+        specTimesLst = []
+        for n in range(zeroDpN-2,zeroDpN+2):
+            dp = self.dataPointsObj[n]
+            dpObj = json.loads(dp['dataJSON'])
+            dataObj = json.loads(dpObj['dataJSON'])
+            specVals = dataObj['simpleSpec']
+            # Normalise the spectrum so maximum value is always 1
+            specMax = max(specVals)
+            specNorm = [float(v)/specMax for v in specVals]
+            specLst.append(specNorm)
+            specTimesLst.append(self.analysisTimestampLst[n])
+        #print(specLst)
+        fig, ax = plt.subplots(1,1, figsize=(8,5))
+        fig.suptitle('Event Number %d, %s\n%s, %s' % (
+            self.eventId,
+            self.dataTimeStr,
+            self.eventObj['type'],
+            self.eventObj['subType']),
+                     fontsize=11)
+        for spec in specLst:
+            ax.plot(range(1,11),spec)
+        ax.set_ylabel("Power per bin (normalised)")
+        ax.set_title("Datapoint Spectra")
+        ax.grid(True)
+        ax.legend(specTimesLst)
+        ax.set_xlabel("Frequency (Hz)")
+        fig.tight_layout()
+        fig.subplots_adjust(top=0.85)
+        fig.savefig(outFname)
+        print("Graph written to %s" % outFname)
+
+
+        
     def analyseEvent(self, eventId):
         print("analyse_event: eventId=%d" % eventId)
         eventObj, dataPointsObj = self.getEventDataPoints(eventId)
@@ -179,10 +326,10 @@ class EventAnalyser:
 
         for dp in dataPointsObj:
             currTs = dateStr2secs(dp['dataTime'])
-            print(dp['dataTime'], currTs)
+            #print(dp['dataTime'], currTs)
             dpObj = json.loads(dp['dataJSON'])
             dataObj = json.loads(dpObj['dataJSON'])
-            print(dataObj)
+            #print(dataObj)
             
             # Create raw data list
             accelLst = []
@@ -195,7 +342,7 @@ class EventAnalyser:
             rawDataObj['data'] = accelLst
             # FIXME - add o2sat
             dataJSON = json.dumps(rawDataObj)
-            print(dataJSON)
+            print(dp['dataTime'],dataJSON)
             osdAppConnection.sendData(dataJSON)
             time.sleep(5)
         
