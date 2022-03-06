@@ -20,11 +20,16 @@
 	"Cycling",
 	"Knitting",
 	"Motor Vehicle",
-	"Other (Please describe in notes)",
+	"Mowing Lawn",
 	"Pushing Pram/Wheelchair",
+	"Sorting",
 	"Talking",
 	"Typing",
-	"Unknown",
-	"Washing Up"
+	"Washing / cleaning",
+	"Other (Please describe in notes)",
+	"Unknown"
+    ],
+        "Unknown": [
+	"Unknown"
     ]
 }
