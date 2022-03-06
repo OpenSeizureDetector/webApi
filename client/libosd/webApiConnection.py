@@ -12,7 +12,7 @@ class WebApiConnection:
 
     def __init__(self, cfg=None, baseUrl=None, uname=None, passwd=None, debug=False):
         self.DEBUG = debug
-        if (self.DEBUG): print("libosd.__init__()")
+        if (self.DEBUG): print("libosd.WebApiConnection.__init__()")
 
         if (cfg is not None):
             if (os.path.isfile(cfg)):
@@ -110,6 +110,17 @@ class WebApiConnection:
         retVal = self.getData(urlStr,None)
         return retVal
 
+    def getUser(self, userId=None):
+        if (self.DEBUG):
+            print("libosd.webApiConnection.getUser(): userId=%s, baseUrl=%s" % (userId, self.baseUrl))
+        if (userId is None):
+            urlStr = "%s/accounts/profile/" % (self.baseUrl)
+        else:
+            urlStr = "%s/accounts/profile/%d" % (self.baseUrl, userId)
+        if (self.DEBUG): print("getUser - urlStr=%s" % urlStr)
+        retVal = self.getData(urlStr,None)
+        if (self.DEBUG): print("getUser, returning: ",retVal)
+        return retVal
  
     def uploadFile(self, fname, wearerId=1):
         print("libosd.uploadFile")
@@ -246,10 +257,14 @@ class WebApiConnection:
         
 if (__name__ == "__main__"):
     print("libosd.main()")
-    osd = libosd(cfg="client.cfg", uname="graham4", passwd="testpwd1", debug=True)
+    osd = WebApiConnection(cfg="client.cfg", uname="graham4", passwd="testpwd1", debug=True)
     #osd.uploadFile("DataLog_2019-11-04.txt", wearerId=3)
-    eventsObj = osd.getEvents()
-    print("eventsObj = ", eventsObj)
+    #eventsObj = osd.getEvents()
+    #print("eventsObj = ", eventsObj)
+    usersObj = osd.getUser()
+    print("usersObj = ", usersObj)
+    usersObj = osd.getUser(39)
+    print("usersObj = ", usersObj)
     #unvalidatedEventsObj = osd.getUnvalidatedEvents()
     #print("unvalidatedEventsObj = ", unvalidatedEventsObj)
 
