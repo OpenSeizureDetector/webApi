@@ -110,9 +110,11 @@ class EventAnalyser:
         self.roiRatioLst = []
         self.roiRatioThreshLst = []
         self.alarmRatioThreshLst = []
+        self.alarmThreshLst = []
         self.alarmStateLst = []
         self.hrLst = []
         self.o2satLst = []
+        self.minRoiAlarmPower = 0
         for dp in self.dataPointsObj:
             currTs = dateStr2secs(dp['dataTime'])
             #print(dp['dataTime'], currTs)
@@ -129,6 +131,11 @@ class EventAnalyser:
             else:
                 self.roiRatioThreshLst.append(0.)
             self.alarmStateLst.append(dataObj['alarmState'])
+            # Record the minimum ROI Power that caused a WARNING or ALARM
+            if (dataObj['alarmState']>0):
+                if (dataObj['roiPower']>self.minRoiAlarmPower):
+                    self.minRoiAlarmPower = dataObj['roiPower']
+            self.alarmThreshLst.append(dataObj['alarmThresh'])
             self.alarmRatioThreshLst.append(dataObj['alarmRatioThresh']/10.)
             self.hrLst.append(dataObj['hr'])
             self.o2satLst.append(dataObj['o2Sat'])
@@ -175,7 +182,9 @@ class EventAnalyser:
                      fontsize=11)
         ax[0].plot(self.analysisTimestampLst, self.specPowerLst)
         ax[0].plot(self.analysisTimestampLst, self.roiPowerLst)
-        ax[0].legend(['Spectrum Power','ROI Power'])
+        ax[0].plot(self.analysisTimestampLst, self.alarmThreshLst)
+        ax[0].legend(['Spectrum Power','ROI Power', 'ROI Power Threshold'])
+        ax[0].set_ylim(0,max(self.alarmThreshLst)*5)
         ax[0].set_ylabel("Average Power per bin")
         ax[0].set_title("Spectrum / ROI Powers")
         ax[0].grid(True)
@@ -206,7 +215,7 @@ class EventAnalyser:
         #print(zeroDp)
         specLst = []
         specTimesLst = []
-        for n in range(zeroDpN-2,zeroDpN+2):
+        for n in range(zeroDpN-1,zeroDpN+2):
             dp = self.dataPointsObj[n]
             dpObj = json.loads(dp['dataJSON'])
             dataObj = json.loads(dpObj['dataJSON'])
@@ -239,7 +248,7 @@ class EventAnalyser:
 
         
     def analyseEvent(self, eventId):
-        print("analyse_event: eventId=%d" % eventId)
+        print("analyseEvent: eventId=%d" % eventId)
         eventObj, dataPointsObj = self.getEventDataPoints(eventId)
         alarmTime = dateStr2secs(eventObj['dataTime'])
         # FIXME - plan ahead for when we pass 3 direction values,

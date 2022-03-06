@@ -55,6 +55,7 @@ def makeEventSummary(eventId,configFname):
         'alarmRatioThreshold': dataObj['alarmRatioThresh'],
         'roiRatioMax': np.max(analyser.roiRatioLst),
         'roiRatioMaxThresholded': np.max(analyser.roiRatioThreshLst),
+        'minRoiAlarmPower' : analyser.minRoiAlarmPower,
         'pageDateStr': (datetime.datetime.now()).strftime("%Y-%m-%d %H:%M"),
         }
     print(pageData)

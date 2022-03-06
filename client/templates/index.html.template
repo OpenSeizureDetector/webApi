@@ -82,6 +82,9 @@
       <tr>
 	<th>Max. ROI Ratio<br>(allowing for Threshold)</th><td>{{ "%.2f"|format(data.roiRatioMaxThresholded) }}</td>
       </tr>
+      <tr>
+	<th>Min ROI Alarm Power</th><td>{{ "%.2f"|format(data.minRoiAlarmPower) }}</td>
+      </tr>
     </table>
     <img src="analysis.png"/>
     <img src="spectrum.png"/>
