@@ -144,6 +144,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+STATICFILES_DIRS = (os.path.join(BASE_DIR,'static2/'),)
+print("static_root="+STATIC_ROOT)
 
 
 REST_FRAMEWORK = {
@@ -175,7 +177,7 @@ REST_REGISTRATION = {
     'REGISTER_VERIFICATION_URL': 'https://osdapi.ddns.net/static/confirm.html',
     'RESET_PASSWORD_VERIFICATION_URL': 'https://osdapi.ddns.net/static/reset_password.html',
     'REGISTER_EMAIL_VERIFICATION_URL': 'https://osdapi.ddns.net/static/verify-email.html',
-    'VERIFICATION_FROM_EMAIL': 'donotreply@osdapi.ddns.net',
+    'VERIFICATION_FROM_EMAIL': 'donotreply@openseizuredetector.org.uk',
     'REGISTER_EMAIL_VERIFICATION_EMAIL_TEMPLATES': {
         'body': 'register_email_templates/body.txt',
         'subject': 'register_email_templates/subject.txt'
@@ -199,7 +201,8 @@ EMAIL_HOST = credentials['email_host']
 EMAIL_PORT = credentials['email_port']
 EMAIL_HOST_USER = credentials['email_host_user']
 EMAIL_HOST_PASSWORD = credentials['email_host_passwd']
-EMAIL_USE_TLS = True
+#EMAIL_USE_TLS = True
+EMAIL_USE_SSL = True
 
 
 CORS_ORIGIN_WHITELIST = [
@@ -212,4 +215,4 @@ CORS_ORIGIN_WHITELIST = [
 ]
 
 
-print(TEMPLATES)
+#print(TEMPLATES)

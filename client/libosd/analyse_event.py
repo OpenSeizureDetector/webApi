@@ -205,36 +205,37 @@ class EventAnalyser:
 
     def plotSpectrumGraph(self,outFname="spectrum.png"):
         print("plotSpectrumGraph")
-        # Find the datapoint at the event time.
-        for n in range (0,len(self.analysisTimestampLst)):
-            #print(n,self.analysisTimestampLst[n])
-            if (abs(self.analysisTimestampLst[n])<=1.):
-                #print("Found datapoint close to zero")
-                zeroDpN = n
-                zeroDp = self.dataPointsObj[n]
-        #print(zeroDp)
-        specLst = []
-        specTimesLst = []
-        for n in range(zeroDpN-1,zeroDpN+2):
-            dp = self.dataPointsObj[n]
-            dpObj = json.loads(dp['dataJSON'])
-            dataObj = json.loads(dpObj['dataJSON'])
-            specVals = dataObj['simpleSpec']
-            # Normalise the spectrum so maximum value is always 1
-            specMax = max(specVals)
-            specNorm = [float(v)/specMax for v in specVals]
-            specLst.append(specNorm)
-            specTimesLst.append(self.analysisTimestampLst[n])
-        #print(specLst)
         fig, ax = plt.subplots(1,1, figsize=(8,5))
-        fig.suptitle('Event Number %d, %s\n%s, %s' % (
-            self.eventId,
-            self.dataTimeStr,
-            self.eventObj['type'],
-            self.eventObj['subType']),
-                     fontsize=11)
-        for spec in specLst:
-            ax.plot(range(1,11),spec)
+        if len(self.analysisTimestampLst)>0:
+            # Find the datapoint at the event time.
+            for n in range (0,len(self.analysisTimestampLst)):
+                #print(n,self.analysisTimestampLst[n])
+                if (abs(self.analysisTimestampLst[n])<=1.):
+                    #print("Found datapoint close to zero")
+                    zeroDpN = n
+                    zeroDp = self.dataPointsObj[n]
+            #print(zeroDp)
+            specLst = []
+            specTimesLst = []
+            for n in range(zeroDpN-1,zeroDpN+2):
+                dp = self.dataPointsObj[n]
+                dpObj = json.loads(dp['dataJSON'])
+                dataObj = json.loads(dpObj['dataJSON'])
+                specVals = dataObj['simpleSpec']
+                # Normalise the spectrum so maximum value is always 1
+                specMax = max(specVals)
+                specNorm = [float(v)/specMax for v in specVals]
+                specLst.append(specNorm)
+                specTimesLst.append(self.analysisTimestampLst[n])
+            #print(specLst)
+            fig.suptitle('Event Number %d, %s\n%s, %s' % (
+                self.eventId,
+                self.dataTimeStr,
+                self.eventObj['type'],
+                self.eventObj['subType']),
+                         fontsize=11)
+            for spec in specLst:
+                ax.plot(range(1,11),spec)
         ax.set_ylabel("Power per bin (normalised)")
         ax.set_title("Datapoint Spectra")
         ax.grid(True)
