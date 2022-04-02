@@ -3,6 +3,12 @@
 import os
 import json
 import requests
+import dateutil.parser
+
+def dateStr2secs(dateStr):
+    parsed_t = dateutil.parser.parse(dateStr)
+    return parsed_t.timestamp()
+
 
 class WebApiConnection:
     DEBUG = False
@@ -13,13 +19,14 @@ class WebApiConnection:
     cacheFname = "osd_data.json"
     download = True
     saveCache = True
+    maxEvents = 10000
 
     def __init__(self, cfg=None, baseUrl=None, uname=None, passwd=None, cacheDir = None, download=True, saveCache=True, debug=False):
         self.download = download
         self.saveCache = saveCache
         self.DEBUG = debug
         if (self.DEBUG): print("libosd.WebApiConnection.__init__()")
-
+        self.cfgFname = cfg
         if (cfg is not None):
             if (os.path.isfile(cfg)):
                 print("Opening file %s" % (cfg))
@@ -59,7 +66,10 @@ class WebApiConnection:
               (self.baseUrl, self.uname, self.passwd, self.cacheDir))
 
         if (self.download):
+            print("webApiConnection - retrieving authentication token")
             self.getToken()
+        else:
+            print("webApiConnection - not downloading data so not logging in")
         
     def saveEventsCache(self,eventsLst):
         '''Write the list of events data eventsLst as a json file
@@ -90,11 +100,11 @@ class WebApiConnection:
         if (self.DEBUG): print("libOsd.getEvents, baseUrl=%s" % (self.baseUrl))
         # If we are not downloading data, just return what we have cached
         if (not self.download):
-            return loadEventsCache()
+            return self.loadEventsCache()
 
         # Otherwise download the specified data
         if (userId is not None):
-            urlStr = "%s/events/?user=%d" % (self.baseUrl, userId)
+            urlStr = "%s/events/?user=%s" % (self.baseUrl, userId)
         else:
             urlStr = "%s/events/" % (self.baseUrl)
         if (self.DEBUG): print("getEvents - urlStr=%s" % urlStr)
@@ -115,42 +125,26 @@ class WebApiConnection:
                                        event['subType'],
                                        event['desc']
                                        ))
-            analyser.loadEvent(event['id'])
+            dataPointsObj = self.getDataPointsByEvent(event['id'])
+            # Make sure we are sorted into time order
+            dataPointsObj.sort(key=lambda dp: dateStr2secs(dp['dataTime']))
+
             # Extract data from first datapoint to get OSD settings
             #     at time of event.
-            if len(analyser.dataPointsObj)!=0:
-                dp=analyser.dataPointsObj[0]
-                dpObj = json.loads(dp['dataJSON'])
-                dataObj = json.loads(dpObj['dataJSON'])
-
-                eventSummaryObj = {}
-                eventSummaryObj['id'] = event['id']
-                eventSummaryObj['userId'] = event['userId']
-                eventSummaryObj['dataTimeStr'] = dateutil.parser.parse(
-                    analyser.eventObj['dataTime']).strftime("%Y-%m-%d %H:%M")
-                eventSummaryObj['type'] = event['type']
-                eventSummaryObj['subType'] = event['subType']
-                eventSummaryObj['osdAlarmState'] = event['osdAlarmState']
-                eventSummaryObj['desc'] = event['desc']
-                eventSummaryObj['maxRoiRatio'] = max(analyser.roiRatioLst)
-                eventSummaryObj['minRoiAlarmPower'] = analyser.minRoiAlarmPower
-                eventSummaryObj['alarmFreqMin'] = dataObj['alarmFreqMin']
-                eventSummaryObj['alarmFreqMax'] = dataObj['alarmFreqMax']
-                eventSummaryObj['alarmThreshold'] = dataObj['alarmThresh']
-                eventSummaryObj['alarmRatioThreshold'] = dataObj['alarmRatioThresh']
-                eventSummaryObj['datapoints'] = analyser.dataPointsObj
-
-                eventLst.append(eventSummaryObj)
+            if len(dataPointsObj)!=0:
+                event['datapoints'] = dataPointsObj
+                eventLst.append(event)
             else:
                 print("Ignoring event with zero datapoints")
 
             count = count + 1
-            if count >= maxEvents:
-                print("reached maxEvents (%d) - stopping" % maxEvents)
+            if count >= self.maxEvents:
+                print("reached maxEvents (%d) - stopping" % self.maxEvents)
                 break
 
         # Cache the data in case we need it next time
-        self.saveCache(eventLst)
+        if (self.saveCache):
+            self.saveEventsCache(eventLst)
         return eventLst
 
 
@@ -328,9 +322,10 @@ class WebApiConnection:
         return(retVal)
 
     def getToken(self):
-        if (self.DEBUG): print("getToken")
         urlStr = "%s/accounts/login/" % self.baseUrl
-        if (self.DEBUG): print("urlStr=%s" % urlStr)
+        if (self.DEBUG): print("webApiConnection.getToken(): urlStr=%s" % urlStr)
+        if (self.DEBUG): print("webApiConnection.getToken(): %s, %s" %
+                               (self.uname, self.passwd))
         response = requests.post(
             urlStr,
             json = {

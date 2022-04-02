@@ -337,7 +337,7 @@ class EventAnalyser:
         f.write(json.dumps(dataPointsObj))
         f.close
 
-        osdAppConnection = libosd.osdAppConnection.OsdAppConnection(addr)
+        osdAppConnection = osdAppConnection.OsdAppConnection(addr)
 
         for dp in dataPointsObj:
             currTs = dateStr2secs(dp['dataTime'])

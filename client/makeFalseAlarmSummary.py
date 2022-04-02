@@ -10,7 +10,6 @@ import jinja2
 import numpy as np
 import distutils.dir_util
 
-import libosd.analyse_event
 import libosd.webApiConnection
 import libosd.loadConfig
 
@@ -93,25 +92,23 @@ def getFname(userId):
 
 
 
-def makeFalseAlarmSummary(userId,configFname, download=False, maxEvents=10000):
-    fname = getFname(userId)
-    if download:
-        eventLst = downloadData(userId,configFname, maxEvents=maxEvents)
-        seizureFile = open(fname, 'w')
-        seizureFile.write(json.dumps(eventLst, indent=2))
-        seizureFile.close()
-        print("data saved to %s" % fname)
+def makeFalseAlarmSummary(userId,credentialsFname, download=False, maxEvents=10000, debug=False):
+    credentialsObj = libosd.loadConfig.loadConfig(credentialsFname)
+    osd = libosd.webApiConnection.WebApiConnection(cfg="client.cfg",
+                      uname=credentialsObj["uname"],
+                      passwd=credentialsObj["passwd"],
+                      download=download,
+                                                   debug=debug)
+    if (userId=="all"):
+        eventLst = osd.getEvents(userId=None, includeDatapoints=True)
     else:
-        seizureFile = open(fname, 'r')
-        eventLst = json.load(seizureFile)
-        seizureFile.close()
-        
+        eventLst = osd.getEvents(userId=userId, includeDatapoints=True)
 
     print("Loaded %d Events" % len(eventLst))
 
     #Now summarise the data by loading it into a pandas dataframe.
     df = pd.DataFrame(eventLst)
-    df['dataTime'] = pd.to_datetime(df['dataTimeStr'])
+    df['dataTime'] = pd.to_datetime(df['dataTime'])
 
 
     # False Alarms
@@ -203,6 +200,8 @@ if (__name__=="__main__"):
                         help='user ID number of user to be analysed')
     parser.add_argument('--download', action='store_true',
                         help="Download data from remote database rather than using local data")
+    parser.add_argument('--debug', action='store_true',
+                        help="Write debugging information to screen")
     argsNamespace = parser.parse_args()
     args = vars(argsNamespace)
     print(args)
@@ -212,6 +211,6 @@ if (__name__=="__main__"):
 
     if (args['user'] is not None):
             print("Analysing False Alarms for User %s" % args['user'])
-            makeFalseAlarmSummary(args['user'],args['config'], download=args['download'])
+            makeFalseAlarmSummary(args['user'],args['config'], download=args['download'], debug=args['debug'])
     else:
         print("Not doing anything")
