@@ -29,10 +29,10 @@ class WebApiConnection:
         self.cfgFname = cfg
         if (cfg is not None):
             if (os.path.isfile(cfg)):
-                print("Opening file %s" % (cfg))
+                print("Opening configuration file %s" % (cfg))
                 with open(cfg) as infile:
                     jsonObj = json.load(infile)
-                print(jsonObj)
+                if (self.DEBUG): print(jsonObj)
                 if ("uname" in jsonObj):
                     if (self.DEBUG): print("found uname - %s" % jsonObj["uname"])
                     self.uname = jsonObj["uname"]
@@ -96,6 +96,7 @@ class WebApiConnection:
         or for all users if userId is None.
         The returned data does NOT contain the datapoints associated 
         with the events unless includeDatapoints is set to True.
+        FIXME - add data range options
         '''
         if (self.DEBUG): print("libOsd.getEvents, baseUrl=%s" % (self.baseUrl))
         # If we are not downloading data, just return what we have cached
@@ -161,13 +162,21 @@ class WebApiConnection:
         retVal = self.getData(urlStr,None)
         return retVal
 
-    def getEvent(self, eventId):
+    def getEvent(self, eventId, includeDatapoints=False):
         if (self.DEBUG): print("libOsd.getEvent, eventId=%d, baseUrl=%s" % (eventId, self.baseUrl))
         urlStr = "%s/events/%d" % (self.baseUrl, eventId)
         if (self.DEBUG): print("getEvent - urlStr=%s" % urlStr)
-        retVal = self.getData(urlStr,None)
-        if (self.DEBUG): print("getEvent, returning: ",retVal)
-        return retVal
+        eventObj = self.getData(urlStr,None)
+        
+        ###############################################################
+        # Return just the event list, unless includeDatapoints is True.
+        if includeDatapoints:
+            dataPointsObj = self.getDataPointsByEvent(eventObj['id'])
+            # Make sure we are sorted into time order
+            dataPointsObj.sort(key=lambda dp: dateStr2secs(dp['dataTime']))
+            if len(dataPointsObj)!=0:
+                eventObj['datapoints'] = dataPointsObj
+        return eventObj
 
     def addEvent(self, eventType, dataTime, desc, wearerId):
         data = {

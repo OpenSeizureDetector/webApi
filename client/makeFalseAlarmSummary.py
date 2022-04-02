@@ -16,75 +16,6 @@ import libosd.loadConfig
 import pandas as pd
 
 
-def downloadData(userId, configFname, maxEvents=1000):
-    configObj = libosd.loadConfig.loadConfig(configFname)
-    outDir = os.path.join("output","False_alarm_summary_user_%s" % userId)
-    os.makedirs(outDir, exist_ok=True)
-    print("makeFalseAlarmSummary - outDir=%s" % outDir)
-
-    osd = libosd.webApiConnection.WebApiConnection(cfg="client.cfg",
-                                 uname=configObj["uname"],
-                                 passwd=configObj["passwd"],
-                                                   debug=False)
-    analyser = libosd.analyse_event.EventAnalyser(configFname=args['config'], debug=False)
-
-    if (userId=="all"):
-        eventsObj = osd.getEvents(userId=None)
-    else:
-        eventsObj = osd.getEvents(userId=userId)
-    for event in eventsObj:
-        print(event)
-    eventLst = []
-    count = 0
-    for event in eventsObj:
-        #if (event['type'] is not None and event['type'] != 'Unknown'):
-        if True:
-            print("%5d %s %s %s %s" % (event['id'],
-                                       event['dataTime'],
-                                       event['type'],
-                                       event['subType'],
-                                       event['desc']
-                                       ))
-            analyser.loadEvent(event['id'])
-            # Extract data from first datapoint to get OSD settings
-            #     at time of event.
-            if len(analyser.dataPointsObj)!=0:
-                dp=analyser.dataPointsObj[0]
-                dpObj = json.loads(dp['dataJSON'])
-                dataObj = json.loads(dpObj['dataJSON'])
-
-                eventSummaryObj = {}
-                eventSummaryObj['id'] = event['id']
-                eventSummaryObj['userId'] = event['userId']
-                eventSummaryObj['dataTimeStr'] = dateutil.parser.parse(
-                    analyser.eventObj['dataTime']).strftime("%Y-%m-%d %H:%M")
-                eventSummaryObj['type'] = event['type']
-                eventSummaryObj['subType'] = event['subType']
-                eventSummaryObj['osdAlarmState'] = event['osdAlarmState']
-                eventSummaryObj['desc'] = event['desc']
-                eventSummaryObj['maxRoiRatio'] = max(analyser.roiRatioLst)
-                eventSummaryObj['minRoiAlarmPower'] = analyser.minRoiAlarmPower
-                eventSummaryObj['alarmFreqMin'] = dataObj['alarmFreqMin']
-                eventSummaryObj['alarmFreqMax'] = dataObj['alarmFreqMax']
-                eventSummaryObj['alarmThreshold'] = dataObj['alarmThresh']
-                eventSummaryObj['alarmRatioThreshold'] = dataObj['alarmRatioThresh']
-                eventSummaryObj['datapoints'] = analyser.dataPointsObj
-
-                eventLst.append(eventSummaryObj)
-            else:
-                print("Ignoring event with zero datapoints")
-
-        else:
-            pass
-            #print("Ignoring Unclassified or unknown event %d" % event['id'])
-
-        count = count + 1
-        if count >= maxEvents:
-            print("reached maxEvents (%d) - stopping" % maxEvents)
-            break
-
-
-    return eventLst
     
 def getFname(userId):
     fname = 'user_%s_data.json' % userId
@@ -92,12 +23,9 @@ def getFname(userId):
 
 
 
-def makeFalseAlarmSummary(userId,credentialsFname, download=False, maxEvents=10000, debug=False):
-    credentialsObj = libosd.loadConfig.loadConfig(credentialsFname)
-    osd = libosd.webApiConnection.WebApiConnection(cfg="client.cfg",
-                      uname=credentialsObj["uname"],
-                      passwd=credentialsObj["passwd"],
-                      download=download,
+def makeFalseAlarmSummary(userId, credentialsFname="client.cfg", download=False, maxEvents=10000, debug=False):
+    osd = libosd.webApiConnection.WebApiConnection(cfg=credentialsFname,
+                                                   download=download,
                                                    debug=debug)
     if (userId=="all"):
         eventLst = osd.getEvents(userId=None, includeDatapoints=True)
@@ -108,13 +36,15 @@ def makeFalseAlarmSummary(userId,credentialsFname, download=False, maxEvents=100
 
     #Now summarise the data by loading it into a pandas dataframe.
     df = pd.DataFrame(eventLst)
+    df = df.fillna('unclassified')
     df['dataTime'] = pd.to_datetime(df['dataTime'])
-
+    print(df[['id','userId','dataTime','osdAlarmState','type']])
 
     # False Alarms
     dfSummary = df.query('osdAlarmState!=1').groupby([
         df['userId'],
-        df['dataTime'].dt.floor('d'),
+        pd.Grouper(key='dataTime', freq='W-MON'),
+        #df['dataTime'].dt.floor('d'),
         df['type'],
         df['osdAlarmState']
     ]).size()
@@ -194,8 +124,8 @@ def makeFalseAlarmSummary(userId,credentialsFname, download=False, maxEvents=100
 if (__name__=="__main__"):
     print("makeFalseALarmSummary.py.main()")
     parser = argparse.ArgumentParser(description='analyse false alarms for a user')
-    parser.add_argument('--config', default="credentials.json",
-                        help='name of json file containing api login token')
+    parser.add_argument('--config', default="client.cfg",
+                        help='name of json file containing configuration information and login credientials - see client.cfg.template')
     parser.add_argument('--user', default=None,
                         help='user ID number of user to be analysed')
     parser.add_argument('--download', action='store_true',
