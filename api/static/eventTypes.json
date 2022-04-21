@@ -1,6 +1,7 @@
 {
     "Seizure": [
 	"Tonic-Clonic",
+	"Aura",
 	"Other"
     ],
     "Fall": [
