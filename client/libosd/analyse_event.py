@@ -50,7 +50,7 @@ def runTest():
             
 class EventAnalyser:
     configObj = None
-    DEBUG = False;
+    DEBUG = False
 
     def __init__(self, configFname = "credentials.json", debug=False):
         self.DEBUG = debug
@@ -97,10 +97,38 @@ class EventAnalyser:
         if (self.DEBUG): print("loadEvent: eventId=%d" % eventId)
         self.eventId = eventId
         self.eventObj, self.dataPointsObj = self.getEventDataPoints(eventId)
+        if ('dataJSON' in self.eventObj):
+            if (self.eventObj['dataJSON'] is None):
+                eventDataObj = {}
+            else:
+                print("Creating eventDataObj",self.eventObj)
+                eventDataObj = json.loads(self.eventObj['dataJSON'])
+        else:
+            eventDataObj = {}
+        #print(self.eventObj, eventDataObj)
         alarmTime = dateStr2secs(self.eventObj['dataTime'])
         self.dataTime = dateutil.parser.parse(self.eventObj['dataTime'])
         self.dataTimeStr = self.dataTime.strftime("%Y-%m-%d %H:%M")
 
+        # Populate the analysis parameter variables.
+        if ('alarmRatioThresh' in eventDataObj):
+            print("Reading parameters from event object")
+            self.alarmThresh = eventDataObj['alarmThresh']
+            self.alarmRatioThresh = eventDataObj['alarmRatioThresh']
+            self.alarmFreqMin = eventDataObj['alarmFreqMin']
+            self.alarmFreqMax = eventDataObj['alarmFreqMax']
+        else:
+            print("Reading parameters from first datapoint Object")
+            dp = self.dataPointsObj[0]
+            dpObj = json.loads(dp['dataJSON'])
+            dpDataObj = json.loads(dpObj['dataJSON'])
+            self.alarmThresh = dpDataObj['alarmThresh']
+            self.alarmRatioThresh = dpDataObj['alarmRatioThresh']
+            self.alarmFreqMin = dpDataObj['alarmFreqMin']
+            self.alarmFreqMax = dpDataObj['alarmFreqMax']
+
+
+        
 
         # Collect all the raw data into a single list with associated
         # time from the alarm (in seconds)
@@ -131,7 +159,8 @@ class EventAnalyser:
             else:
                 roiRatio = 999
             self.roiRatioLst.append(roiRatio)
-            if (dataObj['roiPower']>=dataObj['alarmThresh']):
+                
+            if (dataObj['roiPower'] >= self.alarmThresh):
                 self.roiRatioThreshLst.append(roiRatio)
             else:
                 self.roiRatioThreshLst.append(0.)
@@ -140,8 +169,8 @@ class EventAnalyser:
             if (dataObj['alarmState']>0):
                 if (dataObj['roiPower']>self.minRoiAlarmPower):
                     self.minRoiAlarmPower = dataObj['roiPower']
-            self.alarmThreshLst.append(dataObj['alarmThresh'])
-            self.alarmRatioThreshLst.append(dataObj['alarmRatioThresh']/10.)
+            self.alarmThreshLst.append(self.alarmThresh)
+            self.alarmRatioThreshLst.append(self.alarmRatioThresh/10.)
             self.hrLst.append(dataObj['hr'])
             self.o2satLst.append(dataObj['o2Sat'])
 
@@ -275,10 +304,10 @@ class EventAnalyser:
         o2satLst = []
         for dp in dataPointsObj:
             currTs = dateStr2secs(dp['dataTime'])
-            print(dp['dataTime'], currTs)
+            if (self.DEBUG): print(dp['dataTime'], currTs)
             dpObj = json.loads(dp['dataJSON'])
             dataObj = json.loads(dpObj['dataJSON'])
-            print(dataObj)
+            if (self.DEBUG): print(dataObj)
             analysisTimestampLst.append(currTs - alarmTime)
             specPowerLst.append(dataObj['specPower'])
             roiPowerLst.append(dataObj['roiPower'])

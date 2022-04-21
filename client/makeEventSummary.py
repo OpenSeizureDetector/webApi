@@ -5,7 +5,7 @@ import dateutil.parser
 import os
 import argparse
 import json
-import tempfile
+# import tempfile
 import jinja2
 import numpy as np
 import distutils.dir_util
@@ -23,7 +23,7 @@ def makeEventSummary(eventId,configFname):
     
     analyser.loadEvent(int(args['event']))
 
-    #print(analyser.eventObj)
+    print(analyser.eventObj)
     # Extract data from first datapoint to get OSD settings at time of event.
     dp=analyser.dataPointsObj[0]
     dpObj = json.loads(dp['dataJSON'])
@@ -49,10 +49,10 @@ def makeEventSummary(eventId,configFname):
         'eventType': analyser.eventObj['type'],
         'eventSubType': analyser.eventObj['subType'],
         'eventDesc': analyser.eventObj['desc'],
-        'alarmFreqMin': dataObj['alarmFreqMin'],
-        'alarmFreqMax': dataObj['alarmFreqMax'],
-        'alarmThreshold': dataObj['alarmThresh'],
-        'alarmRatioThreshold': dataObj['alarmRatioThresh'],
+        'alarmFreqMin': analyser.alarmFreqMin,
+        'alarmFreqMax': analyser.alarmFreqMax,
+        'alarmThreshold': analyser.alarmThresh,
+        'alarmRatioThreshold': analyser.alarmRatioThresh,
         'roiRatioMax': np.max(analyser.roiRatioLst),
         'roiRatioMaxThresholded': np.max(analyser.roiRatioThreshLst),
         'minRoiAlarmPower' : analyser.minRoiAlarmPower,
