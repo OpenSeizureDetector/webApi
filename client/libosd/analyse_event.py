@@ -50,24 +50,26 @@ def runTest():
             
 class EventAnalyser:
     configObj = None
+    DEBUG = False
 
-    def __init__(self, configFname = "credentials.json"):
-        print("EventAnalyser.__init__: configFname=%s" % configFname)
+    def __init__(self, configFname = "credentials.json", debug=False):
+        self.DEBUG = debug
+        if (debug): print("EventAnalyser.__init__: configFname=%s" % configFname)
         self.loadConfig(configFname)
-        print("self.configObj=",self.configObj)
+        if (debug): print("self.configObj=",self.configObj)
         self.osd = libosd.webApiConnection.WebApiConnection(cfg="client.cfg",
-                                 uname=self.configObj["uname"],
-                                 passwd=self.configObj["passwd"],
-                                 debug=True)
+                                                            uname=self.configObj["uname"],
+                                                            passwd=self.configObj["passwd"],
+                                                            debug=debug)
             
     def loadConfig(self,configFname):
         # Opening JSON file
         try:
             f = open(configFname)
-            print("Opened File")
+            if (self.DEBUG): print("Opened File")
             self.configObj = json.load(f)
             f.close()
-            print("configObj=",self.configObj)
+            if (self.DEBUG): print("configObj=",self.configObj)
         except BaseException as e:
             print("Error Opening File %s" % configFname)
             print("OS error: {0}".format(e))
@@ -85,20 +87,48 @@ class EventAnalyser:
 
     def getEventDataPoints(self, eventId):
         eventObj = self.osd.getEvent(eventId)
-        print("eventObj=", eventObj)
+        if (self.DEBUG): print("eventObj=", eventObj)
         dataPointsObj = self.osd.getDataPointsByEvent(eventId)
         # Make sure we are sorted into time order
         dataPointsObj.sort(key=lambda dp: dateStr2secs(dp['dataTime']))
         return(eventObj, dataPointsObj)
 
     def loadEvent(self, eventId):
-        print("loadEvent: eventId=%d" % eventId)
+        if (self.DEBUG): print("loadEvent: eventId=%d" % eventId)
         self.eventId = eventId
         self.eventObj, self.dataPointsObj = self.getEventDataPoints(eventId)
+        if ('dataJSON' in self.eventObj):
+            if (self.eventObj['dataJSON'] is None):
+                eventDataObj = {}
+            else:
+                print("Creating eventDataObj",self.eventObj)
+                eventDataObj = json.loads(self.eventObj['dataJSON'])
+        else:
+            eventDataObj = {}
+        #print(self.eventObj, eventDataObj)
         alarmTime = dateStr2secs(self.eventObj['dataTime'])
         self.dataTime = dateutil.parser.parse(self.eventObj['dataTime'])
         self.dataTimeStr = self.dataTime.strftime("%Y-%m-%d %H:%M")
 
+        # Populate the analysis parameter variables.
+        if ('alarmRatioThresh' in eventDataObj):
+            print("Reading parameters from event object")
+            self.alarmThresh = eventDataObj['alarmThresh']
+            self.alarmRatioThresh = eventDataObj['alarmRatioThresh']
+            self.alarmFreqMin = eventDataObj['alarmFreqMin']
+            self.alarmFreqMax = eventDataObj['alarmFreqMax']
+        else:
+            print("Reading parameters from first datapoint Object")
+            dp = self.dataPointsObj[0]
+            dpObj = json.loads(dp['dataJSON'])
+            dpDataObj = json.loads(dpObj['dataJSON'])
+            self.alarmThresh = dpDataObj['alarmThresh']
+            self.alarmRatioThresh = dpDataObj['alarmRatioThresh']
+            self.alarmFreqMin = dpDataObj['alarmFreqMin']
+            self.alarmFreqMax = dpDataObj['alarmFreqMax']
+
+
+        
 
         # Collect all the raw data into a single list with associated
         # time from the alarm (in seconds)
@@ -124,9 +154,13 @@ class EventAnalyser:
             self.analysisTimestampLst.append(currTs - alarmTime)
             self.specPowerLst.append(dataObj['specPower'])
             self.roiPowerLst.append(dataObj['roiPower'])
-            roiRatio = dataObj['roiPower']/dataObj['specPower']
+            if (dataObj['specPower']!=0):
+                roiRatio = dataObj['roiPower']/dataObj['specPower']
+            else:
+                roiRatio = 999
             self.roiRatioLst.append(roiRatio)
-            if (dataObj['roiPower']>=dataObj['alarmThresh']):
+                
+            if (dataObj['roiPower'] >= self.alarmThresh):
                 self.roiRatioThreshLst.append(roiRatio)
             else:
                 self.roiRatioThreshLst.append(0.)
@@ -135,8 +169,8 @@ class EventAnalyser:
             if (dataObj['alarmState']>0):
                 if (dataObj['roiPower']>self.minRoiAlarmPower):
                     self.minRoiAlarmPower = dataObj['roiPower']
-            self.alarmThreshLst.append(dataObj['alarmThresh'])
-            self.alarmRatioThreshLst.append(dataObj['alarmRatioThresh']/10.)
+            self.alarmThreshLst.append(self.alarmThresh)
+            self.alarmRatioThreshLst.append(self.alarmRatioThresh/10.)
             self.hrLst.append(dataObj['hr'])
             self.o2satLst.append(dataObj['o2Sat'])
 
@@ -148,7 +182,7 @@ class EventAnalyser:
                 self.rawTimestampLst.append((currTs + n*1./25.)-alarmTime)
         
     def plotRawDataGraph(self,outFname="rawData.png"):
-        print("plotRawDataGraph")
+        if (self.DEBUG): print("plotRawDataGraph")
         fig, ax = plt.subplots(2,1, figsize=(8,8))
         fig.suptitle('Event Number %d, %s\n%s, %s' % (
             self.eventId,
@@ -172,7 +206,7 @@ class EventAnalyser:
         print("Graph written to %s" % outFname)
 
     def plotAnalysisGraph(self,outFname="analysis.png"):
-        print("plotAnalysisGraph")
+        if (self.DEBUG): print("plotAnalysisGraph")
         fig, ax = plt.subplots(2,1, figsize=(8,8))
         fig.suptitle('Event Number %d, %s\n%s, %s' % (
             self.eventId,
@@ -204,7 +238,7 @@ class EventAnalyser:
 
 
     def plotSpectrumGraph(self,outFname="spectrum.png"):
-        print("plotSpectrumGraph")
+        if (self.DEBUG): print("plotSpectrumGraph")
         fig, ax = plt.subplots(1,1, figsize=(8,5))
         if len(self.analysisTimestampLst)>0:
             # Find the datapoint at the event time.
@@ -249,7 +283,7 @@ class EventAnalyser:
 
         
     def analyseEvent(self, eventId):
-        print("analyseEvent: eventId=%d" % eventId)
+        if (self.DEBUG): print("analyseEvent: eventId=%d" % eventId)
         eventObj, dataPointsObj = self.getEventDataPoints(eventId)
         alarmTime = dateStr2secs(eventObj['dataTime'])
         # FIXME - plan ahead for when we pass 3 direction values,
@@ -270,10 +304,10 @@ class EventAnalyser:
         o2satLst = []
         for dp in dataPointsObj:
             currTs = dateStr2secs(dp['dataTime'])
-            print(dp['dataTime'], currTs)
+            if (self.DEBUG): print(dp['dataTime'], currTs)
             dpObj = json.loads(dp['dataJSON'])
             dataObj = json.loads(dpObj['dataJSON'])
-            print(dataObj)
+            if (self.DEBUG): print(dataObj)
             analysisTimestampLst.append(currTs - alarmTime)
             specPowerLst.append(dataObj['specPower'])
             roiPowerLst.append(dataObj['roiPower'])
@@ -332,7 +366,7 @@ class EventAnalyser:
         f.write(json.dumps(dataPointsObj))
         f.close
 
-        osdAppConnection = libosd.osdAppConnection.OsdAppConnection(addr)
+        osdAppConnection = osdAppConnection.OsdAppConnection(addr)
 
         for dp in dataPointsObj:
             currTs = dateStr2secs(dp['dataTime'])

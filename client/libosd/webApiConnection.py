@@ -3,23 +3,36 @@
 import os
 import json
 import requests
+import dateutil.parser
+
+def dateStr2secs(dateStr):
+    parsed_t = dateutil.parser.parse(dateStr)
+    return parsed_t.timestamp()
+
 
 class WebApiConnection:
     DEBUG = False
     uname = "user"
     passwd = "user1_pw"
     baseUrl = "osd.dynu.net"
+    cacheDir = os.path.join(os.path.expanduser("~"),"osd")
+    cacheFname = "osd_data.json"
+    download = True
+    saveCache = True
+    maxEvents = 10000
 
-    def __init__(self, cfg=None, baseUrl=None, uname=None, passwd=None, debug=False):
+    def __init__(self, cfg=None, baseUrl=None, uname=None, passwd=None, cacheDir = None, download=True, saveCache=True, debug=False):
+        self.download = download
+        self.saveCache = saveCache
         self.DEBUG = debug
         if (self.DEBUG): print("libosd.WebApiConnection.__init__()")
-
+        self.cfgFname = cfg
         if (cfg is not None):
             if (os.path.isfile(cfg)):
-                print("Opening file %s" % (cfg))
+                print("Opening configuration file %s" % (cfg))
                 with open(cfg) as infile:
                     jsonObj = json.load(infile)
-                print(jsonObj)
+                if (self.DEBUG): print(jsonObj)
                 if ("uname" in jsonObj):
                     if (self.DEBUG): print("found uname - %s" % jsonObj["uname"])
                     self.uname = jsonObj["uname"]
@@ -29,6 +42,9 @@ class WebApiConnection:
                 if ("baseurl" in jsonObj):
                     if (self.DEBUG): print("found baseurl - %s" % jsonObj["baseurl"])
                     self.baseUrl = jsonObj["baseurl"]
+                if ("cacheDir" in jsonObj):
+                    if (self.DEBUG): print("found cacheDir - %s" % jsonObj["cacheDir"])
+                    self.cacheDir = jsonObj["cacheDir"]
             else:
                 print("ERROR - file %s does not exist" % cfg)
                 exit(-1)
@@ -43,36 +59,124 @@ class WebApiConnection:
         if (baseUrl is not None):
             if (self.DEBUG): print("setting baseUrl")
             self.baseUrl = baseUrl
+        if (cacheDir is not None):
+            self.cacheDir = cacheDir
 
-        if (self.DEBUG): print("baseUrl=%s, uname=%s, passwd=%s" %
-              (self.baseUrl, self.uname, self.passwd))
+        if (self.DEBUG): print("baseUrl=%s, uname=%s, passwd=%s, cacheDir=%s" %
+              (self.baseUrl, self.uname, self.passwd, self.cacheDir))
 
-        self.getToken()
+        if (self.download):
+            print("webApiConnection - retrieving authentication token")
+            self.getToken()
+        else:
+            print("webApiConnection - not downloading data so not logging in")
         
-    def getEvents(self, userId=None):
+    def saveEventsCache(self,eventsLst):
+        '''Write the list of events data eventsLst as a json file
+        '''
+        fpath = os.path.join(self.cacheDir, self.cacheFname)
+        if (self.DEBUG): print("webApiConnection.saveEventsCache - fpath=%s" % fpath)
+        fp = open(fpath,"w")
+        fp.write(json.dumps(eventsLst, indent=2))
+        fp.close()
+
+    def loadEventsCache(self):
+        ''' Retrieve a list of events data from a json file
+        '''
+        fpath = os.path.join(self.cacheDir, self.cacheFname)
+        if (self.DEBUG): print("webApiConnection.loadEventsCache - fpath=%s" % fpath)
+        fp = open(fpath,"r")
+        eventsLst = json.load(fp)
+        fp.close()
+        return eventsLst
+
+            
+    def getEvents(self, userId=None, includeDatapoints = False):
+        ''' Returns a list of all events in the database for the given userId
+        or for all users if userId is None.
+        The returned data does NOT contain the datapoints associated 
+        with the events unless includeDatapoints is set to True.
+        FIXME - add data range options
+        '''
         if (self.DEBUG): print("libOsd.getEvents, baseUrl=%s" % (self.baseUrl))
+        # If we are not downloading data, just return what we have cached
+        if (not self.download):
+            return self.loadEventsCache()
+
+        # Otherwise download the specified data
         if (userId is not None):
-            urlStr = "%s/events/?user=%d" % (self.baseUrl, userId)
+            urlStr = "%s/events/?user=%s" % (self.baseUrl, userId)
         else:
             urlStr = "%s/events/" % (self.baseUrl)
         if (self.DEBUG): print("getEvents - urlStr=%s" % urlStr)
-        retVal = self.getData(urlStr,None)
-        return retVal
+        eventsObj = self.getData(urlStr,None)
+
+        ###############################################################
+        # Return just the events list, unless includeDatapoints is True.
+        if includeDatapoints == False:
+            print("includeDatapoints is False - returning list of events without datapoints")
+            return eventsObj
+
+        eventLst = []
+        count = 0
+        for event in eventsObj:
+            print("%5d %s %s %s %s" % (event['id'],
+                                       event['dataTime'],
+                                       event['type'],
+                                       event['subType'],
+                                       event['desc']
+                                       ))
+            dataPointsObj = self.getDataPointsByEvent(event['id'])
+            # Make sure we are sorted into time order
+            dataPointsObj.sort(key=lambda dp: dateStr2secs(dp['dataTime']))
+
+            # Extract data from first datapoint to get OSD settings
+            #     at time of event.
+            if len(dataPointsObj)!=0:
+                event['datapoints'] = dataPointsObj
+                eventLst.append(event)
+            else:
+                print("Ignoring event with zero datapoints")
+
+            count = count + 1
+            if count >= self.maxEvents:
+                print("reached maxEvents (%d) - stopping" % self.maxEvents)
+                break
+
+        # Cache the data in case we need it next time
+        if (self.saveCache):
+            self.saveEventsCache(eventLst)
+        return eventLst
+
+
+        
+        
     
-    def getUnvalidatedEvents(self, wearerId =1):
-        if (self.DEBUG): print("libOsd.getUnvalidatedEvents, wearerId=%d, baseUrl=%s" % (wearerId, self.baseUrl))
-        urlStr = "%s/events/?type__isnull=true" % self.baseUrl
+    def getUnvalidatedEvents(self, userId =1):
+        if (self.DEBUG): print("libOsd.getUnvalidatedEvents, userId=%d, baseUrl=%s" % (userId, self.baseUrl))
+        if (userId is not None):
+            urlStr = "%s/events/?type__isnull=true&user=%d" % (self.baseUrl, userId)
+        else:
+            urlStr = "%s/events/?type__isnull=true" % (self.baseUrl)
         if (self.DEBUG): print("getUnvalidatedEvents - urlStr=%s" % urlStr)
         retVal = self.getData(urlStr,None)
         return retVal
 
-    def getEvent(self, eventId):
+    def getEvent(self, eventId, includeDatapoints=False):
         if (self.DEBUG): print("libOsd.getEvent, eventId=%d, baseUrl=%s" % (eventId, self.baseUrl))
         urlStr = "%s/events/%d" % (self.baseUrl, eventId)
         if (self.DEBUG): print("getEvent - urlStr=%s" % urlStr)
-        retVal = self.getData(urlStr,None)
-        if (self.DEBUG): print("getEvent, returning: ",retVal)
-        return retVal
+        eventObj = self.getData(urlStr,None)
+        
+        ###############################################################
+        # Return just the event list, unless includeDatapoints is True.
+        if includeDatapoints:
+            dataPointsObj = self.getDataPointsByEvent(eventObj['id'])
+            # Make sure we are sorted into time order
+            dataPointsObj.sort(key=lambda dp: dateStr2secs(dp['dataTime']))
+            if len(dataPointsObj)!=0:
+                eventObj['datapoints'] = dataPointsObj
+        return eventObj
 
     def addEvent(self, eventType, dataTime, desc, wearerId):
         data = {
@@ -227,9 +331,10 @@ class WebApiConnection:
         return(retVal)
 
     def getToken(self):
-        if (self.DEBUG): print("getToken")
         urlStr = "%s/accounts/login/" % self.baseUrl
-        if (self.DEBUG): print("urlStr=%s" % urlStr)
+        if (self.DEBUG): print("webApiConnection.getToken(): urlStr=%s" % urlStr)
+        if (self.DEBUG): print("webApiConnection.getToken(): %s, %s" %
+                               (self.uname, self.passwd))
         response = requests.post(
             urlStr,
             json = {

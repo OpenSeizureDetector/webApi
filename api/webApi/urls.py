@@ -12,6 +12,8 @@ from events.views import EventViewSet
 from userdata.views import UserViewSet, ProfileViewSet, LicenceViewSet
 
 
+admin.autodiscover()
+
 router = DefaultRouter()
 router.register(r'api/events', EventViewSet)
 router.register(r'api/datapoints', DatapointViewSet)
@@ -20,7 +22,9 @@ router.register(r'api/profile', ProfileViewSet)
 #router.register(r'api/licence', LicenceViewSet)
 
 urlpatterns = [
-    #path('api/admin/', admin.site.urls),
+    path('api/admin/', admin.site.urls),
+    path('api/o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    path('social/', include('drf_social_oauth2.urls', namespace='social')),
     path('api/accounts/', include('rest_registration.api.urls')),
     #path('api/datapoints/', csrf_exempt(DatapointList.as_view())),
     path('api/dataSummary/', DatapointSummaryList.as_view()),

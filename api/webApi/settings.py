@@ -48,6 +48,9 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_registration',
     'django_filters',
+    'oauth2_provider',
+    'social_django',
+    'drf_social_oauth2',
     'datapoints',
     'events',
     'userdata',
@@ -81,6 +84,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -153,6 +158,8 @@ REST_FRAMEWORK = {
         #'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.TokenAuthentication',
         #'rest_framework.authentication.SessionAuthentication',
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+        'drf_social_oauth2.authentication.SocialAuthentication',
     ],
 #    'DEFAULT_PERMISSION_CLASSES': (
 #        'rest_framework.permissions.IsAuthenticated', ),
@@ -168,6 +175,27 @@ REST_FRAMEWORK = {
     ), 
 }
 
+AUTHENTICATION_BACKENDS = (
+    'drf_social_oauth2.backends.DjangoOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+    'social_core.backends.google.GoogleOAuth2',
+)
+
+# Google configuration
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = "784512403432-34qaqmetppti8nfin68gs94i0ahhrems.apps.googleusercontent.com"
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = "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"
+
+# Define SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE to get extra permissions from Google.
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
+    'https://www.googleapis.com/auth/userinfo.email',
+    #'https://www.googleapis.com/auth/userinfo.profile',
+]
+
+OAUTH2_PROVIDER = {
+    'SCOPES': {'read' : 'Read scope',
+               'write': 'Write scope',
+               'groups': 'Access to your groups'}
+    }
 
 REST_REGISTRATION = {
     'REGISTER_VERIFICATION_ENABLED': True,
