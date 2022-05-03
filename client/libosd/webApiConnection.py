@@ -14,7 +14,7 @@ class WebApiConnection:
     DEBUG = False
     uname = "user"
     passwd = "user1_pw"
-    baseUrl = "osd.dynu.net"
+    baseUrl = "http://osd.dynu.net"
     cacheDir = os.path.join(os.path.expanduser("~"),"osd")
     cacheFname = "osd_data.json"
     download = True

@@ -1,0 +1,32 @@
+#!usr/bin/python3
+
+import json
+
+class SdAlg:
+    DEBUG = False
+    settingsObj = None
+    def __init__(self, settingsStr, debug=False):
+        self.DEBUG = debug
+        self.logD("SdAlg.__init__(): settingsStr=%s"
+                               % settingsStr)
+        self.settingsObj = json.loads(settingsStr)
+        self.logD("SdAlg.__init__(): settingsObj="+json.dumps(self.settingsObj))
+
+
+
+    def processDp(self, dpStr):
+        self.logD("SdAlg.processDp: dpStr=%s." % dpStr)
+        retVal = { "alarmState": 0 }
+        return(json.dumps(retVal))
+                  
+
+    def logD(self,msgStr):
+        if (self.DEBUG):
+            print(msgStr)
+
+    def log(self, msgStr):
+            print(msgStr)
+
+
+if __name__ == "__main__":
+    print("sdAlg.SdAlg.main()")
