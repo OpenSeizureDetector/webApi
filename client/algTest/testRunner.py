@@ -17,9 +17,10 @@ def runTest(configObj, debug=False):
         download=configObj['download'],
         debug=debug)
 
-    
     for eventId in configObj['eventsList']:
         print("Analysing event %s" % eventId)
+        eventObj = osd.getEvent(eventId, includeDatapoints=True)
+        print(eventObj)
 
 
 def main():
