@@ -4,13 +4,15 @@ import json
 import sdAlg
 
 class OsdAlg(sdAlg.SdAlg):
-    def __init__(self, settingsStr, debug=False):
+    def __init__(self, settingsStr, debug=True):
+        print("OsdAlg.__init__() - settingsStr=%s" % settingsStr)
+        print("OsdAlg.__init__(): settingsStr=%s (%s)"
+                               % (settingsStr, type(settingsStr)))
         super().__init__(settingsStr, debug)
         
-
     def processDp(self, dpStr):
         self.logD("OsdAlg.processDp: dpStr=%s." % dpStr)
-        retVal = { "alarmState": 0 }
+        retVal = {"alarmState": 0}
         return(json.dumps(retVal))
                   
 if __name__ == "__main__":

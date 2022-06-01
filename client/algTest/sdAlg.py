@@ -7,8 +7,8 @@ class SdAlg:
     settingsObj = None
     def __init__(self, settingsStr, debug=False):
         self.DEBUG = debug
-        self.logD("SdAlg.__init__(): settingsStr=%s"
-                               % settingsStr)
+        self.logD("SdAlg.__init__(): settingsStr=%s (%s)"
+                               % (settingsStr, type(settingsStr)))
         self.settingsObj = json.loads(settingsStr)
         self.logD("SdAlg.__init__(): settingsObj="+json.dumps(self.settingsObj))
 

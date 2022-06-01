@@ -163,6 +163,15 @@ class WebApiConnection:
         return retVal
 
     def getEvent(self, eventId, includeDatapoints=False):
+        # If we are not downloading data, just return what we have cached
+        if (not self.download):
+            eventsLst = self.loadEventsCache()
+            for event in eventsLst:
+                if (event['id']==eventId):
+                    return event
+            print("Event not found in cache")
+            return None
+
         if (self.DEBUG): print("libOsd.getEvent, eventId=%d, baseUrl=%s" % (eventId, self.baseUrl))
         urlStr = "%s/events/%d" % (self.baseUrl, eventId)
         if (self.DEBUG): print("getEvent - urlStr=%s" % urlStr)

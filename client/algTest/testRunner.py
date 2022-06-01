@@ -9,6 +9,8 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import libosd.analyse_event
 import libosd.webApiConnection
 
+import osdAlg
+
 
 def runTest(configObj, debug=False):
     print("runTest - configObj="+json.dumps(configObj))
@@ -16,13 +18,24 @@ def runTest(configObj, debug=False):
         cfg=configObj['credentialsFname'],
         download=configObj['download'],
         debug=debug)
+    
+
+    algs = []
+    for algObj in configObj['algorithms']:
+        print(algObj['name'])
+        settingsStr = json.dumps(algObj['settings'])
+        print("settingsStr=%s (%s)" % (settingsStr, type(settingsStr)))
+        algs.append(eval("%s(settingsStr)" % (algObj['alg'])))
 
     for eventId in configObj['eventsList']:
         print("Analysing event %s" % eventId)
         eventObj = osd.getEvent(eventId, includeDatapoints=True)
         print(eventObj)
+        for alg in algs:
+            alg.processDp(eventObj['datapoints'][0])
 
-
+        
+        
 def main():
     print("testRunner.main()")
     parser = argparse.ArgumentParser(description='Seizure Detection Test Runner')
