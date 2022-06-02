@@ -49,4 +49,11 @@ This will be a python implementation of the original OpenSeizureDetector detecti
 
 Usage
 =====
-Edit testConfig.json to suit your requirements.
+Edit testConfig.json to suit your requirements.   Note that it points to a client.cfg file
+which should contain database login credentials.   If you want to analyse other users' data
+you must authenticate as a 'researcher' user rather than a normal user.
+Contact graham@openseizuredetector.org.uk for access.
+
+Then just run ./testRunner.py
+
+There are a few dependencies such as numpy which must be satisfied for it to work.
