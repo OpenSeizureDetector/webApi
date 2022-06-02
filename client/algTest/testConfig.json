@@ -11,7 +11,15 @@
 		"alarmThreshold" : 100,
 		"alarmRatioThreshold" : 57
             }
+	},
+	{
+	    "name": "Physical_Device",
+	    "alg": "deviceAlg.DeviceAlg",
+	    "settings" : {
+		"ipAddr": "192.168.1.168"
+            }
 	}
+
     ],
     "download": true,
     "credentialsFname": "../client.cfg"

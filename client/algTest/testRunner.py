@@ -4,13 +4,11 @@ import argparse
 import json
 import sys
 import os
+import importlib
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import libosd.analyse_event
 import libosd.webApiConnection
-
-import osdAlg
-
 
 def runTest(configObj, debug=False):
     print("runTest - configObj="+json.dumps(configObj))
@@ -23,9 +21,14 @@ def runTest(configObj, debug=False):
     algs = []
     for algObj in configObj['algorithms']:
         print(algObj['name'])
+        moduleId = algObj['alg'].split('.')[0]
+        classId = algObj['alg'].split('.')[1]
+        print("Importing Module %s" % moduleId)
+        module = importlib.import_module(moduleId)
+
         settingsStr = json.dumps(algObj['settings'])
         print("settingsStr=%s (%s)" % (settingsStr, type(settingsStr)))
-        algs.append(eval("%s(settingsStr)" % (algObj['alg'])))
+        algs.append(eval("module.%s(settingsStr)" % (classId)))
 
     for eventId in configObj['eventsList']:
         print("Analysing event %s" % eventId)
