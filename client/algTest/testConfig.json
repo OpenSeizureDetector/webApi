@@ -1,6 +1,6 @@
 {
     "testName": "Test Configuration Test",
-    "eventsList": [ 5745],
+    "eventsList": [ 5745, 5726, 5640, 5580, 5486, 5483, 5254 ],
     "algorithms": [
 	{
 	    "name": "OSD_Orig",
@@ -16,7 +16,7 @@
 	    "name": "Physical_Device",
 	    "alg": "deviceAlg.DeviceAlg",
 	    "settings" : {
-		"ipAddr": "192.168.1.168"
+		"ipAddr": "192.168.0.95"
             }
 	}
 

@@ -29,9 +29,9 @@ class OsdAppConnection:
         params is encoded into the URL and data is sent with the request.
         if json is True it interprets the returned string as a json object,
         otherwise it returns the string itself. """
-        print("_sendRequest(%s, %s)" % (urlStr, method))
+        #print("_sendRequest(%s, %s)" % (urlStr, method))
         url = self._makeUrl(urlStr)
-        print("url=%s" % url)
+        #print("url=%s" % url)
         if (method == "GET"):
             r = requests.get(url, auth=(self.user, self.passwd), params=params)
         elif (method == "POST"):
@@ -69,11 +69,20 @@ class OsdAppConnection:
         returns the response
         """
         urlStr = "data"
-        print("sendData: urlStr=%s, dataJSON=%s" % (urlStr,dataJSON))
+        #print("sendData: urlStr=%s, dataJSON=%s" % (urlStr,dataJSON))
         retVal = self._post(urlStr, None, dataJSON, False)
-        print(retVal)
+        #print(retVal)
         return retVal
 
+    def getResult(self):
+        """ Get the lastest analysis results from the device."""
+        urlStr = "data"
+        #print("getResult: urlStr=%s" % (urlStr))
+        retVal = self._get(urlStr, None, False)
+        #print(retVal)
+        return retVal
+        
+    
 
 if __name__=="_main__":
     print("osdAppConnection.main()")

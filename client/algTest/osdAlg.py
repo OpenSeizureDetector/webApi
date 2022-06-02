@@ -11,7 +11,7 @@ class OsdAlg(sdAlg.SdAlg):
         super().__init__(settingsStr, debug)
         
     def processDp(self, dpStr):
-        self.logD("OsdAlg.processDp: dpStr=%s." % dpStr)
+        #self.logD("OsdAlg.processDp: dpStr=%s." % dpStr)
         retVal = {"alarmState": 0}
         return(json.dumps(retVal))
                   

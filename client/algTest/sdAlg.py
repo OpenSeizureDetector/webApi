@@ -1,6 +1,7 @@
 #!usr/bin/python3
 
 import json
+import dateutil.parser
 
 class SdAlg:
     DEBUG = False
@@ -12,6 +13,9 @@ class SdAlg:
         self.settingsObj = json.loads(settingsStr)
         self.logD("SdAlg.__init__(): settingsObj="+json.dumps(self.settingsObj))
 
+    def dateStr2secs(self, dateStr):
+        parsed_t = dateutil.parser.parse(dateStr)
+        return parsed_t.timestamp()
 
 
     def processDp(self, dpStr):

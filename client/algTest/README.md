@@ -15,3 +15,38 @@ integer element, whose values are:
 	1 : WARNING
 	2 : ALARM
 Other elements may be included in the return value.
+
+The current state of the code is that it is working to do a simple test using a physical device
+running OpenSeizureDetector to provide the processing.  See the example testConfig.json file.
+
+testConfig.json is should contain a single JSON object with teh following elements:
+		testName - a human readable description
+		download - true to download data from the database, false to use cached data
+		credentialsFname - file name of a file containing database login credentials
+				 (see client.cfg.template).
+		eventsList - an array of eventId numbers to process
+		algorithms - an array of algorithm objects, each of which contains the following:
+			   "name" - a human readable name
+			   "alg" - the module and class name of the algorithm to test.
+			   "settings" - an algorithm specific settings object which is passed
+			   	      to the class constructor.
+
+
+Algorithms
+==========
+
+deviceAlg.DeviceAlg
+-------------------
+This algorithm uses the web interface to a running instance of the OpenSeizureDetector Android
+App on an a Android device.   The only used setting is "ipAddr" which is the IP address of the
+Android device running OpenSeizureDetector as shown on the OpenSeizureDetector main screen.
+
+osdAlg.OsdAlg
+-------------
+This will be a python implementation of the original OpenSeizureDetector detection algorithm
+(not yet implemented).
+
+
+Usage
+=====
+Edit testConfig.json to suit your requirements.
