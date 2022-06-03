@@ -56,6 +56,7 @@ def runTest(configObj, debug=False):
     # They are imported dynamically so we do not need to have 'import'
     # statements for all the possible algorithm classes in this file.
     algs = []
+    algNames = []
     for algObj in configObj['algorithms']:
         print(algObj['name'])
         moduleId = algObj['alg'].split('.')[0]
@@ -66,6 +67,7 @@ def runTest(configObj, debug=False):
         settingsStr = json.dumps(algObj['settings'])
         print("settingsStr=%s (%s)" % (settingsStr, type(settingsStr)))
         algs.append(eval("module.%s(settingsStr)" % (classId)))
+        algNames.append(algObj['name'])
 
     # Now we loop through each event in the eventsList and run the event
     # through each of the specified algorithms.
@@ -98,6 +100,13 @@ def runTest(configObj, debug=False):
             sys.stdout.flush()
     print(results)
 
+
+    lineStr = "eventId, type, subType, "
+    for algNo in range(0,nAlgs):
+        lineStr = "%s, %s" % (lineStr, algNames[algNo])
+    lineStr = "%s, desc" % lineStr
+    print(lineStr)
+    
     for eventNo in range(0,nEvents):
         eventId = configObj['eventsList'][eventNo]
         eventObj = osd.getEvent(eventId, includeDatapoints=False)

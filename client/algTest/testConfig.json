@@ -1,22 +1,27 @@
 {
     "testName": "Test Configuration Test",
+    "eventsList2": [ 5745, 5486 ],
     "eventsList": [ 5745, 5726, 5640, 5580, 5486, 5483, 5254 ],
     "algorithms": [
 	{
 	    "name": "OSD_Orig",
 	    "alg": "osdAlg.OsdAlg",
 	    "settings" : {
+		"sampleFreq" : 25,
+		"samplePeriod" : 5.0,
 		"alarmFreqMin" : 3,
 		"alarmFreqMax" : 8,
-		"alarmThreshold" : 100,
-		"alarmRatioThreshold" : 57
+		"alarmThresh" : 100,
+		"alarmRatioThresh" : 57,
+		"warnTime": 5,
+		"alarmTime": 5
             }
 	},
 	{
 	    "name": "Physical_Device",
 	    "alg": "deviceAlg.DeviceAlg",
 	    "settings" : {
-		"ipAddr": "192.168.0.95"
+		"ipAddr": "192.168.0.100"
             }
 	}
 
