@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 import datetime
 import dateutil.parser
@@ -11,7 +11,7 @@ import numpy as np
 import distutils.dir_util
 
 import libosd.analyse_event
-
+import libosd.webApiConnection
 
 
 
@@ -21,6 +21,21 @@ def makeEventSummary(eventId,configFname):
     os.makedirs(outDir, exist_ok=True)
     print("makeEventSummary - outDir=%s" % outDir)
     
+
+    inFile = open(configFname,'r')
+    configObj = json.load(inFile)
+    inFile.close()
+    osd = libosd.webApiConnection.WebApiConnection(
+        cfg=configFname,
+        download=True,
+        debug=False)
+    eventObj = osd.getEvent(eventId, includeDatapoints=True)
+
+    outFile = open(os.path.join(outDir,"rawData.json"),"w")
+    json.dump(eventObj, outFile,sort_keys=True, indent=4)
+    outFile.close()
+    
+
     analyser.loadEvent(int(args['event']))
 
     print(analyser.eventObj)

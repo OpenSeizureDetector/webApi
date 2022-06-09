@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 import argparse
 
@@ -40,8 +40,8 @@ if (__name__=="__main__"):
                         help='name of json file containing configuration information and login credientials - see client.cfg.template')
     parser.add_argument('--user', default=None,
                         help='user ID number of user to be analysed')
-    parser.add_argument('--download', action='store_true',
-                        help="Download data from remote database rather than using local data")
+    parser.add_argument('--nodownload', action='store_true',
+                        help="Do not Download data from remote database - use local data instead")
     parser.add_argument('--debug', action='store_true',
                         help="Write debugging information to screen")
     parser.add_argument('--seizure', action='store_true',
@@ -52,4 +52,4 @@ if (__name__=="__main__"):
 
     print("Analysing False Alarms for User %s" % args['user'])
     listEvents(args['user'], args['config'], seizure=args['seizure'],
-               download=args['download'], debug=args['debug'])
+               download=not args['nodownload'], debug=args['debug'])
