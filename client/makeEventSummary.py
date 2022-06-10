@@ -11,6 +11,7 @@ import numpy as np
 import distutils.dir_util
 
 import libosd.analyse_event
+import libosd.webApiConnection
 
 
 
@@ -29,6 +30,17 @@ def makeEventSummary(eventId,configFname):
     dpObj = json.loads(dp['dataJSON'])
     dataObj = json.loads(dpObj['dataJSON'])
     #print(dataObj)
+
+    osd = libosd.webApiConnection.WebApiConnection(
+        cfg=configFname,
+        download=True,
+        debug=False)
+
+    eventObj = osd.getEvent(eventId, includeDatapoints=True)
+    outFile = open(os.path.join(outDir,'eventData.json'),'w')
+    outFile.write(json.dumps(eventObj,sort_keys=True, indent=4))
+    outFile.close()
+
 
     templateDir = os.path.join(os.path.dirname(__file__), 'templates/')
     env = jinja2.Environment(
@@ -106,6 +118,7 @@ if (__name__=="__main__"):
         if (args['test'] is not None):
             print("Running Event Number %d on test server %s" %
                   (int(args['event']), args['test']))
+            analyser = libosd.analyse_event.EventAnalyser(configFname=args['config'])
             analyser.testEvent(int(args['event']), args['test'])
         else:
             print("Analysing Event Number %d" % int(args['event']))
