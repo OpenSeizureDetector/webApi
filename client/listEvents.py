@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 import argparse
 
@@ -7,6 +7,7 @@ import libosd.loadConfig
 
 
 def listEvents(userId, credentialsFname="client.cfg", seizure=False,
+               tc=False,
                download=False, maxEvents=10000, debug=False):
     osd = libosd.webApiConnection.WebApiConnection(cfg=credentialsFname,
                                                    download=download,
@@ -21,15 +22,17 @@ def listEvents(userId, credentialsFname="client.cfg", seizure=False,
     for eventObj in eventLst:
         if (not seizure
             or eventObj['type'] == "Seizure"):
-            print("userId=%d, eventId=%d, date=%s, osdState=%d, "
-                  "type=%s, subType=%s, notes=%s" %
-                  (eventObj['userId'],
-                   eventObj['id'],
-                   eventObj['dataTime'],
-                   eventObj['osdAlarmState'],
-                   eventObj['type'],
-                   eventObj['subType'],
-                   eventObj['desc']))
+            if (not tc
+                or eventObj['subType'] == "Tonic-Clonic"):
+                print("userId=%d, eventId=%d, date=%s, osdState=%d, "
+                      "type=%s, subType=%s, notes=%s" %
+                      (eventObj['userId'],
+                       eventObj['id'],
+                       eventObj['dataTime'],
+                       eventObj['osdAlarmState'],
+                       eventObj['type'],
+                       eventObj['subType'],
+                       eventObj['desc']))
     return
 
 
@@ -40,16 +43,19 @@ if (__name__=="__main__"):
                         help='name of json file containing configuration information and login credientials - see client.cfg.template')
     parser.add_argument('--user', default=None,
                         help='user ID number of user to be analysed')
-    parser.add_argument('--download', action='store_true',
-                        help="Download data from remote database rather than using local data")
+    parser.add_argument('--nodownload', action='store_true',
+                        help="Do not Download data from remote database - use local data instead")
     parser.add_argument('--debug', action='store_true',
                         help="Write debugging information to screen")
     parser.add_argument('--seizure', action='store_true',
                         help="List only seizure events")
+    parser.add_argument('--tc', action='store_true',
+                        help="List only tonic-clonic seizure events")
     argsNamespace = parser.parse_args()
     args = vars(argsNamespace)
     print(args)
 
     print("Analysing False Alarms for User %s" % args['user'])
-    listEvents(args['user'], args['config'], seizure=args['seizure'],
-               download=args['download'], debug=args['debug'])
+    listEvents(args['user'], args['config'],
+               seizure=args['seizure'], tc=args['tc'],
+               download=not args['nodownload'], debug=args['debug'])

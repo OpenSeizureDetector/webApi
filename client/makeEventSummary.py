@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 import datetime
 import dateutil.parser
@@ -14,14 +14,27 @@ import libosd.analyse_event
 import libosd.webApiConnection
 
 
-
-
 def makeEventSummary(eventId,configFname):
     analyser = libosd.analyse_event.EventAnalyser(configFname=args['config'])
     outDir = os.path.join("output","Event_%d_summary" % eventId)
     os.makedirs(outDir, exist_ok=True)
     print("makeEventSummary - outDir=%s" % outDir)
     
+
+    inFile = open(configFname,'r')
+    configObj = json.load(inFile)
+    inFile.close()
+    osd = libosd.webApiConnection.WebApiConnection(
+        cfg=configFname,
+        download=True,
+        debug=False)
+    eventObj = osd.getEvent(eventId, includeDatapoints=True)
+
+    outFile = open(os.path.join(outDir,"rawData.json"),"w")
+    json.dump(eventObj, outFile,sort_keys=True, indent=4)
+    outFile.close()
+    
+
     analyser.loadEvent(int(args['event']))
 
     print(analyser.eventObj)
@@ -30,17 +43,6 @@ def makeEventSummary(eventId,configFname):
     dpObj = json.loads(dp['dataJSON'])
     dataObj = json.loads(dpObj['dataJSON'])
     #print(dataObj)
-
-    osd = libosd.webApiConnection.WebApiConnection(
-        cfg=configFname,
-        download=True,
-        debug=False)
-
-    eventObj = osd.getEvent(eventId, includeDatapoints=True)
-    outFile = open(os.path.join(outDir,'eventData.json'),'w')
-    outFile.write(json.dumps(eventObj,sort_keys=True, indent=4))
-    outFile.close()
-
 
     templateDir = os.path.join(os.path.dirname(__file__), 'templates/')
     env = jinja2.Environment(

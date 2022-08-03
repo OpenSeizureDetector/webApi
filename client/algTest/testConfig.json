@@ -1,7 +1,10 @@
 {
     "testName": "Test Configuration Test",
     "eventsList2": [ 5745, 5486 ],
-    "eventsList": [ 5745, 5726, 5640, 5580, 5486, 5483, 5254 ],
+    "eventsList": [ 5745, 5726, 5640, 5580, 5486, 5483, 5254,
+		    7823, 7778,
+		    8420, 8661, 8726, 8736, 
+		    8872, 8970,  9005, 9401, 9472, 9628, 9828  ],
     "algorithms": [
 	{
 	    "name": "OSD_Orig",
@@ -16,16 +19,8 @@
 		"warnTime": 5,
 		"alarmTime": 5
             }
-	},
-	{
-	    "name": "Physical_Device",
-	    "alg": "deviceAlg.DeviceAlg",
-	    "settings" : {
-		"ipAddr": "192.168.0.100"
-            }
 	}
-
     ],
-    "download": true,
+    "download": false,
     "credentialsFname": "../client.cfg"
 }

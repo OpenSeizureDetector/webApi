@@ -218,7 +218,7 @@ class EventAnalyser:
         ax[0].plot(self.analysisTimestampLst, self.roiPowerLst)
         ax[0].plot(self.analysisTimestampLst, self.alarmThreshLst)
         ax[0].legend(['Spectrum Power','ROI Power', 'ROI Power Threshold'])
-        ax[0].set_ylim(0,max(self.alarmThreshLst)*5)
+        ax[0].set_ylim(0,max(self.alarmThreshLst)*10)
         ax[0].set_ylabel("Average Power per bin")
         ax[0].set_title("Spectrum / ROI Powers")
         ax[0].grid(True)
