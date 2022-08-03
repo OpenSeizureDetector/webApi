@@ -22,7 +22,10 @@ class SdAlg:
         self.logD("SdAlg.processDp: dpStr=%s." % dpStr)
         retVal = { "alarmState": 0 }
         return(json.dumps(retVal))
-                  
+
+    def resetAlg(self):
+        pass
+    
 
     def logD(self,msgStr):
         if (self.DEBUG):

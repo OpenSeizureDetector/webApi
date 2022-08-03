@@ -83,19 +83,20 @@ def runTest(configObj, debug=False):
         eventId = configObj['eventsList'][eventNo]
         print("Analysing event %s" % eventId)
         eventObj = osd.getEvent(eventId, includeDatapoints=True)
-        print(eventObj.keys())
+        #print(eventObj.keys())
         for algNo in range(0, nAlgs):
             alg = algs[algNo]
             print("Processing Algorithm %d (%s): " % (algNo, alg.__class__.__name__))
+            alg.resetAlg()
             sys.stdout.write("Looping through Datapoints: ")
             for dp in eventObj['datapoints']:
-                sys.stdout.write(".")
-                sys.stdout.flush()
                 retVal = alg.processDp(dp2rawData(dp))
                 #print(alg.__class__.__name__, retVal)
                 retObj = json.loads(retVal)
                 statusVal = retObj['alarmState']
                 results[eventNo][algNo][statusVal] += 1
+                sys.stdout.write("%d" % statusVal)
+                sys.stdout.flush()
             sys.stdout.write("\n")
             sys.stdout.flush()
     print(results)

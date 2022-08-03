@@ -6,6 +6,7 @@ import sdAlg
 
 class OsdAlg(sdAlg.SdAlg):
     alarmState = 0
+    alarmCount = 0
     def __init__(self, settingsStr, debug=True):
         print("OsdAlg.__init__() - settingsStr=%s" % settingsStr)
         print("OsdAlg.__init__(): settingsStr=%s (%s)"
@@ -133,7 +134,9 @@ class OsdAlg(sdAlg.SdAlg):
         #retVal = {"alarmState": 0}
         #return(json.dumps(retVal))
         
-
+    def resetAlg(self):
+        self.alarmState = 0
+        self.alarmCount = 0
 
                   
 if __name__ == "__main__":
