@@ -100,6 +100,7 @@ class OsdAlg(sdAlg.SdAlg):
         
     def processDp(self, dpStr):
         #self.logD("OsdAlg.processDp: dpStr=%s." % dpStr)
+        #print(dpStr)
         accData = self.getAccelDataFromJson(dpStr)
         inAlarm = self.getAlarmState(accData)
 

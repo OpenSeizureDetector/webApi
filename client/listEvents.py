@@ -9,8 +9,20 @@ import libosd.webApiConnection
 import libosd.loadConfig
 
 
+def extractJsonVal(row, elem):
+    print("extractJsonVal(): row=",row)
+    dataJSON = row['dataJSON']
+    if (dataJSON is not None):
+        print("extractJsonVal(): dataJSON=",dataJSON)
+        dataObj = json.loads(dataJSON)
+        elemVal = dataObj[elem]
+    else:
+        elemVal = None
+    return(elemVal)
+
+
 def listEvents(userId, credentialsFname="client.cfg", seizure=False,
-               tc=False, unique=False,
+               tc=False, unique=False, outFile="listEvents",
                download=False, maxEvents=10000, debug=False):
     osd = libosd.webApiConnection.WebApiConnection(cfg=credentialsFname,
                                                    download=download,
@@ -39,6 +51,9 @@ def listEvents(userId, credentialsFname="client.cfg", seizure=False,
 
         # Read the event list into a pandas data frame.
         df = pd.read_json(json.dumps(eventLst))
+        df['dataTime'] = pd.to_datetime(df['dataTime'])
+        # FIXME - this crashes!
+        #df['dataSource'] = df.apply(lambda row: extractJsonVal(row,'dataSource'), axis = 1)
         # drop the dataJSON column because we do not need it.
         df=df.drop('dataJSON', axis=1)
         # Filter out warnings (unless they are tagged as a seizure) and tests.
@@ -46,11 +61,8 @@ def listEvents(userId, credentialsFname="client.cfg", seizure=False,
         df=df.query("not(desc.str.lower().str.contains('test'))")
         #print(df.columns)
         #print(df.dtypes)
-        df['dataTime'] = pd.to_datetime(df['dataTime'])
         #print(df.describe())
         #print(df.dtypes)
-        # Group the data by userID and time period
-        groupedDf=df.groupby(['userId','type',pd.Grouper(key='dataTime', freq='10min')])
         allUniqueEventsDf = pd.DataFrame()
         tcUniqueEventsDf = pd.DataFrame()
         allSeizureUniqueEventsDf = pd.DataFrame()
@@ -58,36 +70,48 @@ def listEvents(userId, credentialsFname="client.cfg", seizure=False,
         unknownUniqueEventsDf = pd.DataFrame()
         #
         # This is to set the print order when we print the data frames
-        columnList = ['id', 'userId','dataTime','type','subType','osdAlarmState','desc']
+        columnList = ['id', 'userId',
+                      'dataTime', 'type',
+                      'subType', 'osdAlarmState',
+                      'desc']
+
+        # Group the data by userID and time period
+        groupedDf=df.groupby(['userId','type',pd.Grouper(key='dataTime', freq='10min')])
+
         # Loop through the grouped data
         for groupParts, group in groupedDf:
             userId, eventType, dataTime = groupParts
+            print()
+            print("Starting New Group....")
             print("UserId=%d, type=%s, dataTime=%s" % (userId, eventType,
                                                        dataTime.strftime('%Y-%m-%d %H:%M:%S')))
             #print(type(group))
-            #print(group[columnList])
+            print(group[columnList])
+            # non-zero length description
             taggedRows=group[group.desc.str.len()>0]
+            # description is not 'null'
+            taggedRows=taggedRows[~taggedRows.desc.str.contains("null")]
             if len(taggedRows.index)>0:
-                #print("Tagged Rows:")
-                #print(taggedRows[columnList])
+                print("Tagged Rows:")
+                print(taggedRows[columnList])
                 outputRows = taggedRows
             else:
-                #print("No tagged rows")
-                manualAlarmRows=group[group.osdAlarmState==5]
-                if len(manualAlarmRows.index)>0:
-                    #print("ManualAlarmRows:")
-                    #print(manualAlarmRows[columnList])
-                    outputRows = manualAlarmRows
+                print("No tagged rows")
+                alarmRows=group[group.osdAlarmState==2]
+                if len(alarmRows.index)>0:
+                    print("alarmRows:")
+                    print(alarmRows[columnList])
+                    outputRows = alarmRows
                 else:
-                    #print("No manual alarm rows")
+                    print("No alarm rows")
                     outputRows = group
 
             # Now just pick the middle row of the ouput rows list as the unique event.
             outputIndex = int(len(outputRows.index)/2)
             #print("len(outputRows)=%d, outputIndex=%d" % (len(outputRows), outputIndex))
-            #print("UniqueEvent=")
+            print("UniqueEvent=")
             eventRow = outputRows.iloc[[outputIndex]]
-            #print(eventRow[columnList])
+            print(eventRow[columnList])
             allUniqueEventsDf = allUniqueEventsDf.append(eventRow)
 
 
@@ -123,6 +147,26 @@ def listEvents(userId, credentialsFname="client.cfg", seizure=False,
         print("Unique TC Seizure Events (%d):" % len(tcUniqueEventsDf.index))
         print(tabulate.tabulate(tcUniqueEventsDf[columnList], headers=columnList, tablefmt='fancy_grid'))
 
+        fname = "%s_tcSeizures.csv" % outFile
+        tcUniqueEventsDf.to_csv(fname, index=False, columns=columnList)
+        print("Tonic-Clonic Seizure Events saved as %s" % fname)
+
+        fname = "%s_allSeizures.csv" % outFile
+        allSeizureUniqueEventsDf.to_csv(fname, index=False, columns=columnList)
+        print("All Seizure Events saved as %s" % fname)
+
+        fname = "%s_falseAlarms.csv" % outFile
+        falseAlarmUniqueEventsDf.to_csv(fname, index=False, columns=columnList)
+        print("False Alarm Events saved as %s" % fname)
+
+        fname = "%s_unknownEvents.csv" % outFile
+        unknownUniqueEventsDf.to_csv(fname, index=False, columns=columnList)
+        print("Unknown Events saved as %s" % fname)
+
+        fname = "%s_allEvents.csv" % outFile
+        allUniqueEventsDf.to_csv(fname, index=False, columns=columnList)
+        print("All Events saved as %s" % fname)
+        
         #print(tcUniqueEventsDf, tcUniqueEventsDf.columns)
     else:
         for eventObj in eventLst:
@@ -158,6 +202,9 @@ if (__name__=="__main__"):
     parser.add_argument('--tc', action='store_true',
                         help="List only tonic-clonic seizure events")
     parser.add_argument('--unique',action='store_true', help='List only unique events (events from the same user within 5 minutes are assumed to be part of the same event')
+    parser.add_argument('--out', default="listEvents",
+                        help='root of output filenames')
+    
     argsNamespace = parser.parse_args()
     args = vars(argsNamespace)
     print(args)
@@ -165,4 +212,5 @@ if (__name__=="__main__"):
     print("Analysing False Alarms for User %s" % args['user'])
     listEvents(args['user'], args['config'],
                seizure=args['seizure'], tc=args['tc'], unique=args['unique'],
+               outFile=args['out'],
                download=not args['nodownload'], debug=args['debug'])
