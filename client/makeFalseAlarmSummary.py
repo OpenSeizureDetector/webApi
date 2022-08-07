@@ -22,15 +22,17 @@ def getFname(userId):
     return fname
 
 
-
-def makeFalseAlarmSummary(userId, credentialsFname="client.cfg", download=False, maxEvents=10000, debug=False):
-    osd = libosd.webApiConnection.WebApiConnection(cfg=credentialsFname,
+def getFalseAlarmDf(userId, credFname="client.cfg",
+                    includeUnknowns=False,
+                    download=False,
+                    debug=False):
+    osd = libosd.webApiConnection.WebApiConnection(cfg=credFname,
                                                    download=download,
                                                    debug=debug)
     if (userId=="all"):
-        eventLst = osd.getEvents(userId=None, includeDatapoints=True)
+        eventLst = osd.getEvents(userId=None, includeDatapoints=False)
     else:
-        eventLst = osd.getEvents(userId=userId, includeDatapoints=True)
+        eventLst = osd.getEvents(userId=userId, includeDatapoints=False)
 
     print("Loaded %d Events" % len(eventLst))
 
@@ -38,30 +40,83 @@ def makeFalseAlarmSummary(userId, credentialsFname="client.cfg", download=False,
     df = pd.DataFrame(eventLst)
     df = df.fillna('unclassified')
     df['dataTime'] = pd.to_datetime(df['dataTime'])
-    print(df[['id','userId','dataTime','osdAlarmState','type']])
+    # We need to rename column 'type' because 'type' is a python keyword
+    df['eventType'] = df['type']
+    df = df.drop('type', axis=1)
+    #print(df[['id','userId','dataTime','osdAlarmState','eventType']])
 
     # False Alarms
-    dfSummary = df.query('osdAlarmState!=1').groupby([
-        df['userId'],
+    # Ignore warnings.   Include events explicitly tagge as false alarm
+    if (includeUnknowns):
+        queryStr = 'osdAlarmState!=1 and (eventType=="False Alarm" or eventType=="Unknown")'
+    else:
+        queryStr = 'osdAlarmState!=1 and (eventType=="False Alarm")'
+    df = df.query(queryStr)
+    df=df.query("not(desc.str.lower().str.contains('test'))")
+
+    return(df)
+
+
+def extractValue(keyStr, row):
+    #print("extractValue - row=",row,type(row))
+    if ('dataJSON' in row):
+        #print("dataJSON=%s" % row['dataJSON'])
+        try:
+            dataObj = json.loads(row['dataJSON'])
+            if (keyStr in dataObj.keys()):
+                val = dataObj[keyStr]
+                #print("Extracted %s" % str(val))
+            else:
+                #print("extractValue ERROR - %s is not in dataObj" % keyStr)
+                val = None
+        except json.JSONDecodeError:
+            #print("decode Error")
+            val = None
+    else:
+        #print("extractValue ERROR - dataJSON is not in row", row)
+        val = None
+    return val
+
+def addOsdColumns(df):
+    """adds some extra columns for the OSD algorithm to dataframe DF
+    by querying the dataJSON string for each event.
+    """
+    df['alarmThresh'] = df.apply(lambda row: extractValue('alarmThresh',row), axis=1)
+    df['alarmRatioThresh'] = df.apply(lambda row: extractValue('alarmRatioThresh',row), axis=1)
+    df['phoneAppVersion'] = df.apply(lambda row: extractValue('phoneAppVersion',row), axis=1)
+    df['watchAppVersion'] = df.apply(lambda row: extractValue('watchSdVersion',row), axis=1)
+
+    #print(df)
+    return df
+
+
+def makeFalseAlarmSummary(userId, credentialsFname="client.cfg", download=False, maxEvents=10000, debug=False):
+    columnLst = ['id','userId','dataTime','osdAlarmState','eventType','alarmThresh', 'alarmRatioThresh', 'phoneAppVersion', 'watchAppVersion', 'desc']
+    df = getFalseAlarmDf(userId, credentialsFname,
+                         includeUnknowns=False,
+                         download=download,
+                         debug=debug)
+    df = addOsdColumns(df)
+    print(df.columns)
+    print(df[columnLst])
+    df = getFalseAlarmDf(userId, credentialsFname,
+                         includeUnknowns=True,
+                         download=download,
+                         debug=debug)
+    df = addOsdColumns(df)
+    print(df[columnLst])
+
+    dfSummary = df.groupby([
+        'userId',
+        'alarmThresh',
+        #df['userId'],
         pd.Grouper(key='dataTime', freq='W-MON'),
-        #df['dataTime'].dt.floor('d'),
-        df['type'],
-        df['osdAlarmState']
+        #df['eventType'],
+        #df['osdAlarmState']
     ]).size()
-    print("Alarms")
     print(dfSummary)
     print()
 
-    # Warnings
-    dfSummary = df.groupby([
-        df['userId'],
-        pd.Grouper(key='dataTime', freq='W-MON'),
-        #df['dataTime'].dt.floor('W'),
-        df['type'],
-        df['osdAlarmState']
-    ]).size()
-    print("Warnings")
-    print(dfSummary)
     
         
     return
