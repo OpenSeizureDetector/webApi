@@ -83,24 +83,24 @@ def listEvents(userId, credentialsFname="client.cfg", seizure=False,
             userId, eventType, dataTime = groupParts
             print()
             print("Starting New Group....")
-            print("UserId=%d, type=%s, dataTime=%s" % (userId, eventType,
-                                                       dataTime.strftime('%Y-%m-%d %H:%M:%S')))
+            #print("UserId=%d, type=%s, dataTime=%s" % (userId, eventType,
+            #                                           dataTime.strftime('%Y-%m-%d %H:%M:%S')))
             #print(type(group))
-            print(group[columnList])
+            #print(group[columnList])
             # non-zero length description
             taggedRows=group[group.desc.str.len()>0]
             # description is not 'null'
             taggedRows=taggedRows[~taggedRows.desc.str.contains("null")]
             if len(taggedRows.index)>0:
                 print("Tagged Rows:")
-                print(taggedRows[columnList])
+                #print(taggedRows[columnList])
                 outputRows = taggedRows
             else:
                 print("No tagged rows")
                 alarmRows=group[group.osdAlarmState==2]
                 if len(alarmRows.index)>0:
                     print("alarmRows:")
-                    print(alarmRows[columnList])
+                    #print(alarmRows[columnList])
                     outputRows = alarmRows
                 else:
                     print("No alarm rows")
