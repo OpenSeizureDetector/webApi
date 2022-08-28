@@ -9,8 +9,9 @@ import dateutil.parser
 import numpy as np
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-import libosd.analyse_event
+#import libosd.analyse_event
 import libosd.webApiConnection
+import libosd.osdDbConnection
 
 def dateStr2secs(dateStr):
     ''' Convert a string representation of date/time into seconds from
@@ -32,13 +33,20 @@ def dp2rawData(dp):
     dataObj = json.loads(dpObj['dataJSON'])
     # Create raw data list
     accelLst = []
+    accelLst3d = []
     # FIXME:  It is not good to hard code the length of an array!
     for n in range(0,125):
         accelLst.append(dataObj['rawData'][n])
+        if ("data3D" in dataObj.keys()):
+            print("3dData present")
+            accelLst3d.append(dataObj['rawData3D'][n*3])
+            accelLst3d.append(dataObj['rawData3D'][n*3 + 1])
+            accelLst3d.append(dataObj['rawData3D'][n*3 + 2])
 
     rawDataObj = {"dataType": "raw", "Mute": 0}
     rawDataObj['HR'] = dataObj['hr']
     rawDataObj['data'] = accelLst
+    rawDataObj['data3D'] = accelLst3d
     # FIXME - add o2sat
     dataJSON = json.dumps(rawDataObj)
     return dataJSON
@@ -46,10 +54,19 @@ def dp2rawData(dp):
 
 def runTest(configObj, outFile="trOutput.csv", debug=False):
     print("runTest - configObj="+json.dumps(configObj))
-    osd = libosd.webApiConnection.WebApiConnection(
-        cfg=configObj['credentialsFname'],
-        download=configObj['download'],
-        debug=debug)
+
+    if (configObj['download']):
+        # Use the live API
+        osd = libosd.webApiConnection.WebApiConnection(
+            cfg=configObj['credentialsFname'],
+            download=configObj['download'],
+            debug=debug)
+    else:
+        osd = libosd.osdDbConnection.OsdDbConnection(debug=debug)
+        for fname in configObj['dbFiles']:
+            eventsObjLen = osd.loadDbFile(fname)
+        print("eventsObjLen=%d" % eventsObjLen)
+
     
     # Create an instance of the relevant Algorithm class for each algorithm
     # specified in the configuration file.

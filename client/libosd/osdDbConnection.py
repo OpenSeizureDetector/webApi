@@ -11,6 +11,19 @@ def dateStr2secs(dateStr):
     parsed_t = dateutil.parser.parse(dateStr)
     return parsed_t.timestamp()
 
+def extractJsonVal(row, elem, debug=False):
+    if (debug): print("extractJsonVal(): row=",row)
+    dataJSON = row['dataJSON']
+    if (dataJSON is not None):
+        if (debug): print("extractJsonVal(): dataJSON=",dataJSON)
+        dataObj = json.loads(dataJSON)
+        if (elem in dataObj.keys()):
+            elemVal = dataObj[elem]
+        else:
+            elemVal = None
+    else:
+        elemVal = None
+    return(elemVal)
 
 class OsdDbConnection:
     DEBUG = False
@@ -49,12 +62,24 @@ class OsdDbConnection:
 
     def listEvents(self):
         for event in self.eventsLst:
+<<<<<<< HEAD
             print("%d, %s, %d, %s, %s, %s" %
+=======
+            phoneAppVersion = extractJsonVal(event,"phoneAppVersion",False)
+            dataSource = extractJsonVal(event,"dataSourceName",False)
+            watchSdName =extractJsonVal(event,"watchSdName",False)
+            watchSdVersion =extractJsonVal(event,"watchSdVersion",False)
+            print("%d, %s, %d, %s, %s, %s, %s, %s, %s, %s" %
+>>>>>>> upstream/master
                   (event['id'],
                    event['dataTime'],
                    event['userId'],
                    event['type'],
                    event['subType'],
+<<<<<<< HEAD
+=======
+                   phoneAppVersion,dataSource, watchSdName, watchSdVersion,
+>>>>>>> upstream/master
                    event['desc']
                    ))
 
@@ -62,10 +87,17 @@ class OsdDbConnection:
 if (__name__ == "__main__"):
     print("libosd.osdDbConnection.main()")
     osd = OsdDbConnection(debug=True)
+<<<<<<< HEAD
     eventsObjLen = osd.loadDbFile("osdb_tcSeizures.json")
     eventsObjLen = osd.loadDbFile("osdb_allSeizures.json")
     eventsObjLen = osd.loadDbFile("osdb_falseAlarms.json")
     eventsObjLen = osd.loadDbFile("osdb_unknownEvents.json")
+=======
+    #eventsObjLen = osd.loadDbFile("osdb_tcSeizures.json")
+    #eventsObjLen = osd.loadDbFile("osdb_allSeizures.json")
+    eventsObjLen = osd.loadDbFile("osdb_falseAlarms.json")
+    #eventsObjLen = osd.loadDbFile("osdb_unknownEvents.json")
+>>>>>>> upstream/master
     osd.listEvents()
     print("eventsObjLen=%d" % eventsObjLen)
     #eventsObjLen = osd.getEvents()
