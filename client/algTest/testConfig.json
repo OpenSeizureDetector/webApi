@@ -1,7 +1,22 @@
 {
-    "testName": "Test Configuration Test",
-    "eventsList2": [ 5745, 5486 ],
-    "eventsList": [ 5745, 5726, 5640, 5580, 5486, 5483, 5254 ],
+    "testName": "Unique Events from DB 04aug2022",
+    "eventsList_ALL_Seizures below": 0,
+    "eventsList": [
+	407, 764, 887, 1851, 1934, 4924, 5483, 5610,
+	5705, 6897, 7778, 8800, 1046, 5031, 5087,
+	5256, 5288, 5582, 5630, 5640, 5725, 5738,
+	5750, 5892, 5889, 
+	6476, 6589, 6592, 6668, 6716, 6733, 6762, 6767, 6811,
+	6847, 6894, 7010, 7038, 7047, 7123, 7217, 7258,
+	7264, 7363, 7438, 7447, 7823, 8726, 8420, 8740, 8875, 8970,
+	9002, 9402, 9470, 5596, 5595, 7357, 8663, 9629, 9828 ],
+    "eventsList_TC below": 0,
+    "eventsList_TC": [
+	5483, 7778, 5256, 5582, 5640, 5750, 5892, 5889,
+	6476, 6592, 6668, 6733, 7047, 7258, 7264,
+	7363, 7823, 8726, 8420, 8740, 8875, 8970,
+	9402 ],
+    "invalidEvents": [5887],
     "algorithms": [
 	{
 	    "name": "OSD_Orig",
@@ -14,17 +29,9 @@
 		"alarmThresh" : 100,
 		"alarmRatioThresh" : 57,
 		"warnTime": 5,
-		"alarmTime": 5
-            }
-	},
-	{
-	    "name": "Physical_Device",
-	    "alg": "deviceAlg.DeviceAlg",
-	    "settings" : {
-		"ipAddr": "192.168.0.100"
+		"alarmTime": 10
             }
 	}
-
     ],
     "download": true,
     "credentialsFname": "../client.cfg"

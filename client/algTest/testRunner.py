@@ -44,7 +44,7 @@ def dp2rawData(dp):
     return dataJSON
 
 
-def runTest(configObj, debug=False):
+def runTest(configObj, outFile="trOutput.csv", debug=False):
     print("runTest - configObj="+json.dumps(configObj))
     osd = libosd.webApiConnection.WebApiConnection(
         cfg=configObj['credentialsFname'],
@@ -83,29 +83,32 @@ def runTest(configObj, debug=False):
         eventId = configObj['eventsList'][eventNo]
         print("Analysing event %s" % eventId)
         eventObj = osd.getEvent(eventId, includeDatapoints=True)
-        print(eventObj.keys())
+        #print(eventObj.keys())
         for algNo in range(0, nAlgs):
             alg = algs[algNo]
             print("Processing Algorithm %d (%s): " % (algNo, alg.__class__.__name__))
+            alg.resetAlg()
             sys.stdout.write("Looping through Datapoints: ")
             for dp in eventObj['datapoints']:
-                sys.stdout.write(".")
-                sys.stdout.flush()
                 retVal = alg.processDp(dp2rawData(dp))
                 #print(alg.__class__.__name__, retVal)
                 retObj = json.loads(retVal)
                 statusVal = retObj['alarmState']
                 results[eventNo][algNo][statusVal] += 1
+                sys.stdout.write("%d" % statusVal)
+                sys.stdout.flush()
             sys.stdout.write("\n")
             sys.stdout.flush()
-    print(results)
+    #print(results)
 
-
+    outf = open(outFile,"w")
     lineStr = "eventId, type, subType, "
     for algNo in range(0,nAlgs):
         lineStr = "%s, %s" % (lineStr, algNames[algNo])
-    lineStr = "%s, desc" % lineStr
+    lineStr = "%s, reported, desc" % lineStr
     print(lineStr)
+    outf.write(lineStr)
+    outf.write("\n")
     
     for eventNo in range(0,nEvents):
         eventId = configObj['eventsList'][eventNo]
@@ -117,15 +120,24 @@ def runTest(configObj, debug=False):
             elif results[eventNo][algNo][1] > 0:
                 lineStr = "%s, WARN" % (lineStr)
             else:
-                lineStr = "%s, ----" % (lineStr) 
+                lineStr = "%s, ----" % (lineStr)
+        alarmPhrases = ['OK','WARN','ALARM','FALL','unused','MAN_ALARM']
+        lineStr = "%s, %s" % (lineStr, alarmPhrases[eventObj['osdAlarmState']])
         lineStr = "%s, %s" % (lineStr, eventObj['desc'])
         print(lineStr)
+        outf.write(lineStr)
+        outf.write("\n")
+    outf.close()
+    print("Output written to file %s" % outFile)
+        
         
 def main():
     print("testRunner.main()")
     parser = argparse.ArgumentParser(description='Seizure Detection Test Runner')
     parser.add_argument('--config', default="testConfig.json",
                         help='name of json file containing test configuration')
+    parser.add_argument('--out', default="trOutput.csv",
+                        help='name of output CSV file')
     parser.add_argument('--debug', action="store_true",
                         help='Write debugging information to screen')
     argsNamespace = parser.parse_args()
@@ -136,7 +148,7 @@ def main():
     inFile = open(args['config'],'r')
     configObj = json.load(inFile)
     inFile.close()
-    runTest(configObj, args['debug'])
+    runTest(configObj, args['out'], args['debug'])
     
 
 

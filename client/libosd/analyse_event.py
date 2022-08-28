@@ -218,7 +218,7 @@ class EventAnalyser:
         ax[0].plot(self.analysisTimestampLst, self.roiPowerLst)
         ax[0].plot(self.analysisTimestampLst, self.alarmThreshLst)
         ax[0].legend(['Spectrum Power','ROI Power', 'ROI Power Threshold'])
-        ax[0].set_ylim(0,max(self.alarmThreshLst)*5)
+        ax[0].set_ylim(0,max(self.alarmThreshLst)*10)
         ax[0].set_ylabel("Average Power per bin")
         ax[0].set_title("Spectrum / ROI Powers")
         ax[0].grid(True)
@@ -366,7 +366,7 @@ class EventAnalyser:
         f.write(json.dumps(dataPointsObj))
         f.close
 
-        osdAppConnection = osdAppConnection.OsdAppConnection(addr)
+        osd = libosd.osdAppConnection.OsdAppConnection(addr)
 
         for dp in dataPointsObj:
             currTs = dateStr2secs(dp['dataTime'])
@@ -377,17 +377,26 @@ class EventAnalyser:
             
             # Create raw data list
             accelLst = []
+            accelLst3D = []
             # FIXME:  IT is not good to hard code the length of an array!
             for n in range(0,125):
                 accelLst.append(dataObj['rawData'][n])
+                if ('rawData3D' in dataObj.keys()):
+                    accelLst3D.append(dataObj['rawData3D'][3*n])
+                    accelLst3D.append(dataObj['rawData3D'][3*n + 1])
+                    accelLst3D.append(dataObj['rawData3D'][3*n + 2])
+                else:
+                    # No 3D data available so do not send it.
+                    pass
 
             rawDataObj = {"dataType": "raw", "Mute": 0}
             rawDataObj['HR'] = dataObj['hr']
             rawDataObj['data'] = accelLst
+            rawDataObj['data3D'] = accelLst3D
             # FIXME - add o2sat
             dataJSON = json.dumps(rawDataObj)
             print(dp['dataTime'],dataJSON)
-            osdAppConnection.sendData(dataJSON)
+            osd.sendData(dataJSON)
             time.sleep(5)
         
             

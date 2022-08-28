@@ -14,7 +14,6 @@ import libosd.analyse_event
 import libosd.webApiConnection
 
 
-
 def makeEventSummary(eventId,configFname):
     analyser = libosd.analyse_event.EventAnalyser(configFname=args['config'])
     outDir = os.path.join("output","Event_%d_summary" % eventId)
@@ -121,6 +120,7 @@ if (__name__=="__main__"):
         if (args['test'] is not None):
             print("Running Event Number %d on test server %s" %
                   (int(args['event']), args['test']))
+            analyser = libosd.analyse_event.EventAnalyser(configFname=args['config'])
             analyser.testEvent(int(args['event']), args['test'])
         else:
             print("Analysing Event Number %d" % int(args['event']))

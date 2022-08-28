@@ -115,6 +115,9 @@ class WebApiConnection:
         # Return just the events list, unless includeDatapoints is True.
         if includeDatapoints == False:
             print("includeDatapoints is False - returning list of events without datapoints")
+            # Cache the data in case we need it next time
+            if (self.saveCache):
+                self.saveEventsCache(eventsObj)
             return eventsObj
 
         eventLst = []
