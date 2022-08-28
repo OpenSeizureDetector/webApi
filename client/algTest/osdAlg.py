@@ -38,8 +38,11 @@ class OsdAlg(sdAlg.SdAlg):
 
 
     def getAccelDataFromJson(self,jsonStr):
-        jsonObj = json.loads(jsonStr)
-        accData = jsonObj['data']
+        if (jsonStr is not None):
+            jsonObj = json.loads(jsonStr)
+            accData = jsonObj['data']
+        else:
+            accData = None
         return(accData)
         
     def freq2fftBin(self,freq):
@@ -102,7 +105,10 @@ class OsdAlg(sdAlg.SdAlg):
         #self.logD("OsdAlg.processDp: dpStr=%s." % dpStr)
         #print(dpStr)
         accData = self.getAccelDataFromJson(dpStr)
-        inAlarm = self.getAlarmState(accData)
+        if (accData is not None):
+            inAlarm = self.getAlarmState(accData)
+        else:
+            inAlarm = 0
 
         if (inAlarm):
             #print("inAlarm - roiPower=%f, roiRatio=%f" % (roiPower, roiRatio))

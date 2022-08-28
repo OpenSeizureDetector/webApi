@@ -35,7 +35,7 @@ class OsdDbConnection:
     cacheFname = "osdb"  # base of filename
     download = True
     maxEvents = 10000
-    eventsLst = []
+    
 
     def __init__(self, cacheDir = None, debug=False):
         self.DEBUG = debug
@@ -45,6 +45,7 @@ class OsdDbConnection:
 
         if (self.DEBUG): print("cacheDir=%s, debug=%s" %
               (self.cacheDir, self.DEBUG))
+        self.eventsLst = []
 
     def loadDbFile(self, fname):
         ''' Retrieve a list of events data from a json file
@@ -64,6 +65,24 @@ class OsdDbConnection:
         print("Event not found in cache")
         return None
 
+    def getEventIds(self):
+        """ Returns a list of all the eventIds in the database.
+        """
+        eventIdsLst = []
+        for event in self.eventsLst:
+            eventIdsLst.append(event['id'])
+        return eventIdsLst
+            
+
+    def removeEvents(self, invalidLst):
+        for evId in invalidLst:
+            print("removeEvents: evId=%s" % evId)
+            for event in self.eventsLst:
+                if (event['id'] == evId):
+                    print("Removing event Id %s" % evId)
+                    self.eventsLst.remove(event)
+
+    
     def listEvents(self):
         for event in self.eventsLst:
             phoneAppVersion = extractJsonVal(event,"phoneAppVersion",False)

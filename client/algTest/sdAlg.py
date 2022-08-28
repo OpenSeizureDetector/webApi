@@ -4,8 +4,6 @@ import json
 import dateutil.parser
 
 class SdAlg:
-    DEBUG = False
-    settingsObj = None
     def __init__(self, settingsStr, debug=False):
         self.DEBUG = debug
         self.logD("SdAlg.__init__(): settingsStr=%s (%s)"
