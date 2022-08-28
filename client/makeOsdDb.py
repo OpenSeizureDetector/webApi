@@ -41,14 +41,10 @@ def extractJsonVal(row, elem, debug=False):
     if (dataJSON is not None):
         if (debug): print("extractJsonVal(): dataJSON=",dataJSON)
         dataObj = json.loads(dataJSON)
-<<<<<<< HEAD
-        elemVal = dataObj[elem]
-=======
         if (elem in dataObj.keys()):
             elemVal = dataObj[elem]
         else:
             elemVal = None
->>>>>>> upstream/master
     else:
         elemVal = None
     return(elemVal)
