@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { url } from '../../constants';
+import { Event } from '../../types/Event';
 
 export class EventRepository {
     token: string;
@@ -19,7 +20,9 @@ export class EventRepository {
             });
 
             if (response.status === 200) {
-                return response.data;
+                return response.data.map((dataPoint: Event) => {
+                    return { ...dataPoint, date: new Date(dataPoint.dataTime) };
+                });
             }
             return [];
         } catch (e) {

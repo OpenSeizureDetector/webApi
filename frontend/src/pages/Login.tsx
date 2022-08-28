@@ -5,12 +5,14 @@ import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { useContext, useReducer } from 'react';
+import { useContext, useReducer, useState } from 'react';
 import { AuthRepository } from '../data/auth/authRepository';
 import { AuthStateContext } from '../context/AuthStateContext';
+import { CircularProgress } from '@mui/material';
 
 export const Login = () => {
     const [state, dispatch] = useReducer(reducer, initialState);
+    const [isLoading, setIsLoading] = useState(false);
     const { login } = useContext(AuthStateContext);
 
     const handleUsernameChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
@@ -29,7 +31,9 @@ export const Login = () => {
 
     const handleLogin = async (event: React.FormEvent<HTMLInputElement>) => {
         event.preventDefault();
+        setIsLoading(true);
         const { code, message } = await new AuthRepository().signIn(state.username, state.password);
+        setIsLoading(false);
         if (code === '200' && login) {
             login(message);
         } else {
@@ -95,8 +99,16 @@ export const Login = () => {
                             },
                         }}
                     />
-                    <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
-                        Sign In
+                    <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        sx={{ mt: 3, mb: 2, height: 52 }}>
+                        {isLoading ? (
+                            <CircularProgress color="inherit" />
+                        ) : (
+                            <p style={{ margin: 0 }}>Sign In</p>
+                        )}
                     </Button>
                     <Box
                         sx={{
