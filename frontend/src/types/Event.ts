@@ -1,4 +1,5 @@
 import { AlarmState } from './AlarmState';
+import { EventType } from './EventType';
 
 export interface Event {
     id: number;
@@ -7,7 +8,7 @@ export interface Event {
     dataTime: string;
     date: Date;
     desc: string;
-    type: string;
+    type: EventType;
     subType: string;
     userId: number;
 }

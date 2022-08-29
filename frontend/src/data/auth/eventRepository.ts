@@ -26,6 +26,7 @@ export class EventRepository {
                         ...dataPoint,
                         date: new Date(dataPoint.dataTime),
                         alarmState: getAlarmState(dataPoint.osdAlarmState),
+                        type: dataPoint.type || 'Unknown',
                     };
                 });
             }

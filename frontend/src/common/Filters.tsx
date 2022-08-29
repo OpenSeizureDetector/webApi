@@ -1,6 +1,7 @@
 import { SelectChangeEvent } from '@mui/material';
 import { useData } from '../hooks/useData';
 import { AlarmState } from '../types/AlarmState';
+import { EventType } from '../types/EventType';
 import { MultiSelectDropdown } from './MultiSelectDropdown';
 
 export const Filters = () => {
@@ -10,6 +11,13 @@ export const Filters = () => {
         setFilters({
             ...filters,
             alarmState: event.target.value as AlarmState[],
+        });
+    };
+
+    const handleEventType = (event: SelectChangeEvent<string[]>) => {
+        setFilters({
+            ...filters,
+            eventType: event.target.value as EventType[],
         });
     };
 
@@ -27,6 +35,12 @@ export const Filters = () => {
                 options={Object.values(AlarmState)}
                 selected={filters.alarmState}
                 handleChange={handleAlarmState}
+            />
+            <MultiSelectDropdown
+                label="Event Type"
+                options={Object.values(EventType)}
+                selected={filters.eventType}
+                handleChange={handleEventType}
             />
         </div>
     );

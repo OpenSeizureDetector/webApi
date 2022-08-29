@@ -9,6 +9,7 @@ export const EventDataContext = createContext<EventDataState>({
     filteredData: [],
     filters: {
         alarmState: [],
+        eventType: [],
     },
     setFilters: () => {
         return;
@@ -20,6 +21,7 @@ export const EventDataProvider = (props: EventDataProviderProps) => {
     const [data, setData] = useState<Event[]>([]);
     const [filters, setFilters] = useState<Filters>({
         alarmState: [],
+        eventType: [],
     });
     const [filteredData, setFilteredData] = useState<Event[]>([]);
 
@@ -41,11 +43,17 @@ export const EventDataProvider = (props: EventDataProviderProps) => {
 
     useEffect(() => {
         setFilteredData(
-            data.filter((dataPoint: Event) =>
-                filters.alarmState.length === 0
-                    ? true
-                    : filters.alarmState.includes(dataPoint.alarmState)
-            )
+            data
+                .filter((dataPoint: Event) =>
+                    filters.alarmState.length === 0
+                        ? true
+                        : filters.alarmState.includes(dataPoint.alarmState)
+                )
+                .filter((dataPoint: Event) =>
+                    filters.eventType.length === 0
+                        ? true
+                        : filters.eventType.includes(dataPoint.type)
+                )
         );
     }, [data, filters]);
 
