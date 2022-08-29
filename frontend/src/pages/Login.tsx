@@ -5,15 +5,15 @@ import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { useContext, useReducer, useState } from 'react';
+import { useReducer, useState } from 'react';
 import { AuthRepository } from '../data/auth/authRepository';
-import { AuthStateContext } from '../context/AuthStateContext';
 import { CircularProgress } from '@mui/material';
+import { useAuth } from '../hooks/useAuth';
 
 export const Login = () => {
     const [state, dispatch] = useReducer(reducer, initialState);
     const [isLoading, setIsLoading] = useState(false);
-    const { login } = useContext(AuthStateContext);
+    const { login } = useAuth();
 
     const handleUsernameChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
         dispatch({

@@ -1,15 +1,16 @@
 import { Box, CircularProgress, Typography } from '@mui/material';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { GridColDef } from '@mui/x-data-grid';
 import { OSDAppBar } from '../common/AppBar';
 import { Filters } from '../common/Filters';
 import { renderCellExpand } from '../common/GridCellExpand';
 import { useData } from '../hooks/useData';
+import { StyledDataGrid } from '../theme/StyledDataGrid';
 
 export const Home = () => {
-    const { data, isLoading } = useData();
+    const { filteredData, isLoading } = useData();
 
     const columns: GridColDef[] = [
-        { field: 'id', headerName: 'ID' },
+        { field: 'id', headerName: 'ID', sortable: false, headerClassName: 'table-header' },
         {
             field: 'date',
             headerName: 'Date',
@@ -70,16 +71,19 @@ export const Home = () => {
                     <Typography>Loading data.... This may take some time.</Typography>
                 </div>
             ) : (
-                <div style={{ height: 'calc(100vh - 136px)', width: '100%' }}>
+                <div style={{ height: 'calc(100vh - 160px)', width: '100%' }}>
                     <Filters />
-                    <DataGrid
-                        rows={data}
+                    <StyledDataGrid
+                        rows={filteredData}
                         columns={columns}
                         pageSize={50}
                         rowsPerPageOptions={[50]}
                         disableColumnFilter
                         disableSelectionOnClick
                         disableColumnMenu
+                        getRowClassName={(params) =>
+                            params.indexRelativeToCurrentPage % 2 === 0 ? 'even-row' : 'odd-row'
+                        }
                     />
                 </div>
             )}

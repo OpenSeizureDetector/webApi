@@ -6,44 +6,21 @@ import FormControl from '@mui/material/FormControl';
 import ListItemText from '@mui/material/ListItemText';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Checkbox from '@mui/material/Checkbox';
-import { useState } from 'react';
-
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
 
 export const MultiSelectDropdown = (props: MultiSelectDropdownProps) => {
-    const [selected, setSelected] = useState<string[]>([]);
-
-    const handleChange = (event: SelectChangeEvent<typeof props.options>) => {
-        const {
-            target: { value },
-        } = event;
-        setSelected(typeof value === 'string' ? value.split(',') : value);
-    };
-
     return (
         <div>
             <FormControl sx={{ m: 1, width: 300 }}>
-                <InputLabel id="demo-multiple-checkbox-label">{props.label}</InputLabel>
+                <InputLabel>{props.label}</InputLabel>
                 <Select
-                    labelId="demo-multiple-checkbox-label"
-                    id="demo-multiple-checkbox"
                     multiple
-                    value={selected}
-                    onChange={handleChange}
+                    value={props.selected}
+                    onChange={props.handleChange}
                     input={<OutlinedInput label={props.label} />}
-                    renderValue={(selected) => selected.join(', ')}
-                    MenuProps={{
-                        PaperProps: {
-                            style: {
-                                maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-                                width: 250,
-                            },
-                        },
-                    }}>
+                    renderValue={(selected: string[]) => selected.join(', ')}>
                     {props.options.map((option) => (
                         <MenuItem key={option} value={option}>
-                            <Checkbox checked={selected.indexOf(option) > -1} />
+                            <Checkbox checked={props.selected.indexOf(option) > -1} />
                             <ListItemText primary={option} />
                         </MenuItem>
                     ))}
@@ -56,4 +33,6 @@ export const MultiSelectDropdown = (props: MultiSelectDropdownProps) => {
 interface MultiSelectDropdownProps {
     options: string[];
     label: string;
+    selected: string[];
+    handleChange: (event: SelectChangeEvent<string[]>) => void;
 }

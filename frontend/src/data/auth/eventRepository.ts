@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { url } from '../../constants';
+import { getAlarmState } from '../../types/AlarmState';
 import { Event } from '../../types/Event';
 
 export class EventRepository {
@@ -21,7 +22,11 @@ export class EventRepository {
 
             if (response.status === 200) {
                 return response.data.map((dataPoint: Event) => {
-                    return { ...dataPoint, date: new Date(dataPoint.dataTime) };
+                    return {
+                        ...dataPoint,
+                        date: new Date(dataPoint.dataTime),
+                        alarmState: getAlarmState(dataPoint.osdAlarmState),
+                    };
                 });
             }
             return [];
