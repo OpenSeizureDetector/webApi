@@ -50,18 +50,15 @@ def extractJsonVal(row, elem, debug=False):
     return(elemVal)
 
 
-def getUniqueEventsLIsts(userId, credentialsFname="client.cfg",
+def getUniqueEventsLists(configFname="osdb.cfg",
                outFile="listEvents",
-               download=True, debug=False):
-    osd = libosd.webApiConnection.WebApiConnection(cfg=credentialsFname,
-                                                   download=download,
+               debug=False):
+    cfgObj = libosd.loadConfig.loadConfig(configFname)
+    osd = libosd.webApiConnection.WebApiConnection(cfg=cfgObj['credentialsFname'],
+                                                   download=True,
                                                    debug=debug)
-    if (userId == "all"):
-        eventLst = osd.getEvents(userId=None, includeDatapoints=False)
-    else:
-        eventLst = osd.getEvents(userId=userId, includeDatapoints=False)
-
-    print("Loaded %d Events" % len(eventLst))
+    eventLst = osd.getEvents(userId=None, includeDatapoints=False)
+    print("Loaded %d Raw Events" % len(eventLst))
 
     # In this section we try to produce a list of unique events.
     # We select all events that are either
@@ -85,7 +82,9 @@ def getUniqueEventsLIsts(userId, credentialsFname="client.cfg",
     # drop the dataJSON column because we do not need it.
     df=df.drop('dataJSON', axis=1)
     # Filter out warnings (unless they are tagged as a seizure) and tests.
+    print("Filtering out warnings (unless they are associated with a seizure)")
     df=df.query("type=='Seizure' or osdAlarmState!=1")
+    print("Filterig out events described as 'test'")
     df=df.query("not(desc.str.lower().str.contains('test'))")
     #print(df.columns)
     #print(df.dtypes)
@@ -104,7 +103,10 @@ def getUniqueEventsLIsts(userId, credentialsFname="client.cfg",
                   'desc']
 
     # Group the data by userID and time period
-    groupedDf=df.groupby(['userId','type',pd.Grouper(key='dataTime', freq='10min')])
+    print("Grouping into periods of %s" % cfgObj['groupingPeriod'])
+    groupedDf=df.groupby(['userId','type',pd.Grouper(
+        key='dataTime',
+        freq=cfgObj['groupingPeriod'])])
 
     # Loop through the grouped data
     for groupParts, group in groupedDf:
@@ -153,7 +155,7 @@ def getUniqueEventsLIsts(userId, credentialsFname="client.cfg",
             unknownUniqueEventsDf = unknownUniqueEventsDf.append(eventRow)
 
 
-    if (debug): print("All Unique Events (%d):" % len(allUniqueEventsDf.index))
+    print("Number of Unique Events = %d" % len(allUniqueEventsDf.index))
     #print(tabulate(df, headers='keys', tablefmt='fancy_grid'))
     if (debug): print(tabulate.tabulate(allUniqueEventsDf[columnList], headers=columnList, tablefmt='fancy_grid'))
 
@@ -204,30 +206,35 @@ def getUniqueEventsLIsts(userId, credentialsFname="client.cfg",
            unknownUniqueEventsDf['id'].tolist())
 
 
-def getEventsFromList(eventsLst, credentialsFname="client.cfg",
+def getEventsFromList(eventsLst, configFname="client.cfg",
                       includeDatapoints=True, download=True, debug=False):
     """ Download the data for the evenst in evenstLst, returning a list of
     event Objects.
     """
-    osd = libosd.webApiConnection.WebApiConnection(cfg=credentialsFname,
+    cfgObj = libosd.loadConfig.loadConfig(configFname)
+    osd = libosd.webApiConnection.WebApiConnection(cfg=cfgObj['credentialsFname'],
                                                    download=download,
                                                    debug=debug)
     eventsObjLst = []
 
     for eventId in eventsLst:
-        print("Retrieving eventId %d" % eventId)
-        eventObj = osd.getEvent(eventId,
-                                includeDatapoints=includeDatapoints)
-        eventsObjLst.append(eventObj)
+        if (eventId in cfgObj['invalidEvents']):
+            print("event %s marked as invalid in config file - ignoring" % eventId)
+        else:
+            print("Retrieving eventId %d" % eventId)
+            eventObj = osd.getEvent(eventId,
+                                    includeDatapoints=includeDatapoints)
+            eventsObjLst.append(eventObj)
     return eventsObjLst
 
 
-def saveEventsAsJson(eventsLst, fname, credentialsFname,
-                     download=True, debug=False):
+def saveEventsAsJson(eventsLst, fname, configFname,
+                     debug=False):
+    #cfgObj = libosd.loadConfig.loadConfig(configFname)
     eventsObjLst = getEventsFromList(eventsLst,
-                                       credentialsFname=credentialsFname,
+                                       configFname=configFname,
                                        includeDatapoints=True,
-                                       download=download,
+                                       download=True,
                                        debug=debug)
     if (debug): print(eventsObjLst)
 
@@ -242,27 +249,21 @@ def saveEventsAsJson(eventsLst, fname, credentialsFname,
 if (__name__=="__main__"):
     print("makeOsdDb.py.main()")
     parser = argparse.ArgumentParser(description='Create an anonymised database of unique seizure-like events for distribution')
-    parser.add_argument('--config', default="client.cfg",
-                        help='name of json file containing configuration information and login credientials - see client.cfg.template')
-    parser.add_argument('--user', default=None,
-                        help='user ID number of user to be analysed')
-    parser.add_argument('--nodownload', action='store_true',
-                        help="Do not Download data from remote database - use local data instead")
+    parser.add_argument('--config', default="osdb.cfg",
+                        help='name of json file containing configuration information and login credientials - see osdb.cfg.template')
     parser.add_argument('--debug', action='store_true',
                         help="Write debugging information to screen")
-    parser.add_argument('--out', default="listEvents",
+    parser.add_argument('--out', default="osdb",
                         help='root of output filenames')
     
     argsNamespace = parser.parse_args()
     args = vars(argsNamespace)
     print(args)
 
-    print("Analysing False Alarms for User %s" % args['user'])
     (seizureEventsLst, tcEventsLst,
      falseAlarmEventsLst, unknownEventsLst) \
-     = getUniqueEventsLIsts(args['user'], args['config'],
+     = getUniqueEventsLists(args['config'],
                             outFile=args['out'],
-                            download=not args['nodownload'],
                             debug=args['debug'])
 
     if (args['debug']): print(tcEventsLst)
@@ -271,7 +272,6 @@ if (__name__=="__main__"):
     saveEventsAsJson(tcEventsLst,
                      fname,
                      args['config'],
-                     download=not args['nodownload'],
                      debug=args['debug'])
     print("Tonic Clonic Seizure Events Saved to %s" % fname)
 
@@ -279,7 +279,6 @@ if (__name__=="__main__"):
     saveEventsAsJson(seizureEventsLst,
                      fname, 
                      args['config'],
-                     download=not args['nodownload'],
                      debug=args['debug'])
     print("All Seizure Events Saved to %s" % fname)
     
@@ -287,7 +286,6 @@ if (__name__=="__main__"):
     saveEventsAsJson(falseAlarmEventsLst,
                      fname,
                      args['config'],
-                     download=not args['nodownload'],
                      debug=args['debug'])
     print("False Alarm Events Saved to %s" % fname)
 
@@ -295,7 +293,6 @@ if (__name__=="__main__"):
     saveEventsAsJson(unknownEventsLst,
                      fname,
                      args['config'],
-                     download=not args['nodownload'],
                      debug=args['debug'])
     print("Unknown Events Saved to %s" % fname)
     
