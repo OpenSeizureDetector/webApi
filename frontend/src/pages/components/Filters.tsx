@@ -36,8 +36,6 @@ export const Filters = () => {
         });
     };
 
-    console.log(filters.startDate);
-
     return (
         <div
             style={{

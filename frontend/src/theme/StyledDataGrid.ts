@@ -15,6 +15,9 @@ export const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
     '& .MuiDataGrid-columnHeaders': {
         borderRadius: 0,
     },
+    '& .MuiDataGrid-cell:focus': {
+        outline: 'none',
+    },
     '& .odd-row': {
         backgroundColor: '#E0E0E0',
         '&:hover': {
