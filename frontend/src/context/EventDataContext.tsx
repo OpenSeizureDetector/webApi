@@ -54,6 +54,12 @@ export const EventDataProvider = (props: EventDataProviderProps) => {
                         ? true
                         : filters.eventType.includes(dataPoint.type)
                 )
+                .filter((dataPoint: Event) =>
+                    filters.startDate ? filters.startDate < dataPoint.date : true
+                )
+                .filter((dataPoint: Event) =>
+                    filters.endDate ? filters.endDate > dataPoint.date : true
+                )
         );
     }, [data, filters]);
 
