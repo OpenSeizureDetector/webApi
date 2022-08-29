@@ -39,6 +39,11 @@ def extractJsonVal(row, elem, debug=False):
     if (debug): print("extractJsonVal(): row=",row)
     dataJSON = row['dataJSON']
     if (dataJSON is not None):
+        if (debug): print("extractJsonVal(): dataJSON=",dataJSON,
+                          "length=",len(dataJSON))
+    else:
+        if (debug): print("extractJsonVal(): dataJSON is None")
+    if (dataJSON is not None and dataJSON != ''):
         if (debug): print("extractJsonVal(): dataJSON=",dataJSON)
         dataObj = json.loads(dataJSON)
         if (elem in dataObj.keys()):
@@ -53,6 +58,13 @@ def extractJsonVal(row, elem, debug=False):
 def getUniqueEventsLists(configFname="osdb.cfg",
                outFile="listEvents",
                debug=False):
+    # Create empty dataframes for the different classes of events
+    allUniqueEventsDf = pd.DataFrame()
+    tcUniqueEventsDf = pd.DataFrame()
+    allSeizureUniqueEventsDf = pd.DataFrame()
+    falseAlarmUniqueEventsDf = pd.DataFrame()
+    unknownUniqueEventsDf = pd.DataFrame()
+
     cfgObj = libosd.loadConfig.loadConfig(configFname)
     osd = libosd.webApiConnection.WebApiConnection(cfg=cfgObj['credentialsFname'],
                                                    download=True,
@@ -70,6 +82,7 @@ def getUniqueEventsLists(configFname="osdb.cfg",
     # We then select the 'best' event from within the group and add that to the list.  The
     #   'best' event is one that either
     #    - contains a text description
+    #    - is the first alarm initiation
     #    - is a manual alarm
     #    - Otherwise the middle event in the time period is used.
     #print(eventLst)
@@ -77,29 +90,27 @@ def getUniqueEventsLists(configFname="osdb.cfg",
     # Read the event list into a pandas data frame.
     df = pd.read_json(json.dumps(eventLst))
     df['dataTime'] = pd.to_datetime(df['dataTime'])
-    # FIXME - this crashes!
-    #df['dataSource'] = df.apply(lambda row: extractJsonVal(row,'dataSource'), axis = 1)
+    # Add some extra metadata to the event records.
+    df['phoneAppVersion'] = df.apply(lambda row: extractJsonVal(row,'phoneAppVersion', debug=False), axis = 1)
+    df['dataSource'] = df.apply(lambda row: extractJsonVal(row,'dataSourceName', debug=False), axis = 1)
+    df['watchAppVersion'] = df.apply(lambda row: extractJsonVal(row,'watchSdVersion', debug=False), axis = 1)
     # drop the dataJSON column because we do not need it.
     df=df.drop('dataJSON', axis=1)
     # Filter out warnings (unless they are tagged as a seizure) and tests.
-    print("Filtering out warnings (unless they are associated with a seizure)")
-    df=df.query("type=='Seizure' or osdAlarmState!=1")
-    print("Filterig out events described as 'test'")
+
+    
+    if not cfgObj['includeWarnings']:
+        print("Filtering out warnings (unless they are associated with a seizure)")
+        df=df.query("type=='Seizure' or osdAlarmState!=1")
+    print("Filtering out events described as 'test'")
     df=df.query("not(desc.str.lower().str.contains('test'))")
-    #print(df.columns)
-    #print(df.dtypes)
-    #print(df.describe())
-    #print(df.dtypes)
-    allUniqueEventsDf = pd.DataFrame()
-    tcUniqueEventsDf = pd.DataFrame()
-    allSeizureUniqueEventsDf = pd.DataFrame()
-    falseAlarmUniqueEventsDf = pd.DataFrame()
-    unknownUniqueEventsDf = pd.DataFrame()
+
     #
     # This is to set the print order when we print the data frames
     columnList = ['id', 'userId',
                   'dataTime', 'type',
                   'subType', 'osdAlarmState',
+                  'dataSource', 'phoneAppVersion', 'watchAppVersion',
                   'desc']
 
     # Group the data by userID and time period
@@ -137,7 +148,10 @@ def getUniqueEventsLists(configFname="osdb.cfg",
                 outputRows = group
 
         # Now just pick the middle row of the ouput rows list as the unique event.
+        # Try picking the first on the grounds that the user is most likely
+        # to have put most effort into describing that.
         outputIndex = int(len(outputRows.index)/2)
+        outputIndex = 0
         #print("len(outputRows)=%d, outputIndex=%d" % (len(outputRows), outputIndex))
         if (debug): print("UniqueEvent=")
         eventRow = outputRows.iloc[[outputIndex]]
