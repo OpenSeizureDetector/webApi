@@ -25,10 +25,6 @@ def extractJsonVal(row, elem, debug=False):
         elemVal = None
     return(elemVal)
 
-
-
-
-
 class OsdDbConnection:
     DEBUG = False
     cacheDir = os.path.join(os.path.expanduser("~"),"osd/osdb")
