@@ -1,22 +1,10 @@
 {
     "testName": "Unique Events from DB 04aug2022",
-    "eventsList_ALL_Seizures below": 0,
-    "eventsList": [
-	407, 764, 887, 1851, 1934, 4924, 5483, 5610,
-	5705, 6897, 7778, 8800, 1046, 5031, 5087,
-	5256, 5288, 5582, 5630, 5640, 5725, 5738,
-	5750, 5892, 5889, 
-	6476, 6589, 6592, 6668, 6716, 6733, 6762, 6767, 6811,
-	6847, 6894, 7010, 7038, 7047, 7123, 7217, 7258,
-	7264, 7363, 7438, 7447, 7823, 8726, 8420, 8740, 8875, 8970,
-	9002, 9402,  5596, 5595, 7357, 8663, 9629, 9828 ],
-    "eventsList_TC below": 0,
-    "eventsList_TC": [
-	5483, 7778, 5256, 5582, 5640, 5750, 5892, 5889,
-	6476, 6592, 6668, 6733, 7047, 7258, 7264,
-	7363, 7823, 8726, 8420, 8740, 8875, 8970,
-	9402 ],
-    "invalidEvents": [5887],
+    "tcSeizuresFname":"osdb_tcSeizures.json",
+    "allSeizuresFname":"osdb_allSeizures.json",
+    "falseAlarmsFname":"osdb_falseAlarms.json",
+    
+    "invalidEvents": [5887, 10675, 11020],
     "algorithms": [
 	{
 	    "name": "OSD_v1",
@@ -45,13 +33,18 @@
 		"warnTime": 5,
 		"alarmTime": 10
             }
+	},
+	{
+	    "name": "LSTM",
+	    "alg": "lstmAlg.LstmAlg",
+	    "settings" : {
+		"sampleFreq" : 25,
+		"samplePeriod" : 5.0,
+		"warnTime": 5,
+		"alarmTime": 10
+            }
 	}
     ],
     "download": false,
-    "credentialsFname": "../client.cfg",
-    "dbFiles": [
-	"osdb_allSeizures.json",
-	"osdb_falseAlarms.json",
-	"osdb_unknownEvents.json"
-	]
+    "credentialsFname": "../client.cfg"
 }

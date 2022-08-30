@@ -15,7 +15,7 @@ import sdAlg
 class OsdAlg_v1(sdAlg.SdAlg):
     alarmState = 0
     alarmCount = 0
-    def __init__(self, settingsStr, debug=True):
+    def __init__(self, settingsStr, debug=False):
         print("OsdAlg_v1.__init__() - settingsStr=%s" % settingsStr)
         print("OsdAlg_v1.__init__(): settingsStr=%s (%s)"
                                % (settingsStr, type(settingsStr)))
@@ -46,28 +46,31 @@ class OsdAlg_v1(sdAlg.SdAlg):
 
 
     def getAccelDataFromJson(self,jsonStr):
-        jsonObj = json.loads(jsonStr)
-        print(jsonObj.keys())
-        if ("data3D" in jsonObj.keys()):
-            #print("3dData present")
-            accData = []
-            for n in range(int(len(jsonObj['data3D'])/3)):
-                #print(n)
-                x = jsonObj['data3D'][3 * n]
-                y = jsonObj['data3D'][3 * n + 1]
-                z = jsonObj['data3D'][3 * n + 2]
-                #accData.append(math.sqrt(x*x + y*y + z*z))
-                accData.append(abs(x)+abs(y)+abs(z))
+        if (jsonStr is not None):
+            jsonObj = json.loads(jsonStr)
+            #print(jsonObj.keys())
+            if ("data3D" in jsonObj.keys()):
+                #print("3dData present")
+                accData = []
+                for n in range(int(len(jsonObj['data3D'])/3)):
+                    #print(n)
+                    x = jsonObj['data3D'][3 * n]
+                    y = jsonObj['data3D'][3 * n + 1]
+                    z = jsonObj['data3D'][3 * n + 2]
+                    #accData.append(math.sqrt(x*x + y*y + z*z))
+                    accData.append(abs(x)+abs(y)+abs(z))
 
-                
-            if (len(accData)==0):
-                print("no 3d data, so using 'data' values")
+
+                if (len(accData)==0):
+                    if (self.DEBUG): print("no 3d data, so using 'data' values")
+                    accData = jsonObj['data']
+
+            else:
+                #print("no 3d data, so using 'data' values")
                 accData = jsonObj['data']
-                
+            #print(accData)
         else:
-            #print("no 3d data, so using 'data' values")
-            accData = jsonObj['data']
-        #print(accData)
+            accData = None
         return(accData)
         
     def freq2fftBin(self,freq):
@@ -130,7 +133,10 @@ class OsdAlg_v1(sdAlg.SdAlg):
         #self.logD("OsdAlg.processDp: dpStr=%s." % dpStr)
         #print(dpStr)
         accData = self.getAccelDataFromJson(dpStr)
-        inAlarm = self.getAlarmState(accData)
+        if (accData is not None):
+            inAlarm = self.getAlarmState(accData)
+        else:
+            inAlarm = 0
 
         if (inAlarm):
             #print("inAlarm - roiPower=%f, roiRatio=%f" % (roiPower, roiRatio))
