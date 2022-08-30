@@ -110,20 +110,9 @@ export const Login = () => {
                             <p style={{ margin: 0 }}>Sign In</p>
                         )}
                     </Button>
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                        }}>
-                        <Link href="#" variant="body2">
-                            Forgot password?
-                        </Link>
-                        <Link href="/register" variant="body2">
-                            {"Don't have an account? Sign Up"}
-                        </Link>
-                    </Box>
+                    <Link href="/register" variant="body2">
+                        {"Don't have an account? Sign Up"}
+                    </Link>
                 </Box>
             </Box>
         </Container>

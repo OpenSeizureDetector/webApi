@@ -4,11 +4,10 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import { useContext } from 'react';
-import { AuthStateContext } from '../context/AuthStateContext';
+import { useAuth } from '../hooks/useAuth';
 
 export const OSDAppBar = () => {
-    const { logout } = useContext(AuthStateContext);
+    const { logout } = useAuth();
 
     return (
         <Box sx={{ flexGrow: 1 }}>

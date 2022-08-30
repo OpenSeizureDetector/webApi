@@ -14,6 +14,11 @@ export const EventDataContext = createContext<EventDataState>({
     setFilters: () => {
         return;
     },
+    eventTypes: {},
+    data: [],
+    setData: () => {
+        return;
+    },
 });
 
 export const EventDataProvider = (props: EventDataProviderProps) => {
@@ -24,6 +29,7 @@ export const EventDataProvider = (props: EventDataProviderProps) => {
         eventType: [],
     });
     const [filteredData, setFilteredData] = useState<Event[]>([]);
+    const [eventTypes, setEventTypes] = useState({});
 
     const { token } = useContext(AuthStateContext);
 
@@ -32,14 +38,19 @@ export const EventDataProvider = (props: EventDataProviderProps) => {
         filters,
         filteredData,
         setFilters,
+        eventTypes,
+        data,
+        setData,
     };
 
     useEffect(() => {
+        setLoading(true);
+        new EventRepository(token ?? '').getEventTypes().then(setEventTypes);
         new EventRepository(token ?? '').getAllEvents().then((response) => {
             setData(response);
             setLoading(false);
         });
-    }, []);
+    }, [token]);
 
     useEffect(() => {
         setFilteredData(
@@ -55,10 +66,10 @@ export const EventDataProvider = (props: EventDataProviderProps) => {
                         : filters.eventType.includes(dataPoint.type)
                 )
                 .filter((dataPoint: Event) =>
-                    filters.startDate ? filters.startDate < dataPoint.date : true
+                    filters.startDate ? filters.startDate <= dataPoint.date : true
                 )
                 .filter((dataPoint: Event) =>
-                    filters.endDate ? filters.endDate > dataPoint.date : true
+                    filters.endDate ? filters.endDate >= dataPoint.date : true
                 )
         );
     }, [data, filters]);
@@ -77,4 +88,7 @@ interface EventDataState {
     filteredData: Event[];
     filters: Filters;
     setFilters: (value: Filters) => void;
+    eventTypes: Record<string, string[]>;
+    data: Event[];
+    setData: (value: Event[]) => void;
 }

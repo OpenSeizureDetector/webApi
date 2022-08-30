@@ -15,6 +15,7 @@ export const AuthStateProvider = (props: AuthStateProviderProps) => {
     const logout = () => {
         localStorage.clear();
         setToken(null);
+        window.location.reload();
     };
 
     const contextValue = {

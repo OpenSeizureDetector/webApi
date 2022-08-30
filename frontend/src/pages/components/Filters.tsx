@@ -2,11 +2,10 @@ import { SelectChangeEvent, TextField, Typography } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import { useData } from '../../hooks/useData';
 import { AlarmState } from '../../types/AlarmState';
-import { EventType } from '../../types/EventType';
 import { MultiSelectDropdown } from '../../common/MultiSelectDropdown';
 
 export const Filters = () => {
-    const { filters, setFilters } = useData();
+    const { filters, setFilters, eventTypes } = useData();
 
     const handleAlarmState = (event: SelectChangeEvent<string[]>) => {
         setFilters({
@@ -18,7 +17,7 @@ export const Filters = () => {
     const handleEventType = (event: SelectChangeEvent<string[]>) => {
         setFilters({
             ...filters,
-            eventType: event.target.value as EventType[],
+            eventType: event.target.value as string[],
         });
     };
 
@@ -59,7 +58,7 @@ export const Filters = () => {
                 />
                 <MultiSelectDropdown
                     label="Event Type"
-                    options={Object.values(EventType)}
+                    options={Object.keys(eventTypes)}
                     selected={filters.eventType}
                     handleChange={handleEventType}
                 />
