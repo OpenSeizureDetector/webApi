@@ -1,5 +1,6 @@
+import { DriveFileRenameOutlineSharp } from '@mui/icons-material';
 import { createContext, useContext, useEffect, useState } from 'react';
-import { EventRepository } from '../data/auth/eventRepository';
+import { EventRepository } from '../data/eventRepository';
 import { Event } from '../types/Event';
 import { Filters } from '../types/Filters';
 import { AuthStateContext } from './AuthStateContext';
@@ -70,6 +71,9 @@ export const EventDataProvider = (props: EventDataProviderProps) => {
                 )
                 .filter((dataPoint: Event) =>
                     filters.endDate ? filters.endDate >= dataPoint.date : true
+                )
+                .filter((dataPoint: Event) =>
+                    filters.userId ? filters.userId === dataPoint.userId : true
                 )
         );
     }, [data, filters]);

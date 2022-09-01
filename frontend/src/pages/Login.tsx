@@ -6,7 +6,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { useReducer, useState } from 'react';
-import { AuthRepository } from '../data/auth/authRepository';
+import { AuthRepository } from '../data/authRepository';
 import { CircularProgress } from '@mui/material';
 import { useAuth } from '../hooks/useAuth';
 
@@ -49,7 +49,7 @@ export const Login = () => {
             <CssBaseline />
             <Box
                 sx={{
-                    marginTop: 16,
+                    marginTop: 4,
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
@@ -61,7 +61,7 @@ export const Login = () => {
                 <Typography component="h1" variant="h5">
                     Sign in to OSD
                 </Typography>
-                <Box component="form" onSubmit={handleLogin} sx={{ mt: 1 }}>
+                <Box component="form" onSubmit={handleLogin}>
                     <TextField
                         error={state.hasError}
                         fullWidth

@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { url } from '../../constants';
-import { getAlarmState } from '../../types/AlarmState';
-import { Event } from '../../types/Event';
+import { url } from '../constants';
+import { getAlarmState } from '../types/AlarmState';
+import { Event } from '../types/Event';
 
 export class EventRepository {
     token: string;

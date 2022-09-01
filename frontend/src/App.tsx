@@ -1,6 +1,5 @@
 import { ThemeProvider } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
-import './App.css';
 import { AuthStateProvider } from './context/AuthStateContext';
 import { EventDataProvider } from './context/EventDataContext';
 import { Router } from './router/Router';
@@ -14,7 +13,7 @@ function App() {
             <AuthStateProvider>
                 <EventDataProvider>
                     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={locale}>
-                        <div className="App">
+                        <div style={{ textAlign: 'center' }}>
                             <Router />
                         </div>
                     </LocalizationProvider>

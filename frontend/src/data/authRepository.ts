@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { url } from '../../constants';
+import { url } from '../constants';
 
 export class AuthRepository {
     signIn = async (username: string, password: string): Promise<Response> => {
