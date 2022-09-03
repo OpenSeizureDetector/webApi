@@ -85,7 +85,7 @@ export const Filters = () => {
             <TextField
                 label="User ID"
                 type="number"
-                value={filters.userId}
+                value={filters.userId || ''}
                 onChange={handleUserId}
                 size="small"
                 sx={{ margin: '8px', width: 100 }}

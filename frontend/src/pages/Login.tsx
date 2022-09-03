@@ -54,10 +54,7 @@ export const Login = () => {
                     flexDirection: 'column',
                     alignItems: 'center',
                 }}>
-                <img
-                    src="https://www.openseizuredetector.org.uk/wp-content/uploads/2015/02/icon_48x48.png"
-                    style={{ margin: 8 }}
-                />
+                <img src="/logo.png" style={{ height: 72, margin: 8 }} />
                 <Typography component="h1" variant="h5">
                     Sign in to OSD
                 </Typography>
