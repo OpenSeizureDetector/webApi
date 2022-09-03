@@ -1,4 +1,3 @@
-import { DriveFileRenameOutlineSharp } from '@mui/icons-material';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { EventRepository } from '../data/eventRepository';
 import { Event } from '../types/Event';
@@ -53,12 +52,14 @@ export const EventDataProvider = (props: EventDataProviderProps) => {
     };
 
     useEffect(() => {
-        setLoading(true);
-        new EventRepository(token ?? '').getEventTypes().then(setEventTypes);
-        new EventRepository(token ?? '').getAllEvents().then((response) => {
-            setData(response);
-            setLoading(false);
-        });
+        if (token) {
+            setLoading(true);
+            new EventRepository(token ?? '').getEventTypes().then(setEventTypes);
+            new EventRepository(token ?? '').getAllEvents().then((response) => {
+                setData(response);
+                setLoading(false);
+            });
+        }
     }, [token]);
 
     useEffect(() => {
