@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import { url } from '../constants';
 import { getAlarmState } from '../types/AlarmState';
 import { Event } from '../types/Event';
@@ -49,8 +50,11 @@ export class EventRepository {
                     };
                 });
             }
+
+            toast.error('Unable to fetch data');
             return [];
         } catch (e) {
+            toast.error('Unable to fetch data');
             return [];
         }
     };
@@ -67,7 +71,7 @@ export class EventRepository {
             });
             setData(events.map((event) => (event.id === eventData.id ? eventData : event)));
         } catch (e) {
-            console.log('Unable to update event');
+            toast.error('Unable to update event');
         }
     };
 }

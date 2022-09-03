@@ -62,7 +62,7 @@ export const FilterInputs = () => {
                 value={filters.startDate || null}
                 onChange={handleStartDate}
                 renderInput={(params) => (
-                    <TextField {...params} size="small" sx={{ margin: '8px', width: 190 }} />
+                    <TextField {...params} size="small" sx={{ margin: '8px', width: 200 }} />
                 )}
                 ampm={false}
             />
@@ -71,7 +71,7 @@ export const FilterInputs = () => {
                 value={filters.endDate || null}
                 onChange={handleEndDate}
                 renderInput={(params) => (
-                    <TextField {...params} size="small" sx={{ margin: '8px', width: 190 }} />
+                    <TextField {...params} size="small" sx={{ margin: '8px', width: 200 }} />
                 )}
                 ampm={false}
             />

@@ -6,6 +6,8 @@ import { Router } from './router/Router';
 import { theme } from './theme/theme';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import locale from 'dayjs/locale/en-gb';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
     return (
@@ -15,6 +17,7 @@ function App() {
                     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={locale}>
                         <div style={{ textAlign: 'center' }}>
                             <Router />
+                            <ToastContainer hideProgressBar position="bottom-center" />
                         </div>
                     </LocalizationProvider>
                 </EventDataProvider>
