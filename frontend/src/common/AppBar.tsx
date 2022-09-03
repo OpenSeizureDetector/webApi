@@ -20,7 +20,10 @@ export const OSDAppBar = () => {
                     }}>
                     <div style={{ display: 'flex' }}>
                         <img src="/logo.png" height={36} />
-                        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                        <Typography
+                            variant="h6"
+                            component="div"
+                            sx={{ flexGrow: 1, marginLeft: 1 }}>
                             OpenSeizureDetector
                         </Typography>
                     </div>

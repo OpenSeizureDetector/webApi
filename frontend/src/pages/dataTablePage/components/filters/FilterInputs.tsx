@@ -1,11 +1,11 @@
 import { SelectChangeEvent, TextField } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers';
-import { useData } from '../../../hooks/useData';
-import { AlarmState } from '../../../types/AlarmState';
-import { MultiSelectDropdown } from '../../../common/MultiSelectDropdown';
+import { useData } from '../../../../hooks/useData';
+import { AlarmState } from '../../../../types/AlarmState';
+import { MultiSelectDropdown } from '../../../../common/MultiSelectDropdown';
 import { ChangeEvent } from 'react';
 
-export const Filters = () => {
+export const FilterInputs = () => {
     const { filters, setFilters, eventTypes } = useData();
 
     const handleAlarmState = (event: SelectChangeEvent<string[]>) => {
@@ -44,14 +44,7 @@ export const Filters = () => {
     };
 
     return (
-        <div
-            style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-end',
-                marginLeft: '4px',
-                marginRight: '4px',
-            }}>
+        <>
             <MultiSelectDropdown
                 label="Alarm State"
                 options={Object.values(AlarmState)}
@@ -90,6 +83,6 @@ export const Filters = () => {
                 size="small"
                 sx={{ margin: '8px', width: 100 }}
             />
-        </div>
+        </>
     );
 };

@@ -5,14 +5,19 @@ import { Event } from '../types/Event';
 import { Filters } from '../types/Filters';
 import { AuthStateContext } from './AuthStateContext';
 
+const defaultFilters = {
+    alarmState: [],
+    eventType: [],
+};
+
 export const EventDataContext = createContext<EventDataState>({
     isLoading: true,
     filteredData: [],
-    filters: {
-        alarmState: [],
-        eventType: [],
-    },
+    filters: defaultFilters,
     setFilters: () => {
+        return;
+    },
+    clearFilters: () => {
         return;
     },
     eventTypes: {},
@@ -34,11 +39,14 @@ export const EventDataProvider = (props: EventDataProviderProps) => {
 
     const { token } = useContext(AuthStateContext);
 
+    const clearFilters = () => setFilters(defaultFilters);
+
     const contextValue = {
         isLoading,
         filters,
         filteredData,
         setFilters,
+        clearFilters,
         eventTypes,
         data,
         setData,
@@ -92,6 +100,7 @@ interface EventDataState {
     filteredData: Event[];
     filters: Filters;
     setFilters: (value: Filters) => void;
+    clearFilters: () => void;
     eventTypes: Record<string, string[]>;
     data: Event[];
     setData: (value: Event[]) => void;

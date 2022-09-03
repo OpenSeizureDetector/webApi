@@ -1,7 +1,7 @@
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { GridRenderCellParams } from '@mui/x-data-grid';
 import { OSDAppBar } from '../../common/AppBar';
-import { Filters } from './components/Filters';
+import { Filters } from './components/filters/Filters';
 import { useData } from '../../hooks/useData';
 import { StyledDataGrid } from '../../theme/StyledDataGrid';
 import { Event } from '../../types/Event';
