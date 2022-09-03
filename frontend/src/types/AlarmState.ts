@@ -1,22 +1,22 @@
 export enum AlarmState {
     OK = 'OK',
-    WARNING = 'WARNING',
-    ALARM = 'ALARM',
-    MANUAL_ALARM = 'MANUAL ALARM',
-    FALL = 'FALL',
+    WARNING = 'Warning',
+    ALARM = 'Alarm',
+    MANUAL_ALARM = 'Manual Alarm',
+    FALL = 'Fall',
 }
 
 export const getAlarmState = (state: number) => {
     switch (state) {
-        case 1:
+        case 0:
             return AlarmState.OK;
-        case 2:
+        case 1:
             return AlarmState.WARNING;
-        case 3:
+        case 2:
             return AlarmState.ALARM;
-        case 4:
-            return AlarmState.MANUAL_ALARM;
-        case 5:
+        case 3:
             return AlarmState.FALL;
+        case 5:
+            return AlarmState.MANUAL_ALARM;
     }
 };

@@ -25,9 +25,9 @@ export const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
         },
     },
     '& .even-row': {
-        backgroundColor: '#DCDCDC',
+        backgroundColor: '#F5F5F5',
         '&:hover': {
-            backgroundColor: '#DCDCDC',
+            backgroundColor: '#F5F5F5',
         },
     },
 }));

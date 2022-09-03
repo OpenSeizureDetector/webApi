@@ -6,7 +6,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { useReducer, useRef } from 'react';
-import { AuthRepository, RegisterErrors } from '../data/auth/authRepository';
+import { AuthRepository, RegisterErrors } from '../data/authRepository';
 
 export const Register = () => {
     const [state, dispatch] = useReducer(reducer, initialState);
