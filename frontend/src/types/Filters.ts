@@ -5,4 +5,5 @@ export interface Filters {
     eventType: string[];
     startDate?: Date;
     endDate?: Date;
+    userId?: number;
 }

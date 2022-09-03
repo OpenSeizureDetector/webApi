@@ -6,16 +6,18 @@ import {
     DialogTitle,
     TextField,
 } from '@mui/material';
-import { Dropdown } from '../../common/Dropdown';
-import { useData } from '../../hooks/useData';
-import { Event } from '../../types/Event';
+import { Dropdown } from '../../../common/Dropdown';
+import { useData } from '../../../hooks/useData';
+import { Event } from '../../../types/Event';
 
 export const EditEventDialogue = (props: EditDataDialogueProps) => {
     const { eventTypes } = useData();
 
     return (
         <Dialog open={props.open} onClose={props.onCancel}>
-            <DialogTitle>Edit Event</DialogTitle>
+            <DialogTitle>
+                Edit event {props.eventData.id} ({props.eventData.date.toLocaleString()})
+            </DialogTitle>
             <DialogContent>
                 <Dropdown
                     options={Object.keys(eventTypes)}
@@ -50,6 +52,9 @@ export const EditEventDialogue = (props: EditDataDialogueProps) => {
                         });
                     }}
                     sx={{ m: 1, width: 300 }}
+                    size="small"
+                    multiline
+                    minRows={2}
                 />
             </DialogContent>
             <DialogActions>

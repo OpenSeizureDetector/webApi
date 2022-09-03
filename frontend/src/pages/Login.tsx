@@ -6,7 +6,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { useReducer, useState } from 'react';
-import { AuthRepository } from '../data/auth/authRepository';
+import { AuthRepository } from '../data/authRepository';
 import { CircularProgress } from '@mui/material';
 import { useAuth } from '../hooks/useAuth';
 
@@ -49,19 +49,16 @@ export const Login = () => {
             <CssBaseline />
             <Box
                 sx={{
-                    marginTop: 16,
+                    marginTop: 4,
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
                 }}>
-                <img
-                    src="https://www.openseizuredetector.org.uk/wp-content/uploads/2015/02/icon_48x48.png"
-                    style={{ margin: 8 }}
-                />
+                <img src="/logo.png" style={{ height: 72, margin: 8 }} />
                 <Typography component="h1" variant="h5">
                     Sign in to OSD
                 </Typography>
-                <Box component="form" onSubmit={handleLogin} sx={{ mt: 1 }}>
+                <Box component="form" onSubmit={handleLogin}>
                     <TextField
                         error={state.hasError}
                         fullWidth

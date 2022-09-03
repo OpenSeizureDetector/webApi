@@ -1,17 +1,22 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { EventRepository } from '../data/auth/eventRepository';
+import { EventRepository } from '../data/eventRepository';
 import { Event } from '../types/Event';
 import { Filters } from '../types/Filters';
 import { AuthStateContext } from './AuthStateContext';
 
+const defaultFilters = {
+    alarmState: [],
+    eventType: [],
+};
+
 export const EventDataContext = createContext<EventDataState>({
     isLoading: true,
     filteredData: [],
-    filters: {
-        alarmState: [],
-        eventType: [],
-    },
+    filters: defaultFilters,
     setFilters: () => {
+        return;
+    },
+    clearFilters: () => {
         return;
     },
     eventTypes: {},
@@ -33,23 +38,28 @@ export const EventDataProvider = (props: EventDataProviderProps) => {
 
     const { token } = useContext(AuthStateContext);
 
+    const clearFilters = () => setFilters(defaultFilters);
+
     const contextValue = {
         isLoading,
         filters,
         filteredData,
         setFilters,
+        clearFilters,
         eventTypes,
         data,
         setData,
     };
 
     useEffect(() => {
-        setLoading(true);
-        new EventRepository(token ?? '').getEventTypes().then(setEventTypes);
-        new EventRepository(token ?? '').getAllEvents().then((response) => {
-            setData(response);
-            setLoading(false);
-        });
+        if (token) {
+            setLoading(true);
+            new EventRepository(token ?? '').getEventTypes().then(setEventTypes);
+            new EventRepository(token ?? '').getAllEvents().then((response) => {
+                setData(response);
+                setLoading(false);
+            });
+        }
     }, [token]);
 
     useEffect(() => {
@@ -71,6 +81,9 @@ export const EventDataProvider = (props: EventDataProviderProps) => {
                 .filter((dataPoint: Event) =>
                     filters.endDate ? filters.endDate >= dataPoint.date : true
                 )
+                .filter((dataPoint: Event) =>
+                    filters.userId ? filters.userId === dataPoint.userId : true
+                )
         );
     }, [data, filters]);
 
@@ -88,6 +101,7 @@ interface EventDataState {
     filteredData: Event[];
     filters: Filters;
     setFilters: (value: Filters) => void;
+    clearFilters: () => void;
     eventTypes: Record<string, string[]>;
     data: Event[];
     setData: (value: Event[]) => void;
