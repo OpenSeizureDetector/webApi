@@ -15,19 +15,18 @@
 	"Other"
     ],
     "False Alarm": [
-	"Brushing Teeth",
-	"Brushing Hair",
+	"Brushing Hair/Teeth",
 	"Computer Games",
-	"Cycling",
+	"Walking/Running/Cycling",
 	"Knitting",
 	"Motor Vehicle",
 	"Mowing Lawn",
 	"Pushing Pram/Wheelchair",
 	"Sorting",
-	"Talking",
+	"Talking/Standing Still",
 	"Typing",
-	"Washing / cleaning",
-	"Other (Please describe in notes)",
+	"Coking/Washing/Cleaning",
+	"Other",
 	"Unknown"
     ],
         "Unknown": [
