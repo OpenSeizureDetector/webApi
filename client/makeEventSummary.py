@@ -37,7 +37,7 @@ def makeEventSummary(eventId,configFname):
 
     analyser.loadEvent(int(args['event']))
 
-    print(analyser.eventObj)
+    #print(analyser.eventObj)
     # Extract data from first datapoint to get OSD settings at time of event.
     dp=analyser.dataPointsObj[0]
     dpObj = json.loads(dp['dataJSON'])
@@ -72,7 +72,7 @@ def makeEventSummary(eventId,configFname):
         'minRoiAlarmPower' : analyser.minRoiAlarmPower,
         'pageDateStr': (datetime.datetime.now()).strftime("%Y-%m-%d %H:%M"),
         }
-    print(pageData)
+    #print(pageData)
     outfile.write(template.render(data=pageData))
     outfile.close()
 

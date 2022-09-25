@@ -64,6 +64,7 @@ def getUniqueEventsLists(configFname="osdb.cfg",
     allSeizureUniqueEventsDf = pd.DataFrame()
     falseAlarmUniqueEventsDf = pd.DataFrame()
     unknownUniqueEventsDf = pd.DataFrame()
+    fallUniqueEventsDf = pd.DataFrame()
 
     cfgObj = libosd.loadConfig.loadConfig(configFname)
     osd = libosd.webApiConnection.WebApiConnection(cfg=cfgObj['credentialsFname'],
@@ -77,15 +78,15 @@ def getUniqueEventsLists(configFname="osdb.cfg",
     #    - marked as a seizure
     #    - not an OSD warning (because we don't consisder warnings false alarms
     #    - does not include the word 'test' in the description.
+    #    - is not included in the 'invalidEvents' list in the
+    #            configuration file.
     # We then group them by user ID and by time - all events within a 10 minute period are
     #  considered a single event rather than multiple seizures or false alarms.
     # We then select the 'best' event from within the group and add that to the list.  The
-    #   'best' event is one that either
-    #    - contains a text description
-    #    - is the first alarm initiation
+    #   'best' event is the first one that
     #    - is a manual alarm
-    #    - Otherwise the middle event in the time period is used.
-    #print(eventLst)
+    #    - contains a text description
+    #    - is an OSD generated alarm.
 
     # Read the event list into a pandas data frame.
     df = pd.read_json(json.dumps(eventLst))
@@ -100,8 +101,8 @@ def getUniqueEventsLists(configFname="osdb.cfg",
 
     
     if not cfgObj['includeWarnings']:
-        print("Filtering out warnings (unless they are associated with a seizure)")
-        df=df.query("type=='Seizure' or osdAlarmState!=1")
+        print("Filtering out warnings (unless they are associated with a seizure or a fall event)")
+        df=df.query("type=='Seizure' or type=='Fall' or osdAlarmState!=1")
     print("Filtering out events described as 'test'")
     df=df.query("not(desc.str.lower().str.contains('test'))")
 
@@ -147,10 +148,9 @@ def getUniqueEventsLists(configFname="osdb.cfg",
                 if (debug): print("No alarm rows")
                 outputRows = group
 
-        # Now just pick the middle row of the ouput rows list as the unique event.
-        # Try picking the first on the grounds that the user is most likely
+        # Pick the first recordon the grounds that the user is most likely
         # to have put most effort into describing that.
-        outputIndex = int(len(outputRows.index)/2)
+        #outputIndex = int(len(outputRows.index)/2)
         outputIndex = 0
         #print("len(outputRows)=%d, outputIndex=%d" % (len(outputRows), outputIndex))
         if (debug): print("UniqueEvent=")
@@ -168,6 +168,8 @@ def getUniqueEventsLists(configFname="osdb.cfg",
         if eventRow['type'].str.contains('Unknown').any():
             unknownUniqueEventsDf = unknownUniqueEventsDf.append(eventRow)
 
+        if eventRow['type'].str.contains('Fall').any():
+            fallUniqueEventsDf = fallUniqueEventsDf.append(eventRow)
 
     print("Number of Unique Events = %d" % len(allUniqueEventsDf.index))
     #print(tabulate(df, headers='keys', tablefmt='fancy_grid'))
@@ -199,6 +201,10 @@ def getUniqueEventsLists(configFname="osdb.cfg",
     allSeizureUniqueEventsDf.to_csv(fname, index=False, columns=columnList)
     print("All Seizure Events saved as %s" % fname)
 
+    fname = "%s_fallEvents.csv" % outFile
+    fallUniqueEventsDf.to_csv(fname, index=False, columns=columnList)
+    print("Fall Events saved as %s" % fname)
+    
     fname = "%s_falseAlarms.csv" % outFile
     falseAlarmUniqueEventsDf.to_csv(fname, index=False, columns=columnList)
     print("False Alarm Events saved as %s" % fname)
@@ -217,7 +223,9 @@ def getUniqueEventsLists(configFname="osdb.cfg",
     return(allSeizureUniqueEventsDf['id'].tolist(),
            tcUniqueEventsDf['id'].tolist(),
            falseAlarmUniqueEventsDf['id'].tolist(),
-           unknownUniqueEventsDf['id'].tolist())
+           unknownUniqueEventsDf['id'].tolist(),
+           fallUniqueEventsDf['id'].tolist()
+           )
 
 
 def getEventsFromList(eventsLst, configFname="client.cfg",
@@ -275,7 +283,7 @@ if (__name__=="__main__"):
     print(args)
 
     (seizureEventsLst, tcEventsLst,
-     falseAlarmEventsLst, unknownEventsLst) \
+     falseAlarmEventsLst, unknownEventsLst, fallEventsLst) \
      = getUniqueEventsLists(args['config'],
                             outFile=args['out'],
                             debug=args['debug'])
@@ -295,6 +303,14 @@ if (__name__=="__main__"):
                      args['config'],
                      debug=args['debug'])
     print("All Seizure Events Saved to %s" % fname)
+
+    fname = "%s_fallEvents.json" % args['out']
+    saveEventsAsJson(fallEventsLst,
+                     fname,
+                     args['config'],
+                     debug=args['debug'])
+    print("Fall Events Saved to %s" % fname)
+
     
     fname = "%s_falseAlarms.json" % args['out']
     saveEventsAsJson(falseAlarmEventsLst,
