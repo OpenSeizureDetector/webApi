@@ -2,7 +2,8 @@
     "Seizure": [
 	"Tonic-Clonic",
 	"Aura",
-	"Other"
+	"Other",
+	"Simulation"
     ],
     "Fall": [
 	"Stumble",
@@ -27,7 +28,11 @@
 	"Other",
 	"Unknown"
     ],
-        "Unknown": [
+    "Unknown": [
 	"Unknown"
+    ],
+    "Testing": [
+	"Testing"
     ]
+
 }
