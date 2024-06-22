@@ -7,10 +7,13 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { useReducer, useRef } from 'react';
 import { AuthRepository, RegisterErrors } from '../data/authRepository';
+import { useNavigate } from 'react-router-dom';
 
 export const Register = () => {
     const [state, dispatch] = useReducer(reducer, initialState);
     const formRef = useRef<HTMLFormElement>(null);
+
+    const navigate = useNavigate();
 
     const handleUsernameChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
         dispatch({
@@ -79,7 +82,8 @@ export const Register = () => {
             );
         }
         if (errors === null) {
-            console.log('user created successfully');
+            alert('User created successfully');
+            navigate('/');
         } else {
             dispatch({
                 type: 'createUserFailed',
@@ -97,8 +101,7 @@ export const Register = () => {
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                }}
-            >
+                }}>
                 <img
                     src="https://www.openseizuredetector.org.uk/wp-content/uploads/2015/02/icon_48x48.png"
                     style={{ margin: 8 }}
@@ -190,8 +193,7 @@ export const Register = () => {
                             flexDirection: 'row',
                             alignItems: 'center',
                             justifyContent: 'center',
-                        }}
-                    >
+                        }}>
                         <Link href="/" variant="body2">
                             Return to login
                         </Link>
