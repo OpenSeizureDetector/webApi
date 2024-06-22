@@ -20,7 +20,8 @@ export const MultiSelectDropdown = (props: MultiSelectDropdownProps) => {
                 input={<OutlinedInput label={props.label} />}
                 renderValue={(selected: string[]) => (
                     <Typography sx={{ textAlign: 'start' }}>{selected.join(', ')}</Typography>
-                )}>
+                )}
+            >
                 {props.options.map((option) => (
                     <MenuItem key={option} value={option} dense>
                         <Checkbox size="small" checked={props.selected.indexOf(option) > -1} />

@@ -53,7 +53,7 @@ export const DataTablePage = () => {
                     <StyledDataGrid
                         rows={filteredData}
                         columns={getGridColumns((params: GridRenderCellParams) =>
-                            openDialogue(params.row)
+                            openDialogue(params.row),
                         )}
                         pageSize={50}
                         rowsPerPageOptions={[50]}

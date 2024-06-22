@@ -53,7 +53,8 @@ export const Login = () => {
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                }}>
+                }}
+            >
                 <img src="/logo.png" style={{ height: 72, margin: 8 }} />
                 <Typography component="h1" variant="h5">
                     Sign in to OSD
@@ -100,7 +101,8 @@ export const Login = () => {
                         type="submit"
                         fullWidth
                         variant="contained"
-                        sx={{ mt: 3, mb: 2, height: 52 }}>
+                        sx={{ mt: 3, mb: 2, height: 52 }}
+                    >
                         {isLoading ? (
                             <CircularProgress color="inherit" />
                         ) : (

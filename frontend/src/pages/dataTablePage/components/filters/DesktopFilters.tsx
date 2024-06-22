@@ -10,7 +10,8 @@ export const DesktopFilters = () => {
                 justifyContent: 'flex-end',
                 marginLeft: '4px',
                 marginRight: '4px',
-            }}>
+            }}
+        >
             <ClearFiltersButton />
             <FilterInputs />
         </div>

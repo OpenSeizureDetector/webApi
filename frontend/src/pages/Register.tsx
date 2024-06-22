@@ -75,7 +75,7 @@ export const Register = () => {
                 state.lastName,
                 state.email,
                 state.password,
-                state.confirmPassword
+                state.confirmPassword,
             );
         }
         if (errors === null) {
@@ -97,7 +97,8 @@ export const Register = () => {
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                }}>
+                }}
+            >
                 <img
                     src="https://www.openseizuredetector.org.uk/wp-content/uploads/2015/02/icon_48x48.png"
                     style={{ margin: 8 }}
@@ -189,7 +190,8 @@ export const Register = () => {
                             flexDirection: 'row',
                             alignItems: 'center',
                             justifyContent: 'center',
-                        }}>
+                        }}
+                    >
                         <Link href="/" variant="body2">
                             Return to login
                         </Link>

@@ -68,22 +68,22 @@ export const EventDataProvider = (props: EventDataProviderProps) => {
                 .filter((dataPoint: Event) =>
                     filters.alarmState.length === 0
                         ? true
-                        : filters.alarmState.includes(dataPoint.alarmState)
+                        : filters.alarmState.includes(dataPoint.alarmState),
                 )
                 .filter((dataPoint: Event) =>
                     filters.eventType.length === 0
                         ? true
-                        : filters.eventType.includes(dataPoint.type)
+                        : filters.eventType.includes(dataPoint.type),
                 )
                 .filter((dataPoint: Event) =>
-                    filters.startDate ? filters.startDate <= dataPoint.date : true
+                    filters.startDate ? filters.startDate <= dataPoint.date : true,
                 )
                 .filter((dataPoint: Event) =>
-                    filters.endDate ? filters.endDate >= dataPoint.date : true
+                    filters.endDate ? filters.endDate >= dataPoint.date : true,
                 )
                 .filter((dataPoint: Event) =>
-                    filters.userId ? filters.userId === dataPoint.userId : true
-                )
+                    filters.userId ? filters.userId === dataPoint.userId : true,
+                ),
         );
     }, [data, filters]);
 

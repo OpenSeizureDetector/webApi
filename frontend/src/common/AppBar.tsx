@@ -17,13 +17,15 @@ export const OSDAppBar = () => {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                    }}>
+                    }}
+                >
                     <div style={{ display: 'flex' }}>
                         <img src="/logo.png" height={36} />
                         <Typography
                             variant="h6"
                             component="div"
-                            sx={{ flexGrow: 1, marginLeft: 1 }}>
+                            sx={{ flexGrow: 1, marginLeft: 1 }}
+                        >
                             OpenSeizureDetector
                         </Typography>
                     </div>

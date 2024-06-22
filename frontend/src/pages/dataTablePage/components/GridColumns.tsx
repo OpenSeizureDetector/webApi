@@ -5,7 +5,7 @@ import { getAlarmState } from '../../../types/AlarmState';
 import EditIcon from '@mui/icons-material/Edit';
 
 export const getGridColumns = (
-    onClickEdit: (params: GridRenderCellParams) => void
+    onClickEdit: (params: GridRenderCellParams) => void,
 ): GridColDef[] => [
     { field: 'id', headerName: 'ID', sortable: false, width: 60 },
     {
@@ -56,7 +56,8 @@ export const getGridColumns = (
                 onClick={() => onClickEdit(params)}
                 size="small"
                 style={{ margin: 0 }}
-                tabIndex={params.hasFocus ? 0 : -1}>
+                tabIndex={params.hasFocus ? 0 : -1}
+            >
                 <EditIcon />
             </IconButton>
         ),
