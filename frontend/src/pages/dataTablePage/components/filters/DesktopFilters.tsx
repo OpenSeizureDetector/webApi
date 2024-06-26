@@ -8,10 +8,8 @@ export const DesktopFilters = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'flex-end',
-                marginLeft: '4px',
-                marginRight: '4px',
-            }}
-        >
+                margin: '4px',
+            }}>
             <ClearFiltersButton />
             <FilterInputs />
         </div>
