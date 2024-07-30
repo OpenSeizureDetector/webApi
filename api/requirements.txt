@@ -1,0 +1,8 @@
+django
+django-rest-framework
+mysqlclient
+django-rest-registration
+django-filter
+numpy
+django-cors-headers
+

@@ -40,28 +40,31 @@ GET /events/?user=14&start=2019-11-04 07:44:00&end=2019-11-04 07:49:00
 
 
 ## Installation
-From Ubuntu 18.04 LTS
+From Ubuntu 18.04 LTS or higher
 
 ```
-apt install build-essential python3-dev vitualenvwrapper mysql-server mysql-client-dev
-source /usr/lib/virtualenvwrapper/virtualenvwrapper.sh
+apt install build-essential python3-dev mysql-server mysql-client-dev
 ```
 
 ### Backend
 ```
-mkvirtualenv --python=/usr/bin/python3 webpy
-workon webpy
-pip install django django-rest-framework
-pip install mysqlclient
-pip install django-rest-registration
-pip install django-filter
-pip install numpy
-pip install django-cors-headers
+python -m venv ~/pyEnvs/webpy
+source ~/pyEnvs/webpy/bin/activate
+
 git clone https://github.com/OpenSeizureDetector/webApi.git
-cd webApi
+cd webApi/api
+
+pip install -r requirements.txt
+
 ```
  
-Create a mysql database and associated user/password
+Create a mysql database and associated user/password using
+'''
+sudo mysql -u root
+CREATE DATABASE osd;
+CREATE USER 'osd'@'localhost' identified by '<OSD PASSWORD>';
+GRANT ALL ON osd.* to 'osd'@'localhost';
+'''
 
 copy webApi/api/webApi/credentials.json.template to webApi/api/webApi/credentials.json
 
