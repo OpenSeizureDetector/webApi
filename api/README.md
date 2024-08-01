@@ -56,7 +56,10 @@ cd webApi/api
 
 pip install -r requirements.txt
 
+ln -s static static2
+
 ```
+The symbolic link to static2 is only required for developent using the django development server as described below.   It is not required for production using the nginx web server, because the static files location is specified in the server configuration file, so the django app is never passed requests to /static
  
 Create a mysql database and associated user/password using
 '''
@@ -76,11 +79,8 @@ Edit webApi/api/webApi/credentials.json to use database credentials that will gi
 ```
 
 ### Front End
-```
-sudo apt install npm
-sudo npm install -g @vue/cli
-```
- 
+We do not have a working database access front end at the moment - simple activities such as user registration and validation are achieved using simple static web pages in the api/static folder.
+
 # Deployment
 ## Development
 Use the django development server with
