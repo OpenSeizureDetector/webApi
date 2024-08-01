@@ -43,7 +43,7 @@ export class AuthRepository {
         lastName: string,
         email: string,
         password: string,
-        confirmPassword: string
+        confirmPassword: string,
     ): Promise<RegisterErrors | null> => {
         try {
             const response = await axios({

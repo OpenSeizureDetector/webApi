@@ -72,7 +72,8 @@ const GridCellExpand = React.memo(function GridCellExpand(props: GridCellExpandP
                 height: '100%',
                 position: 'relative',
                 display: 'flex',
-            }}>
+            }}
+        >
             <Box
                 ref={cellDiv}
                 sx={{
@@ -85,17 +86,20 @@ const GridCellExpand = React.memo(function GridCellExpand(props: GridCellExpandP
             />
             <Box
                 ref={cellValue}
-                sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                sx={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+            >
                 {value}
             </Box>
             {showPopper && (
                 <Popper
                     open={showFullCell && anchorEl !== null}
                     anchorEl={anchorEl}
-                    style={{ width, marginLeft: -17 }}>
+                    style={{ width, marginLeft: -17 }}
+                >
                     <Paper
                         elevation={1}
-                        style={{ minHeight: wrapper.current?.offsetHeight ?? 3 - 3 }}>
+                        style={{ minHeight: wrapper.current?.offsetHeight ?? 3 - 3 }}
+                    >
                         <Typography variant="body2" style={{ padding: 8 }}>
                             {value}
                         </Typography>

@@ -16,7 +16,8 @@ export const MobileFilters = () => {
                 variant="outlined"
                 startIcon={<FilterListIcon />}
                 sx={{ m: 1 }}
-                onClick={openDialogue}>
+                onClick={openDialogue}
+            >
                 Filter
             </Button>
             {open && (

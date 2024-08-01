@@ -7,10 +7,13 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { useReducer, useRef } from 'react';
 import { AuthRepository, RegisterErrors } from '../data/authRepository';
+import { useNavigate } from 'react-router-dom';
 
 export const Register = () => {
     const [state, dispatch] = useReducer(reducer, initialState);
     const formRef = useRef<HTMLFormElement>(null);
+
+    const navigate = useNavigate();
 
     const handleUsernameChange: React.ChangeEventHandler<HTMLInputElement> = (event) => {
         dispatch({
@@ -75,11 +78,12 @@ export const Register = () => {
                 state.lastName,
                 state.email,
                 state.password,
-                state.confirmPassword
+                state.confirmPassword,
             );
         }
         if (errors === null) {
-            console.log('user created successfully');
+            alert('User created successfully');
+            navigate('/');
         } else {
             dispatch({
                 type: 'createUserFailed',

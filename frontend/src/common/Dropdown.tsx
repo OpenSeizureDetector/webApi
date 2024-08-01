@@ -19,7 +19,8 @@ export const Dropdown = (props: DropdownProps) => {
                     onChange={props.handleChange}
                     renderValue={(value) => <Typography>{value}</Typography>}
                     size="small"
-                    input={<OutlinedInput label={props.label} />}>
+                    input={<OutlinedInput label={props.label} />}
+                >
                     {props.options.map((option) => (
                         <MenuItem key={option} value={option} dense>
                             <ListItemText primary={option} sx={{ fontSize: 8 }} />
