@@ -1,5 +1,5 @@
+import datetime
 import json
-from datetime import datetime, timedelta
 
 from rest_framework import viewsets
 from rest_framework import permissions
@@ -30,7 +30,7 @@ class EventViewSet(viewsets.ModelViewSet):
         duration is used if only start or end is specified.
         """
         # Build the date from 10 days ago to not retrieve by default all events since the account creation.
-        current_datetime = datetime.now()
+        current_datetime = datetime.datetime.now()
         date_minus_10_days = current_datetime - datetime.timedelta(days=10)
         formatted_start_date_by_default = date_minus_10_days.strftime("%Y-%m-%d %H:%M:%S")
         user = self.request.query_params.get('user', None)
