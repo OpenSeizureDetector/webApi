@@ -5,6 +5,7 @@ from django.http import Http404
 from django.contrib.auth.models import User
 from rest_framework import viewsets
 from rest_framework import status
+from rest_framework.generics import GenericAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics
@@ -53,7 +54,7 @@ class DatapointViewSet(viewsets.ModelViewSet):
 # FIXME - I don't think the code below is used, but need to check!!!
 
 
-class DatapointUploadCsv(APIView):
+class DatapointUploadCsv(GenericAPIView):
     def createEvent(self,eventType, dataTime):
         eventData = {
             'userId' : self.request.user.pk,
