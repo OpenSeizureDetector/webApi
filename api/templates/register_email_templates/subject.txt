@@ -1,1 +1,0 @@
-{% if email_already_used %}Your e-mail addressis already in use{% else %}Please verify new e-mail to use osdapi.ddns.net{% endif %}
