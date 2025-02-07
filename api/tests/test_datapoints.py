@@ -35,10 +35,10 @@ async def test_get_datapoint(async_client):
     response = await async_client.post("/api/datapoints/", json=payload)
     assert response.status_code == 200
     datapoint_id = response.json()["id"]
-    response = await async_client.post(f"/api/datapoints/{datapoint_id}", json=payload)
+    response = await async_client.get(f"/api/datapoints/{datapoint_id}")
 
     assert response.status_code == 200
-    assert response.hr == 200
+    assert response.json()["hr"] == 72.5
 
 
 @pytest.mark.asyncio

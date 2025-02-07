@@ -39,14 +39,14 @@ async def create_datapoint(
 
 
 @router.get("/{id}", response_model=DatapointPublic)
-async def get_datapoints(
+async def get_datapoint(
+    id: int,
     session: AsyncSession = Depends(get_session),
 ):
     datapoint_db = await session.get(Datapoint, id)
     if not datapoint_db:
         raise HTTPException(status_code=404, detail="Datapoint not found")
-    datapoint_data = datapoint_db.model_dump(exclude_unset=True)
-    return datapoint_data
+    return datapoint_db
 
 
 @router.put("/{id}", response_model=DatapointPublic)

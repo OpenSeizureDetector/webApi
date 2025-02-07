@@ -2,11 +2,12 @@ import asyncio
 
 import uvloop
 from fastapi import FastAPI
-from .routers import datapoint
+from .routers import datapoint, event
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 app = FastAPI()
 app.include_router(datapoint.router)
+app.include_router(event.router)
 
 
 @app.get("/")

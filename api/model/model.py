@@ -1,6 +1,7 @@
 from datetime import datetime
+from typing import Any
 
-from sqlalchemy import Column, DateTime, func
+from sqlalchemy import Column, DateTime, func, JSON
 from sqlmodel import SQLModel, Field, Relationship
 
 
@@ -47,7 +48,9 @@ class DatapointBase(SQLModel):
     hr: float | None = Field(None)
     categoryId: int | None = Field(None)
     eventId: int | None = Field(None)
-    # dataJSON = models.TextField(blank=True, null=True) = Field(None)
+    dataJSON: dict[str, Any] | None = Field(
+        sa_column=Column(JSON), default_factory=dict
+    )
 
 
 class Datapoint(DatapointBase, table=True):
@@ -83,33 +86,38 @@ class DatapointUpdate(DatapointBase):
 
 ######################### EVENT ####################################
 class EventBase(SQLModel):
-    created: datetime = Field(
-        sa_column=Column(DateTime(timezone=True), server_default=func.now())
+    osdAlarmState: int | None = Field(None)
+    userId: int | None = Field(default=None, foreign_key="user.id")
+    dataTime: datetime | None = Field(None)
+    type: str | None = Field(None)
+    subType: str | None = Field(None)
+    desc: str | None = Field(None)
+    dataJSON: dict[str, Any] | None = Field(
+        sa_column=Column(JSON), default_factory=dict
     )
-    updated: datetime = Field(
+
+
+class Event(EventBase, table=True):
+    created: datetime | None = Field(
+        default=None,
+        sa_column=Column(DateTime(timezone=True), server_default=func.now()),
+    )
+    updated: datetime | None = Field(
+        default=None,
         sa_column=Column(
             DateTime(timezone=True),
             server_default=func.now(),
             server_onupdate=func.now(),
-        )
+        ),
     )
-
-    osdAlarmState: int | None
-    userId: int | None = Field(default=None, foreign_key="user.id")
-    dataTime: datetime | None
-    type: str | None
-    subType: str | None
-    desc: str | None
-    # dataJSON = models.TextField(blank=True, null=True)
-
-
-class Event(EventBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     user: User | None = Relationship(back_populates="events")
 
 
 class EventPublic(EventBase):
     id: int
+    created: datetime
+    updated: datetime
 
 
 class EventCreate(EventBase): ...
