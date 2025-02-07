@@ -8,7 +8,7 @@ from api.db import get_session
 from model.model import DatapointPublic, DatapointCreate, Datapoint
 
 router = APIRouter(
-    prefix="/datapoints",
+    prefix="/api/datapoints",
     tags=["datapoints"],
     # dependencies=[Depends(get_token_header)],
     responses={404: {"description": "Not found"}},
@@ -20,6 +20,8 @@ async def get_datapoints(
     session: AsyncSession = Depends(get_session),
     offset: int = 0,
     limit: Annotated[int, Query(le=100)] = 100,
+    ordering:str|None = None,
+    search:str|None = None,
 ):
     result = await session.exec(select(Datapoint).offset(offset).limit(limit))
     data = result.all()
