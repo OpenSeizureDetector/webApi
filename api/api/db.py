@@ -1,11 +1,12 @@
 from sqlalchemy.ext.asyncio import AsyncEngine
 from sqlalchemy.orm import sessionmaker
-from sqlmodel import create_engine, SQLModel, Session
+from sqlmodel import create_engine, SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 DATABASE_URL = "mysql+asyncmy://osd:@localhost:3306/osd2"
 
 engine = AsyncEngine(create_engine(DATABASE_URL, echo=True, future=True))
+
 
 async def init_db():
     async with engine.begin() as conn:
@@ -14,8 +15,6 @@ async def init_db():
 
 
 async def get_session() -> AsyncSession:
-    async_session = sessionmaker(
-        engine, class_=AsyncSession, expire_on_commit=False
-    )
+    async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
     async with async_session() as session:
         yield session

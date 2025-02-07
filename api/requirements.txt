@@ -5,4 +5,6 @@ sqlalchemy
 sqlmodel
 asyncmy
 alembic
-
+pytest
+pytest_asyncio
+aiosqlite
