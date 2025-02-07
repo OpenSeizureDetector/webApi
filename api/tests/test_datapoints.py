@@ -22,6 +22,26 @@ async def test_create_datapoint(async_client):
 
 
 @pytest.mark.asyncio
+async def test_get_datapoint(async_client):
+    payload = {
+        "dataTime": datetime.datetime.now(datetime.UTC).isoformat(),  # Format ISO 8601
+        "statusStr": "Active",  # Obligatoire
+        "accMean": 0.95,
+        "accSd": 0.02,
+        "hr": 72.5,
+        "categoryId": 1,
+        "eventId": 1,
+    }
+    response = await async_client.post("/api/datapoints/", json=payload)
+    assert response.status_code == 200
+    datapoint_id = response.json()["id"]
+    response = await async_client.post(f"/api/datapoints/{datapoint_id}", json=payload)
+
+    assert response.status_code == 200
+    assert response.hr == 200
+
+
+@pytest.mark.asyncio
 async def test_get_datapoints(async_client):
     response = await async_client.get("/api/datapoints/")
     assert response.status_code == 200
