@@ -28,8 +28,9 @@ async def test_get_datapoints(async_client):
     assert isinstance(response.json(), list)
 
 
+@pytest.mark.parametrize("update_method_name", ["put", "patch"])
 @pytest.mark.asyncio
-async def test_update_datapoint(async_client):
+async def test_update_datapoint(async_client, update_method_name: str):
     payload = {
         "dataTime": datetime.datetime.now(datetime.UTC).isoformat(),  # Format ISO 8601
         "statusStr": "Active",
@@ -45,7 +46,8 @@ async def test_update_datapoint(async_client):
     assert response.json()["hr"] == 72.5
     # Mise à jour du datapoint
     update_payload = {"hr": 90}
-    response = await async_client.patch(
+    update_method = getattr(async_client, update_method_name)
+    response = await update_method(
         f"/api/datapoints/{datapoint_id}", json=update_payload
     )
     assert response.status_code == 200

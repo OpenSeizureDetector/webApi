@@ -38,6 +38,7 @@ async def create_datapoint(
     return db_object
 
 
+@router.put("/{id}", response_model=DatapointPublic)
 @router.patch("/{id}", response_model=DatapointPublic)
 async def update_datapoint(
     id: int,
