@@ -12,7 +12,6 @@ async def test_create_datapoint(async_client):
         "accSd": 0.02,
         "hr": 72.5,
         "categoryId": 1,
-        "eventId": 1,
     }
     response = await async_client.post("/api/datapoints/", json=payload)
     assert response.status_code == 200
@@ -30,7 +29,6 @@ async def test_get_datapoint(async_client):
         "accSd": 0.02,
         "hr": 72.5,
         "categoryId": 1,
-        "eventId": 1,
     }
     response = await async_client.post("/api/datapoints/", json=payload)
     assert response.status_code == 200
@@ -58,7 +56,6 @@ async def test_update_datapoint(async_client, update_method_name: str):
         "accSd": 0.02,
         "hr": 72.5,
         "categoryId": 1,
-        "eventId": 1,
     }
     response = await async_client.post("/api/datapoints/", json=payload)
     datapoint_id = response.json()["id"]
