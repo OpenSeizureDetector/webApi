@@ -23,7 +23,7 @@ from api.db import get_session
 async def async_db_connection() -> AsyncGenerator[AsyncConnection, None]:
     database_dsn = "sqlite+aiosqlite:///testing.db"
     async_engine = create_async_engine(
-        database_dsn, connect_args={"check_same_thread": False}, echo=True, future=True
+        database_dsn, connect_args={"check_same_thread": False}, echo=False, future=True
     )
 
     async with async_engine.begin() as conn:

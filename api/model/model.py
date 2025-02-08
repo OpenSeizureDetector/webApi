@@ -83,7 +83,7 @@ class EventUpdate(EventBase): ...
 
 ######################### DATAPOINT ####################################
 class DatapointBase(SQLModel):
-    dataTime: datetime | None = Field(None)
+    dataTime: datetime | None = Field(None, index=True)
     # userId: int | None = Field(default=None, foreign_key="user.id")
     statusStr: str = Field(default="", index=True, max_length=30)
     accMean: float | None = Field(None)
