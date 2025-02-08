@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlmodel import select, desc
@@ -85,8 +84,6 @@ async def get_datapoints_summary(
         if end_date is not None and start_date is None:
             start_date = end_date - duration
 
-    result1 = await session.exec(statement=statement)
-    data1 = result1.all()
     # Applying date filtering
     if start_date is not None:
         statement = statement.where(Datapoint.dataTime >= start_date)
