@@ -138,7 +138,7 @@ async def test_get_all_events(async_client, insert_events_in_api):
     data = response.json()
 
     assert isinstance(data, list)
-    assert len(data) >= 3
+    assert len(data) == 3
 
 
 @pytest.mark.asyncio
@@ -173,6 +173,7 @@ async def test_get_events_with_start_date(async_client, insert_events_in_api):
     data = response.json()
 
     assert isinstance(data, list)
+    assert len(data) == 2
     for event in data:
         event_time = datetime.datetime.fromisoformat(event["dataTime"]).replace(
             tzinfo=datetime.timezone.utc
@@ -183,7 +184,7 @@ async def test_get_events_with_start_date(async_client, insert_events_in_api):
 @pytest.mark.asyncio
 async def test_get_events_with_end_date(async_client, insert_events_in_api):
     """Test filtering events using end_date."""
-    end_date = datetime.datetime.now(datetime.UTC) - datetime.timedelta(days=1)
+    end_date = datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=1)
     # Convert start_date to Unix timestamp (in seconds)
     end_timestamp = int(end_date.timestamp())
 
@@ -194,6 +195,7 @@ async def test_get_events_with_end_date(async_client, insert_events_in_api):
     data = response.json()
 
     assert isinstance(data, list)
+    assert len(data) == 2
     for event in data:
         event_time = datetime.datetime.fromisoformat(event["dataTime"]).replace(
             tzinfo=datetime.timezone.utc
@@ -212,6 +214,7 @@ async def test_get_events_with_duration(async_client, insert_events_in_api):
     data = response.json()
 
     assert isinstance(data, list)
+    assert len(data) == 1
     now = datetime.datetime.now(datetime.UTC)
     min_date = now - datetime.timedelta(minutes=duration_minutes)
 
@@ -225,8 +228,8 @@ async def test_get_events_with_duration(async_client, insert_events_in_api):
 @pytest.mark.asyncio
 async def test_get_events_start_date_duration(async_client, insert_events_in_api):
     """Test filtering events using start_date and duration."""
-    start_date = datetime.datetime.now(datetime.UTC) - datetime.timedelta(days=1)
-    duration_minutes = 1440  # 1 jour
+    start_date = datetime.datetime.now(datetime.UTC) - datetime.timedelta(hours=1)
+    duration_minutes = 120
     start_timestamp = int(start_date.timestamp())
 
     response = await async_client.get(
@@ -236,6 +239,7 @@ async def test_get_events_start_date_duration(async_client, insert_events_in_api
     data = response.json()
 
     assert isinstance(data, list)
+    assert len(data) == 1
     min_date = start_date
     max_date = start_date + datetime.timedelta(minutes=duration_minutes)
 
@@ -249,8 +253,8 @@ async def test_get_events_start_date_duration(async_client, insert_events_in_api
 @pytest.mark.asyncio
 async def test_get_events_end_date_duration(async_client, insert_events_in_api):
     """Test filtering events using end_date and duration."""
-    end_date = datetime.datetime.now(datetime.UTC)
-    duration_minutes = 1440  # 1 jour
+    end_date = datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=1)
+    duration_minutes = 120
     end_timestamp = int(end_date.timestamp())
 
     response = await async_client.get(
@@ -260,6 +264,7 @@ async def test_get_events_end_date_duration(async_client, insert_events_in_api):
     data = response.json()
 
     assert isinstance(data, list)
+    assert len(data) == 1
     min_date = end_date - datetime.timedelta(minutes=duration_minutes)
     max_date = end_date
 
@@ -278,6 +283,7 @@ async def test_get_events_to_categorize(async_client, insert_events_in_api):
     data = response.json()
 
     assert isinstance(data, list)
+    assert len(data) == 1
     for event in data:
         assert event["type"] is None
 

@@ -76,6 +76,8 @@ async def get_events(
     # Create the base query
     statement = select(Event).offset(offset).limit(limit)
 
+    result1 = await session.exec(statement)
+    data1 = result1.all()
     # Apply start_date filter if provided
     if start_date is not None:
         statement = statement.where(Event.dataTime >= start_date)
@@ -86,7 +88,7 @@ async def get_events(
 
     # Filter events that need categorization (i.e., type is None)
     if event_to_categorize:
-        statement = statement.where(Event.type == None)
+        statement = statement.where(Event.type.is_(None))
 
     # Order results by descending event date
     statement = statement.order_by(desc(Event.dataTime))
