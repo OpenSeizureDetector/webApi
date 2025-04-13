@@ -29,12 +29,21 @@ class EventViewSet(viewsets.ModelViewSet):
            duration:  required duration (minutes)
         If both start and end are specified, duration is ignored.
         duration is used if only start or end is specified.
+
+        FIXME:  The date_plus_1_day bit is a fiddle because we do not handle
+                time zones and daylight savings time very well.  Without it
+                we did not see a newly created event because it appeared to 
+                be in the future if daylight savings time was active.
+                The real fix is to work properly with time zones and daylight 
+                savings time.  
+                GJ  13 April 2025
         """
         # Build the date from 10 days ago to not retrieve by default all events since the account creation.
         current_datetime = datetime.datetime.now()
         date_minus_10_days = current_datetime - datetime.timedelta(days=10)
+        date_plus_1_day = current_datetime + datetime.timedelta(days=1)
         formatted_start_date_by_default = date_minus_10_days.strftime("%Y-%m-%d %H:%M:%S")
-        formatted_end_date_by_default = current_datetime.strftime("%Y-%m-%d %H:%M:%S")
+        formatted_end_date_by_default = date_plus_1_day.strftime("%Y-%m-%d %H:%M:%S")
         user = self.request.query_params.get('user', None)
         startDateStr = self.request.query_params.get('start', formatted_start_date_by_default)
         endDateStr = self.request.query_params.get('end', formatted_end_date_by_default)
