@@ -6,11 +6,12 @@ from django.urls import include, path
 from django.views.generic import RedirectView
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.views.generic import TemplateView
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 from rest_framework.routers import DefaultRouter
-from datapoints.views import DatapointList, DatapointSummaryList, DatapointUploadCsv, DatapointViewSet
-from events.views import EventViewSet
-from userdata.views import UserViewSet, ProfileViewSet, LicenceViewSet
 
+from datapoints.views import DatapointViewSet, DatapointSummaryList, DatapointUploadCsv
+from events.views import EventViewSet
+from userdata.views import ProfileViewSet
 
 router = DefaultRouter()
 router.register(r'api/events', EventViewSet)
@@ -30,5 +31,8 @@ urlpatterns = [
     path('favicon.ico',RedirectView.as_view(url='/static/favicon.ico')),
     path(r'', TemplateView.as_view(template_name='index.html')),
     #path('', RedirectView.as_view(url='/static/index.html')),
-
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    # Optional UI:
+    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]
