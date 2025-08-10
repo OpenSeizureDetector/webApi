@@ -45,7 +45,7 @@ class EventBase(SQLModel):
     dataTime: datetime | None = Field(None, index=True)
     type: str | None = Field(None)
     subType: str | None = Field(None)
-    desc: str | None = Field(sa_type=Text, max_length=25)
+    desc: str | None = Field(None, sa_type=Text, max_length=50)
     dataJSON: dict[str, Any] | None = Field(
         sa_column=Column(JSON), default_factory=dict
     )
