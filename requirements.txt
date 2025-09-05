@@ -1,9 +1,3 @@
 django
-django-rest-framework
-#mysqlclient
-django-mysql
-django-rest-registration
-django-filter
-numpy
-django-cors-headers
-
+djangorestframework
+gunicorn
