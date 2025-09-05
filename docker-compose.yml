@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: webapidata
+      MYSQL_USER: webapiuser
+      MYSQL_PASSWORD: webapipassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+
+  webapi:
+    build:
+      context: ./api/webApi
+    depends_on:
+      - mysql
+    environment:
+      CREDENTIALS_FILE: /app/credentials.json
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    volumes:
+      - ./api/webApi:/app
+      # Optionally mount a production credentials file here:
+      # - /path/to/production/credentials.json:/app/credentials.json
+
+volumes:
+  mysql-data:
