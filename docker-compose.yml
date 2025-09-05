@@ -1,33 +1,32 @@
 version: '3.8'
-
 services:
   mysql:
     image: mysql:8.0
+    restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: webapidata
-      MYSQL_USER: webapiuser
-      MYSQL_PASSWORD: webapipassword
+      - MYSQL_DATABASE=webapidb
+      - MYSQL_USER=webapiuser
+      - MYSQL_PASSWORD=webapipassword
+      - MYSQL_ROOT_PASSWORD=rootpassword
     ports:
       - "3306:3306"
-    volumes:
-      - mysql-data:/var/lib/mysql
-      - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   webapi:
-    build:
-      context: ./api/webApi
+    build: .
     depends_on:
-      - mysql
-    environment:
-      CREDENTIALS_FILE: /app/credentials.json
+      mysql:
+        condition: service_healthy
     ports:
       - "8000:8000"
-    restart: unless-stopped
-    volumes:
-      - ./api/webApi:/app
-      # Optionally mount a production credentials file here:
-      # - /path/to/production/credentials.json:/app/credentials.json
-
-volumes:
-  mysql-data:
+    environment:
+      - DJANGO_SETTINGS_MODULE=webApi.settings
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=webapidb
+      - DB_USER=webapiuser
+      - DB_PASSWORD=webapipassword
