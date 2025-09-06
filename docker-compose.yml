@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   mysql:
     image: mysql:8.0
@@ -17,14 +16,15 @@ services:
       retries: 5
 
   webapi:
-    build: .
+    build: api
+    #restart: always
     depends_on:
       mysql:
         condition: service_healthy
     ports:
       - "8000:8000"
     environment:
-      - DJANGO_SETTINGS_MODULE=webApi.settings
+      - DJANGO_SETTINGS_MODULE=webApi.settings.settings
       - DB_HOST=mysql
       - DB_PORT=3306
       - DB_NAME=webapidb
