@@ -194,20 +194,12 @@ Then enable the site with
  
  
 ## Enable Email
-The user registration process relies on sending confirmation emails to the user.  To achieve this we use postfix.  Postfix by itself is quite easy to set up, but to have any chance of getting big email providers like Gmail and Outlook to accept it, quite a lot of work
-is needed to authenticate the email so they know we are not spammers.   Even having done this there is a good chance the email will end
-up in the user's spam folder, but at least it gets delivered.
+The user registration process relies on sending confirmation emails to the user.
 
-Install Postfix with 
-```
-apt install mailutils
-```
-Configure it to use DKIM authentication using these instructions:  https://www.linuxbabe.com/mail-server/setting-up-dkim-and-spf
+**Note:** The initial intention was to host our own email server (e.g., using Postfix and DKIM authentication). However, this proved unreliable for production because many major email providers (like Gmail and Outlook) frequently rejected or marked these emails as spam, even with proper authentication.
 
-This involves also configuring the DNS entries in your DNS provider by adding extra text entries to the basic DNS entry for your domain name.
-For my Virtual Private Servier I am using noip.com to give it a domain name (osdapi.ddns.net).  I had to pay for their extended service to be able to make these configuration changes.
+**For the production system, we now use an external email provider (such as Gmail SMTP, SendGrid, or similar) to ensure reliable delivery of confirmation and notification emails.**
 
-There was a lot of fiddling to get this working, so I think I'll need to re-write a step-by step procedure using a new server installation....
-To debug issues with the mail authentication I used https:/mail-tester.com, which was excellent - well worth the 10Euro to use it for a week!
+To configure this, set the appropriate SMTP credentials in `webApi/api/webApi/credentials.json` and ensure your Django settings load these values.
 
- 
+
