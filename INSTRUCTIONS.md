@@ -11,21 +11,33 @@
    cd webApi
    ```
 
-2. **Prepare Credentials**
+2. **Create your `.env` file**
    - Copy the template and edit as needed:
      ```bash
-     cp api/webApi/credentials.json.template api/webApi/credentials.json
+     cp api/.env.template api/.env
      ```
-   - Edit `api/webApi/credentials.json` to match your MySQL values.
+   - Edit `api/.env` to set your MySQL and Django environment variables.
 
-3. **Build and Run Containers**
+3. **Generate MySQL grants file**
+   - Run the grant script (on host or in container with correct permissions):
+     ```bash
+     cd api/mysql-init
+     bash generate_grants.sh
+     ```
+   - If you run the script inside the container, fix permissions:
+     ```bash
+     sudo chown -R 999:999 api/mysql-init
+     # or
+     sudo chmod -R 777 api/mysql-init
+     ```
+
+4. **Build and Run Containers**
    ```bash
    docker-compose up --build
    ```
-
    - The first run initializes MySQL and starts the Django API.
 
-4. **Initialize Django Database**
+5. **Initialize Django Database**
    - Open a shell in the webApi container:
      ```bash
      docker-compose exec webapi bash
@@ -36,7 +48,7 @@
      python manage.py migrate
      ```
 
-5. **Access the API**
+6. **Access the API**
    - Visit [http://localhost:8000](http://localhost:8000)
 
 6. **Stopping**

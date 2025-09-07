@@ -76,7 +76,7 @@ SECRET_KEY=please-change-me
 EMAIL_HOST=smtp.example.com
 EMAIL_PORT=587
 EMAIL_HOST_USER=your@email.com
-EMAIL_HOST_PASSWORD=yourpassword
+EMAIL
 EMAIL_USE_TLS=true
 ```
 
@@ -86,6 +86,26 @@ Run Django migrations to set up the database schema:
 ```
 ./manage.py makemigrations
 ./manage.py migrate
+```
+
+### MySQL Grants Initialization
+
+After creating your `.env` file, run the following script to generate the correct grants for your MySQL user:
+
+```
+cd api/mysql-init
+bash generate_grants.sh
+```
+This will create `init_grants.sql` with the correct user, database, and password from your environment variables. The file will be automatically used by the MySQL container on first startup to grant remote access.
+
+If you run `generate_grants.sh` inside the container, you may encounter a "Permission denied" error when writing `init_grants.sql`. To fix this, ensure the directory is writable by the MySQL user (UID 999):
+
+```
+sudo chown -R 999:999 api/mysql-init
+```
+Or, for broad access (less secure):
+```
+sudo chmod -R 777 api/mysql-init
 ```
 
 ### Front End
@@ -211,5 +231,27 @@ The user registration process relies on sending confirmation emails to the user.
 **For the production system, we now use an external email provider (such as Gmail SMTP, SendGrid, or similar) to ensure reliable delivery of confirmation and notification emails.**
 
 To configure this, set the appropriate SMTP credentials in your `.env` file and ensure your Django settings load these values.
+
+## Required Environment Variables
+All configuration is now handled via environment variables in your `.env` file. The following variables are required:
+
+- MYSQL_DATABASE: Name of the MySQL database
+- MYSQL_USER: MySQL username
+- MYSQL_PASSWORD: MySQL password
+- MYSQL_ROOT_PASSWORD: MySQL root password
+- DJANGO_SETTINGS_MODULE: Django settings module (usually 'webApi.settings.settings')
+- DB_HOST: Hostname for the database (usually 'mysql')
+- DB_PORT: Port for the database (usually '3306')
+- DB_NAME: Name of the database (same as MYSQL_DATABASE)
+- DB_USER: Database user (same as MYSQL_USER)
+- DB_PASSWORD: Database password (same as MYSQL_PASSWORD)
+- SECRET_KEY: Django secret key
+- EMAIL_HOST: SMTP server hostname
+- EMAIL_PORT: SMTP server port
+- EMAIL_HOST_USER: SMTP username
+- EMAIL_HOST_PASSWORD: SMTP password
+- EMAIL_USE_TLS: 'true' or 'false' (whether to use TLS for email)
+
+**Note:** The legacy credentials.json file is no longer used. All sensitive configuration should be set in your `.env` file, which should not be committed to the repository.
 
 

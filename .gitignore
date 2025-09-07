@@ -5,6 +5,7 @@ db.sqlite3
 credentials.json
 my.cnf
 venv
-
+.env
+mysql_data
 
 

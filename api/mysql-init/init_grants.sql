@@ -1,0 +1,3 @@
+CREATE USER IF NOT EXISTS 'osd'@'%' IDENTIFIED BY 'osdpwd';
+GRANT ALL ON osd.* TO 'osd'@'%';
+FLUSH PRIVILEGES;

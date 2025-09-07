@@ -1,14 +1,10 @@
 import os
-from .credentials import load_credentials
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Load credentials
-creds = load_credentials()
+## All configuration is now loaded from environment variables
 
-print("Loaded credentials:", creds)  # Debugging line
-
-SECRET_KEY = os.environ.get('SECRET_KEY', creds['secret_key'])
+SECRET_KEY = os.environ.get('SECRET_KEY', 'please-set-a-secret-key')
 DEBUG = True
 
 ALLOWED_HOSTS = ['api.osd.dynu.net', 'localhost', '127.0.0.1', 'isaac', '185.237.98.234', 'osdapi.ddns.net', 'localhost']
@@ -65,10 +61,10 @@ WSGI_APPLICATION = 'webApi.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.environ.get('DB_NAME', creds['db_name']),
-        'USER': os.environ.get('DB_USER', creds['db_user']),
-        'PASSWORD': os.environ.get('DB_PASSWORD', creds['db_password']),
-        'HOST': os.environ.get('DB_HOST', creds['db_host']),
+        'NAME': os.environ.get('DB_NAME', ''),
+        'USER': os.environ.get('DB_USER', ''),
+        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+        'HOST': os.environ.get('DB_HOST', ''),
         'PORT': os.environ.get('DB_PORT', '3306'),
     }
 }
