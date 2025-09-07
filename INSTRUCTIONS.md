@@ -49,7 +49,30 @@
      ```
 
 6. **Access the API**
+
    - Visit [http://localhost:8000](http://localhost:8000)
+
+## Migrating a MySQL Database to a New Server
+
+To dump an existing MySQL database and import it into a new one on a different server:
+
+### 1. Dump the database on the source server
+```bash
+mysqldump -u <user> -p<password> <database_name> > db_dump.sql
+```
+
+### 2. Copy the dump file to the new server
+```bash
+scp db_dump.sql <user>@<new_server_ip>:/path/to/db_dump.sql
+```
+
+### 3. Import the dump into the new MySQL server
+On the new server:
+```bash
+mysql -u <user> -p<password> <database_name> < /path/to/db_dump.sql
+```
+
+Replace `<user>`, `<password>`, and `<database_name>` with your actual MySQL credentials and database name.
 
 6. **Stopping**
    ```bash
