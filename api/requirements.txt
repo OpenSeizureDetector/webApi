@@ -1,0 +1,7 @@
+django
+djangorestframework
+gunicorn
+django-rest-registration
+django-filter
+mysqlclient
+numpy

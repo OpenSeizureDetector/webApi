@@ -4,5 +4,7 @@
 db.sqlite3
 credentials.json
 my.cnf
+venv
+
 
 
