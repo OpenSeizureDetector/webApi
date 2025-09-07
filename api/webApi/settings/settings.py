@@ -8,7 +8,7 @@ creds = load_credentials()
 
 print("Loaded credentials:", creds)  # Debugging line
 
-SECRET_KEY = creds['secret_key']
+SECRET_KEY = os.environ.get('SECRET_KEY', creds['secret_key'])
 DEBUG = True
 
 ALLOWED_HOSTS = ['api.osd.dynu.net', 'localhost', '127.0.0.1', 'isaac', '185.237.98.234', 'osdapi.ddns.net', 'localhost']
@@ -65,11 +65,11 @@ WSGI_APPLICATION = 'webApi.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': creds['db_name'],
-        'USER': creds['db_user'],
-        'PASSWORD': creds['db_password'],
-        'HOST': creds['db_host'],
-        'PORT': '3306',
+        'NAME': os.environ.get('DB_NAME', creds['db_name']),
+        'USER': os.environ.get('DB_USER', creds['db_user']),
+        'PASSWORD': os.environ.get('DB_PASSWORD', creds['db_password']),
+        'HOST': os.environ.get('DB_HOST', creds['db_host']),
+        'PORT': os.environ.get('DB_PORT', '3306'),
     }
 }
 
@@ -116,8 +116,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Add any other custom settings from your main branch as needed
 
 # Email configuration (loaded from credentials.json)
-EMAIL_HOST = creds.get('email_host', 'localhost')
-EMAIL_PORT = creds.get('email_port', 25)
-EMAIL_HOST_USER = creds.get('email_host_user', '')
-EMAIL_HOST_PASSWORD = creds.get('email_host_passwd', '')
-EMAIL_USE_TLS = creds.get('email_use_tls', True)
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'localhost')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 25))
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() in ('true', '1', 'yes')

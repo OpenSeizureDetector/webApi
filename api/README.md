@@ -55,24 +55,34 @@ git clone https://github.com/OpenSeizureDetector/webApi.git
 cd webApi/api
 
 pip install -r requirements.txt
-
-ln -s static static2
-
 ```
-The symbolic link to static2 is only required for developent using the django development server as described below.   It is not required for production using the nginx web server, because the static files location is specified in the server configuration file, so the django app is never passed requests to /static
- 
-Create a mysql database and associated user/password using
-'''
-sudo mysql -u root
-CREATE DATABASE osd;
-CREATE USER 'osd'@'localhost' identified by '<OSD PASSWORD>';
-GRANT ALL ON osd.* to 'osd'@'localhost';
-'''
 
-copy webApi/api/webApi/credentials.json.template to webApi/api/webApi/credentials.json
+### Configuration
+Create a `.env` file in the repository root (see `.env.template` for example values). This file contains all sensitive credentials and configuration for both MySQL and Django, including database settings, secret key, and email settings.
 
-Edit webApi/api/webApi/credentials.json to use database credentials that will give it access to your mySql database, and provide a secret key string for use with encryption.
+Example:
+```
+MYSQL_DATABASE=webapidb
+MYSQL_USER=webapiuser
+MYSQL_PASSWORD=webapipassword
+MYSQL_ROOT_PASSWORD=rootpassword
+DJANGO_SETTINGS_MODULE=webApi.settings.settings
+DB_HOST=mysql
+DB_PORT=3306
+DB_NAME=webapidb
+DB_USER=webapiuser
+DB_PASSWORD=webapipassword
+SECRET_KEY=please-change-me
+EMAIL_HOST=smtp.example.com
+EMAIL_PORT=587
+EMAIL_HOST_USER=your@email.com
+EMAIL_HOST_PASSWORD=yourpassword
+EMAIL_USE_TLS=true
+```
 
+**Do not commit your `.env` file to the repository.**
+
+Run Django migrations to set up the database schema:
 ```
 ./manage.py makemigrations
 ./manage.py migrate
@@ -200,6 +210,6 @@ The user registration process relies on sending confirmation emails to the user.
 
 **For the production system, we now use an external email provider (such as Gmail SMTP, SendGrid, or similar) to ensure reliable delivery of confirmation and notification emails.**
 
-To configure this, set the appropriate SMTP credentials in `webApi/api/webApi/credentials.json` and ensure your Django settings load these values.
+To configure this, set the appropriate SMTP credentials in your `.env` file and ensure your Django settings load these values.
 
 
