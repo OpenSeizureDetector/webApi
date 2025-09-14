@@ -7,7 +7,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ.get('SECRET_KEY', 'please-set-a-secret-key')
 DEBUG = True
 
-ALLOWED_HOSTS = ['api.osd.dynu.net', 'localhost', '127.0.0.1', 'isaac', '185.237.98.234', 'osdapi.ddns.net', 'localhost']
+ALLOWED_HOSTS = ['osdapi.org.uk', 'api.osd.dynu.net', 'localhost', '127.0.0.1', 'isaac', '185.237.98.234', 'osdapi.ddns.net', 'localhost']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
