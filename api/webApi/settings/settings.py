@@ -97,11 +97,13 @@ REST_FRAMEWORK = {
     ), 
 }
 
+# Use REST_REGISTRATION_HOSTNAME from environment to build URLs
+REST_REGISTRATION_HOSTNAME = os.environ.get('REST_REGISTRATION_HOSTNAME', 'localhost:8000')
 REST_REGISTRATION = {
-    'RESET_PASSWORD_VERIFICATION_URL': 'http://localhost:8000/static/reset_password.html',
-    'REGISTER_VERIFICATION_URL': 'http://localhost:8000/static/confirm.html',
-    'REGISTER_EMAIL_VERIFICATION_URL': 'http://localhost:8000/static/verify-user.html',
-    'VERIFICATION_FROM_EMAIL': 'donotreply@localhost',
+    'RESET_PASSWORD_VERIFICATION_URL': f'http://{REST_REGISTRATION_HOSTNAME}/static/reset_password.html',
+    'REGISTER_VERIFICATION_URL': f'http://{REST_REGISTRATION_HOSTNAME}/static/confirm.html',
+    'REGISTER_EMAIL_VERIFICATION_URL': f'http://{REST_REGISTRATION_HOSTNAME}/static/verify-user.html',
+    'VERIFICATION_FROM_EMAIL': os.environ.get('VERIFICATION_FROM_EMAIL', 'donotreply@openseizuredetector.org.uk'),
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -117,3 +119,10 @@ EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 25))
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() in ('true', '1', 'yes')
+EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False').lower() in ('true', '1', 'yes')
+
+print("*******************************************************")
+print(f"settings.py:  EMAIL_HOST={EMAIL_HOST}, EMAIL_PORT={EMAIL_PORT}, EMAIL_USE_TLS={EMAIL_USE_TLS}, EMAIL_USE_SSL={EMAIL_USE_SSL}")
+print(f"settings.py:  EMAIL_HOST_USER={EMAIL_HOST_USER}")
+print("*******************************************************")
+
